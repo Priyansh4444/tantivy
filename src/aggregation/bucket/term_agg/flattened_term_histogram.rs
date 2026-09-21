@@ -7,7 +7,7 @@
 use std::fmt::Debug;
 use std::sync::Arc;
 
-use columnar::{ColumnType, ColumnValues};
+use columnar::{Cardinality, ColumnType, ColumnValues};
 
 use super::{
     Bucket, SegmentTermCollector, TermsAggReqData, VecTermBuckets, MAX_NUM_BUCKETS_FOR_COUNT_LANES,
@@ -23,7 +23,8 @@ use crate::aggregation::intermediate_agg_result::{
     IntermediateAggregationResult, IntermediateAggregationResults,
 };
 use crate::aggregation::segment_agg_result::{BucketIdProvider, SegmentAggregationCollector};
-use crate::aggregation::{f64_from_fastfield_u64, BucketId, ColumnBlockAccessor};
+use crate::aggregation::value_sources::ColumnBlockAccessor;
+use crate::aggregation::{f64_from_fastfield_u64, BucketId, ValueSource};
 
 /// Maximum number of physical counters in the flattened flat grid. Above this the grid would be too
 /// large/cache-unfriendly, so we fall back to the general buffered path. Count lanes are included
@@ -82,6 +83,7 @@ fn increment_grid_count<const LANES: usize>(
 
 /// Resolver for a histogram whose entire value range maps to one bucket. It deliberately owns no
 /// block accessor: collecting this shape does not read or decode the histogram column at all.
+#[derive(Default)]
 struct SingleBucketResolver {
     next_count_lane: usize,
 }
@@ -122,7 +124,7 @@ impl BucketResolver for SingleBucketResolver {
 struct ComputedBucketResolver {
     hist_block: ColumnBlockAccessor,
     next_count_lane: usize,
-    column_values: Arc<dyn ColumnValues<u64>>,
+    column_values: Arc<dyn ColumnValues>,
     field_type: ColumnType,
     interval: f64,
     offset: f64,
@@ -134,7 +136,7 @@ struct ComputedBucketResolver {
 impl ComputedBucketResolver {
     fn new(
         hist_req_data: &HistogramAggReqData,
-        hist_values: Arc<dyn ColumnValues<u64>>,
+        hist_values: Arc<dyn ColumnValues>,
         base_pos: i64,
         num_buckets: usize,
     ) -> Self {
@@ -216,7 +218,7 @@ impl BucketResolver for ComputedBucketResolver {
 struct LinearBucketResolver<const NUM_BUCKETS: usize> {
     hist_block: ColumnBlockAccessor,
     next_count_lane: usize,
-    column_values: Arc<dyn ColumnValues<u64>>,
+    column_values: Arc<dyn ColumnValues>,
     boundaries: [u64; NUM_BUCKETS],
     num_buckets: usize,
 }
@@ -226,7 +228,7 @@ impl<const NUM_BUCKETS: usize> LinearBucketResolver<NUM_BUCKETS> {
     /// falls back to [`ComputedBucketResolver`].
     fn new(
         hist_req_data: &HistogramAggReqData,
-        hist_values: &Arc<dyn ColumnValues<u64>>,
+        hist_values: &Arc<dyn ColumnValues>,
         base_pos: i64,
         num_time_buckets: usize,
     ) -> Option<Self> {
@@ -363,7 +365,7 @@ struct FlattenedTermHistogramCollector<R: BucketResolver, const LANES: usize> {
     base_pos: i64,
     terms_req_data: TermsAggReqData,
     /// The full terms full column's values
-    terms_values: Arc<dyn ColumnValues<u64>>,
+    terms_values: Arc<dyn ColumnValues>,
     hist_req_data: HistogramAggReqData,
     /// Private term block accessor. The bucket resolver owns a histogram block accessor when it
     /// needs one; the single-bucket resolver deliberately does not.
@@ -521,9 +523,6 @@ pub(super) fn maybe_build_flattened_collector(
     // are less likely to get enough docs for the preallocation to be worth and there's a risk of
     // using too much memory. We could check the maximum theoretical buckets up-front and pass
     // them down.
-    // Both columns must be materialized, not merely full: this path reads them through
-    // `fetch_full_column_block` and derives its bucket grid from their global min/max, none of
-    // which a computed source can provide.
     let fuseable = is_top_level
         // TODO: We can easily support this
         && terms_req_data.allowed_term_ids.is_none()
@@ -537,24 +536,16 @@ pub(super) fn maybe_build_flattened_collector(
         return Ok(None);
     }
 
-    // Check fullness once, here, and hand the bare value array downstream. Separating the values
-    // from the index is what carries the proof: a full column's index is redundant, so nothing
-    // below can be handed a non-full column even by mistake.
-    let Some(terms_values) = terms_req_data
-        .accessor
-        .as_column()
-        .filter(|column| {
-            column.get_cardinality().is_full()
-                // The flat counters are `u32`, bumped once per value, so no count can exceed the
-                // column's value count. (Essentially always true here: the column is full, so its
-                // value count equals the doc count, and `DocId` is `u32`.)
-                && column.values.num_vals() < u32::MAX
-        })
-        .map(|column| column.values.clone())
-    else {
+    // Check fullness once, here, and hand the bare values array downstream.
+    let Some(terms_values) = try_get_column_full_values(&*terms_req_data.accessor) else {
         return Ok(None);
     };
-
+    // The flat counters are `u32`, bumped once per value, so no count can exceed the
+    // column's value count. (Essentially always true here: the column is full, so its
+    // value count equals the doc count, and `DocId` is `u32`.)
+    if terms_values.num_vals() >= u32::MAX {
+        return Ok(None);
+    }
     // Clone + normalize the histogram request and get its dense bucket range; only take the
     // flattened path when the physical counter grid is small enough. Very small logical grids use
     // multiple counters per cell; larger grids retain scalar cells to avoid paying for lanes when
@@ -563,17 +554,10 @@ pub(super) fn maybe_build_flattened_collector(
     else {
         return Ok(None);
     };
-    // Extract from the normalized clone that the resolvers will actually read, rather than from
-    // the pre-normalization entry: the two are the same column only incidentally.
-    // Owned rather than borrowed because `hist_req_data` is moved below.
-    let Some(hist_values) = hist_req_data
-        .accessor
-        .as_column()
-        .filter(|column| column.get_cardinality().is_full())
-        .map(|column| column.values.clone())
-    else {
+    let Some(hist_values) = try_get_column_full_values(&*hist_req_data.accessor) else {
         return Ok(None);
     };
+
     let num_terms = col_max_val.saturating_add(1) as usize;
     let num_grid_cells = num_terms.saturating_mul(range.len);
     let use_count_lanes = num_grid_cells <= MAX_NUM_BUCKETS_FOR_COUNT_LANES;
@@ -610,12 +594,21 @@ pub(super) fn maybe_build_flattened_collector(
     Ok(Some(collector))
 }
 
+fn try_get_column_full_values(value_source: &dyn ValueSource) -> Option<Arc<dyn ColumnValues>> {
+    let column = value_source.as_column()?;
+    if column.get_cardinality() == Cardinality::Full {
+        Some(column.values.clone())
+    } else {
+        None
+    }
+}
+
 fn build_flattened_collector<const LANES: usize>(
     agg_data: &mut AggregationsSegmentCtx,
     terms_req_data: &TermsAggReqData,
     hist_req_data: HistogramAggReqData,
-    terms_values: Arc<dyn ColumnValues<u64>>,
-    hist_values: Arc<dyn ColumnValues<u64>>,
+    terms_values: Arc<dyn ColumnValues>,
+    hist_values: Arc<dyn ColumnValues>,
     num_terms: usize,
     range: DenseRange,
 ) -> crate::Result<Box<dyn SegmentAggregationCollector>> {
@@ -626,7 +619,7 @@ fn build_flattened_collector<const LANES: usize>(
     let all_docs_in_bounds =
         hist_req_data.bounds.min == f64::MIN && hist_req_data.bounds.max == f64::MAX;
     if all_docs_in_bounds && num_time_buckets == 1 {
-        let resolver = SingleBucketResolver { next_count_lane: 0 };
+        let resolver = SingleBucketResolver::default();
         return build_flattened_collector_with_resolver::<SingleBucketResolver, LANES>(
             agg_data,
             terms_req_data,

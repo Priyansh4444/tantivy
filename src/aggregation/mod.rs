@@ -132,7 +132,6 @@ mod agg_data;
 mod agg_limits;
 pub mod agg_req;
 pub mod agg_result;
-mod block_accessor;
 pub mod bucket;
 pub(crate) mod buffered_sub_aggs;
 mod collector;
@@ -147,9 +146,8 @@ use std::cmp::Ordering;
 use std::fmt::Display;
 use std::sync::Arc;
 
-pub(crate) use block_accessor::ColumnBlockAccessor;
-pub use block_accessor::ValueSource;
-pub use value_sources::{ValueSourceProvider, ValueSourceRegistry};
+pub(crate) use value_sources::ColumnBlockAccessor;
+pub use value_sources::{ValueSource, ValueSourceProvider, ValueSourceRegistry};
 
 #[cfg(test)]
 mod agg_tests;

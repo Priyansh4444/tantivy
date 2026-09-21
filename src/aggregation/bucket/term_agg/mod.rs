@@ -429,7 +429,8 @@ pub(crate) fn build_segment_term_collector(
     let col_max_value = terms_req_data
         .accessor
         .as_column()
-        .map_or(u64::MAX, |column| column.max_value());
+        .map(|col| col.max_value())
+        .unwrap_or(u64::MAX);
     let max_column_val: u64 =
         col_max_value.max(terms_req_data.missing_value_for_accessor.unwrap_or(0u64));
 

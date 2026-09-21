@@ -1,35 +1,9 @@
 use std::cmp::Ordering;
 
-use columnar::{Cardinality, Column, ColumnValues, RowId};
+use columnar::{Cardinality, ColumnValues, RowId};
 
+use crate::aggregation::value_sources::ValueSource;
 use crate::DocId;
-
-/// A source of values for a block of documents.
-pub trait ValueSource: std::fmt::Debug {
-    /// Loads the values for `docs` into `values`, and for a non-full source the matching document
-    /// ids into `docids`, returning how the two are aligned.
-    ///
-    /// `row_ids` is scratch the implementation may use freely. `docs` is sorted ascending with no
-    /// duplicates.
-    fn load_block(
-        &self,
-        docs: &[DocId],
-        values: &mut Vec<u64>,
-        docids: &mut Vec<DocId>,
-        row_ids: &mut Vec<RowId>,
-    ) -> Cardinality;
-
-    /// Downcast the BlockValueSource to a Column.
-    fn as_column(&self) -> Option<&Column<u64>> {
-        None
-    }
-
-    /// Global value bounds, for fast paths that need to size or clamp something up front.
-    fn bounds(&self) -> Option<(u64, u64)> {
-        let column = self.as_column()?;
-        Some((column.min_value(), column.max_value()))
-    }
-}
 
 /// Buffers the values associated with a block of documents loaded from a [`BlockValueSource`].
 ///
@@ -40,6 +14,7 @@ pub(crate) struct ColumnBlockAccessor {
     /// Values loaded for the latest document block, in monotonic `u64` representation.
     val_cache: Vec<u64>,
     /// Document ID corresponding to each value in `val_cache` for a non-full source.
+    /// For full sources, this is likely to be empty.
     ///
     /// A document can occur more than once for a multivalued source. For a full source this buffer
     /// is ignored because `val_cache` is aligned directly with the requested document block.
@@ -55,34 +30,6 @@ pub(crate) struct ColumnBlockAccessor {
     ///
     /// Use [`Self::has_one_value_per_doc`] rather than this field to detect that.
     cardinality: Cardinality,
-}
-
-impl ValueSource for Column<u64> {
-    #[inline]
-    fn load_block(
-        &self,
-        docs: &[DocId],
-        values: &mut Vec<u64>,
-        docids: &mut Vec<DocId>,
-        row_ids: &mut Vec<RowId>,
-    ) -> Cardinality {
-        let cardinality = self.index.get_cardinality();
-        if cardinality.is_full() {
-            load_full_column_values(docs, &*self.values, values);
-        } else {
-            docids.clear();
-            row_ids.clear();
-            self.row_ids_for_docs(docs, docids, row_ids);
-            values.resize(row_ids.len(), 0u64);
-            self.values.get_vals(row_ids, values);
-        }
-        cardinality
-    }
-
-    #[inline]
-    fn as_column(&self) -> Option<&Column<u64>> {
-        Some(self)
-    }
 }
 
 impl ColumnBlockAccessor {
@@ -111,7 +58,7 @@ impl ColumnBlockAccessor {
         docs: &[DocId],
         column_values: &dyn ColumnValues<u64>,
     ) {
-        load_full_column_values(docs, column_values, &mut self.val_cache);
+        super::load_full_column_values(docs, column_values, &mut self.val_cache);
         self.cardinality = Cardinality::Full;
     }
 
@@ -315,41 +262,6 @@ impl ColumnBlockAccessor {
     }
 }
 
-#[inline]
-fn load_full_column_values(
-    docs: &[DocId],
-    column_values: &dyn ColumnValues<u64>,
-    values: &mut Vec<u64>,
-) {
-    // Skip the resize when already the right length (common case: fixed-size blocks).
-    if values.len() != docs.len() {
-        values.resize(docs.len(), 0u64);
-    }
-    // When the docs form a contiguous ascending run we can fetch the values as a single range.
-    // This lets codecs (e.g. bitpacked) bulk-decode the slice instead of gathering value-by-value.
-    if is_contiguous(docs) {
-        column_values.get_range(docs[0] as u64, values);
-    } else {
-        column_values.get_vals(docs, values);
-    }
-}
-
-/// Returns true if `docs` is a contiguous ascending run `[d, d + 1, ..., d + n - 1]`.
-///
-/// Assumes `docs` is sorted ascending and free of duplicates (the invariant for the
-/// doc blocks passed to `fetch_block`), so comparing the endpoints is sufficient.
-#[inline]
-fn is_contiguous(docs: &[u32]) -> bool {
-    let (Some(&first), Some(&last)) = (docs.first(), docs.last()) else {
-        return false;
-    };
-    debug_assert!(
-        docs.windows(2).all(|w| w[0] < w[1]),
-        "fetch_block requires docs sorted ascending without duplicates"
-    );
-    (last - first) as usize + 1 == docs.len()
-}
-
 /// Given two sorted lists of docids `docs` and `hits`, hits is a subset of `docs`.
 /// Write in the output Vec all of the docs that are not in `hits`.
 ///
@@ -388,6 +300,8 @@ fn find_missing_docs(docs: &[u32], hits: &[u32], output: &mut Vec<u32>) {
 #[allow(clippy::field_reassign_with_default)]
 mod tests {
     use std::sync::Arc;
+
+    use columnar::Column;
 
     use super::*;
 
@@ -434,7 +348,7 @@ mod tests {
         assert!(accessor.has_one_value_per_doc(&docs));
         assert_eq!(
             accessor.iter_docid_vals(&docs).collect::<Vec<_>>(),
-            vec![(2, 20), (4, 40), (8, 80)]
+            [(2, 20), (4, 40), (8, 80)]
         );
     }
 
@@ -479,13 +393,13 @@ mod tests {
         assert!(!accessor.has_one_value_per_doc(&docs));
         assert_eq!(
             accessor.iter_docid_vals(&docs).collect::<Vec<_>>(),
-            vec![(1, 11), (3, 33)]
+            [(1, 11), (3, 33)]
         );
 
         accessor.fetch_block_with_missing(&docs, &*computed, Some(99));
         let mut pairs = accessor.iter_docid_vals(&docs).collect::<Vec<_>>();
         pairs.sort_unstable();
-        assert_eq!(pairs, vec![(0, 99), (1, 11), (2, 99), (3, 33)]);
+        assert_eq!(pairs, [(0, 99), (1, 11), (2, 99), (3, 33)]);
     }
 
     #[test]
@@ -495,7 +409,7 @@ mod tests {
 
         let mut missing_docs: Vec<u32> = Vec::new();
         find_missing_docs(&docs, &hits, &mut missing_docs);
-        assert_eq!(missing_docs, vec![1, 3, 5, 7, 9]);
+        assert_eq!(missing_docs, [1, 3, 5, 7, 9]);
     }
 
     #[test]
@@ -504,7 +418,7 @@ mod tests {
         let hits: Vec<u32> = vec![2, 4, 6, 8, 10];
         let mut missing_docs: Vec<u32> = Vec::new();
         find_missing_docs(&docs, &hits, &mut missing_docs);
-        assert_eq!(missing_docs, Vec::<u32>::new());
+        assert_eq!(missing_docs, [0u32; 0]);
     }
 
     #[test]
@@ -528,7 +442,7 @@ mod tests {
         assert!(accessor.has_one_value_per_doc(&docs));
         assert_eq!(
             accessor.iter_docid_vals(&docs).collect::<Vec<_>>(),
-            vec![(2, 20), (4, 40), (8, 80)]
+            [(2, 20), (4, 40), (8, 80)]
         );
     }
 
@@ -546,7 +460,7 @@ mod tests {
         assert!(accessor.has_one_value_per_doc(&docs));
         assert_eq!(
             accessor.iter_docid_vals(&docs).collect::<Vec<_>>(),
-            vec![(0, 99), (1, 10), (2, 99), (4, 40)]
+            [(0, 99), (1, 10), (2, 99), (4, 40)]
         );
     }
 
@@ -564,7 +478,7 @@ mod tests {
         assert!(!accessor.has_one_value_per_doc(&docs));
         assert_eq!(
             accessor.iter_docid_vals(&docs).collect::<Vec<_>>(),
-            vec![(0, 1), (0, 3), (1, 5)]
+            [(0, 1), (0, 3), (1, 5)]
         );
     }
 
@@ -589,11 +503,11 @@ mod tests {
 
         assert_eq!(
             accessor.iter_vals().collect::<Vec<_>>(),
-            vec![99, 10, 99, 40, 70, 99]
+            [99, 10, 99, 40, 70, 99]
         );
         assert_eq!(
             accessor.iter_docid_vals(&docs).collect::<Vec<_>>(),
-            vec![(0, 99), (1, 10), (2, 99), (4, 40), (7, 70), (8, 99)]
+            [(0, 99), (1, 10), (2, 99), (4, 40), (7, 70), (8, 99)]
         );
     }
 
@@ -603,8 +517,8 @@ mod tests {
         accessor.docid_cache = vec![0, 0, 2, 3];
         accessor.val_cache = vec![10, 10, 10, 10];
         accessor.dedup_docid_val_pairs();
-        assert_eq!(accessor.docid_cache, vec![0, 2, 3]);
-        assert_eq!(accessor.val_cache, vec![10, 10, 10]);
+        assert_eq!(accessor.docid_cache, [0, 2, 3]);
+        assert_eq!(accessor.val_cache, [10, 10, 10]);
     }
 
     #[test]
@@ -614,8 +528,8 @@ mod tests {
         accessor.docid_cache = vec![0, 0, 0];
         accessor.val_cache = vec![1, 2, 1];
         accessor.dedup_docid_val_pairs();
-        assert_eq!(accessor.docid_cache, vec![0, 0]);
-        assert_eq!(accessor.val_cache, vec![1, 2]);
+        assert_eq!(accessor.docid_cache, [0, 0]);
+        assert_eq!(accessor.val_cache, [1, 2]);
     }
 
     #[test]
@@ -625,8 +539,8 @@ mod tests {
         accessor.docid_cache = vec![0, 0, 0, 1, 1];
         accessor.val_cache = vec![3, 1, 3, 5, 5];
         accessor.dedup_docid_val_pairs();
-        assert_eq!(accessor.docid_cache, vec![0, 0, 1]);
-        assert_eq!(accessor.val_cache, vec![1, 3, 5]);
+        assert_eq!(accessor.docid_cache, [0, 0, 1]);
+        assert_eq!(accessor.val_cache, [1, 3, 5]);
     }
 
     #[test]
@@ -635,8 +549,8 @@ mod tests {
         accessor.docid_cache = vec![0, 0, 1];
         accessor.val_cache = vec![1, 2, 3];
         accessor.dedup_docid_val_pairs();
-        assert_eq!(accessor.docid_cache, vec![0, 0, 1]);
-        assert_eq!(accessor.val_cache, vec![1, 2, 3]);
+        assert_eq!(accessor.docid_cache, [0, 0, 1]);
+        assert_eq!(accessor.val_cache, [1, 2, 3]);
     }
 
     #[test]
@@ -645,18 +559,8 @@ mod tests {
         accessor.docid_cache = vec![0];
         accessor.val_cache = vec![1];
         accessor.dedup_docid_val_pairs();
-        assert_eq!(accessor.docid_cache, vec![0]);
-        assert_eq!(accessor.val_cache, vec![1]);
-    }
-
-    #[test]
-    fn test_is_contiguous() {
-        assert!(!is_contiguous(&[]));
-        assert!(is_contiguous(&[5]));
-        assert!(is_contiguous(&[5, 6, 7, 8]));
-        assert!(is_contiguous(&[0, 1, 2]));
-        assert!(!is_contiguous(&[5, 7, 8]));
-        assert!(!is_contiguous(&[0, 1, 3]));
+        assert_eq!(accessor.docid_cache, [0]);
+        assert_eq!(accessor.val_cache, [1]);
     }
 
     #[test]

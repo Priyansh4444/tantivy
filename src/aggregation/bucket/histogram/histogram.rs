@@ -690,19 +690,16 @@ fn normalize_histogram_req(req_data: &mut HistogramAggReqData) -> crate::Result<
     // per-term counts from the grid. Only this collect-time filter is touched — empty-bucket
     // emission reads `req.hard_bounds` directly (see `get_req_min_max`), and `hard_bounds` only
     // ever clips that range, so a wider-than-data bound leaves the result unchanged.
-    // A computed source has no global range to compare against, so the collapse is simply not
-    // attempted and the per-doc `bounds.contains` check stays.
-    if let (true, Some((min_value, max_value))) = (
-        req_data.req.hard_bounds.is_some(),
-        req_data.accessor.bounds(),
-    ) {
-        let col_min = f64_from_fastfield_u64(min_value, req_data.field_type);
-        let col_max = f64_from_fastfield_u64(max_value, req_data.field_type);
-        if col_min >= req_data.bounds.min && col_max <= req_data.bounds.max {
-            req_data.bounds = HistogramBounds {
-                min: f64::MIN,
-                max: f64::MAX,
-            };
+    if req_data.req.hard_bounds.is_some() {
+        if let Some((min_value, max_value)) = req_data.accessor.bounds() {
+            let col_min = f64_from_fastfield_u64(min_value, req_data.field_type);
+            let col_max = f64_from_fastfield_u64(max_value, req_data.field_type);
+            if col_min >= req_data.bounds.min && col_max <= req_data.bounds.max {
+                req_data.bounds = HistogramBounds {
+                    min: f64::MIN,
+                    max: f64::MAX,
+                };
+            }
         }
     }
     Ok(())
