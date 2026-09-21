@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::io;
+use std::sync::Arc;
 
 use columnar::column_values::CompactSpaceU64Accessor;
 use columnar::{ColumnType, Dictionary, StrColumn};
@@ -94,7 +95,7 @@ pub struct CardinalityAggregationReq {
 /// cardinality aggregation on a segment.
 pub(crate) struct CardinalityAggReqData {
     /// The column accessor to access the fast field values.
-    pub(crate) accessor: AggregationValueSource,
+    pub(crate) accessor: Arc<dyn ValueSource>,
     /// The column_type of the field.
     pub(crate) column_type: ColumnType,
     /// The string dictionary column if the field is of type string.
@@ -448,7 +449,7 @@ pub(crate) struct SegmentCardinalityCollector<S: TermOrdAccumulator> {
     buckets: Vec<Option<SegmentCardinalityCollectorBucket<S>>>,
     accessor_idx: usize,
     /// The column accessor to access the fast field values.
-    accessor: AggregationValueSource,
+    accessor: Arc<dyn ValueSource>,
     /// The column_type of the field.
     column_type: ColumnType,
     /// The missing value normalized to the internal u64 representation of the field type.
@@ -616,7 +617,7 @@ impl<S: TermOrdAccumulator> SegmentCardinalityCollector<S> {
     pub fn from_req(
         column_type: ColumnType,
         accessor_idx: usize,
-        accessor: AggregationValueSource,
+        accessor: Arc<dyn ValueSource>,
         missing_value_for_accessor: Option<u64>,
         max_term_ord_inclusive: u64,
     ) -> Self {
@@ -716,7 +717,7 @@ impl<S: TermOrdAccumulator + 'static> SegmentAggregationCollector
                 if self.column_type == ColumnType::IpAddr {
                     let compact_space_accessor = self
                         .accessor
-                        .as_physical()
+                        .as_column()
                         .ok_or_else(|| {
                             TantivyError::AggregationError(
                                 crate::aggregation::AggregationError::InternalError(

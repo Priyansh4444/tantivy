@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::sync::Arc;
 
 use columnar::ColumnType;
 use rustc_hash::FxHashMap;
@@ -24,7 +25,7 @@ use crate::TantivyError;
 #[derive(Debug, Clone)]
 pub(crate) struct HistogramAggReqData {
     /// The column accessor to access the fast field values.
-    pub(crate) accessor: AggregationValueSource,
+    pub(crate) accessor: Arc<dyn ValueSource>,
     /// The field type of the fast field.
     pub(crate) field_type: ColumnType,
     /// The name of the aggregation.
@@ -609,7 +610,7 @@ impl<B: BucketIdSlot> SegmentHistogramCollector<B> {
             .limits
             .add_memory_consumed(req_data.get_memory_consumption() as u64)?;
         let dense_range = compute_dense_range(
-            &req_data.accessor,
+            &*req_data.accessor,
             req_data.field_type,
             req_data.req.interval,
             req_data.offset,
@@ -717,7 +718,7 @@ pub(crate) fn prepare_histogram_dense_range(
     let mut req_data = agg_data.per_request.histogram_req_data[node.idx_in_req_data].clone();
     normalize_histogram_req(&mut req_data)?;
     let dense_range = compute_dense_range(
-        &req_data.accessor,
+        &*req_data.accessor,
         req_data.field_type,
         req_data.req.interval,
         req_data.offset,
@@ -761,7 +762,7 @@ pub(crate) fn get_bucket_pos_f64(val: f64, interval: f64, offset: f64) -> f64 {
 /// Returns `None` for a computed source: there is no global range to size the `Vec` from, so the
 /// histogram keeps its sparse map. The result is identical, just without the dense fast path.
 fn compute_dense_range(
-    accessor: &AggregationValueSource,
+    accessor: &dyn ValueSource,
     field_type: ColumnType,
     interval: f64,
     offset: f64,

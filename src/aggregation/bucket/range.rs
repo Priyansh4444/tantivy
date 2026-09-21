@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 use std::ops::Range;
+use std::sync::Arc;
 
 use columnar::ColumnType;
 use rustc_hash::FxHashMap;
@@ -26,7 +27,7 @@ use crate::TantivyError;
 #[derive(Debug, Clone)]
 pub(crate) struct RangeAggReqData {
     /// The column accessor to access the fast field values.
-    pub(crate) accessor: AggregationValueSource,
+    pub(crate) accessor: Arc<dyn ValueSource>,
     /// The type of the fast field.
     pub(crate) field_type: ColumnType,
     /// The range aggregation request.

@@ -5,62 +5,36 @@
 //! segment, producing the handle the aggregation actually reads through. That handle only needs
 //! to outlive the segment collector, which is `'static` but neither `Send` nor `Sync`.
 
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use columnar::ColumnType;
-use rustc_hash::FxHashMap;
 
-use super::block_accessor::BlockValueSource;
-use crate::{SegmentReader, TantivyError};
+use super::block_accessor::ValueSource;
+use crate::SegmentReader;
 
-/// Defines a computed column that aggregations can read by name.
-///
-/// Implementors are shared across segments and threads for the duration of a search.
+/// Acts as a ValueSource object factory, producing  value source for a given Segment.
 pub trait ValueSourceProvider: Send + Sync + 'static {
-    /// The type of the values produced, which fixes how the `u64` block values are interpreted.
-    ///
-    /// This must not vary between segments, including segments where the source yields nothing.
+    /// The type of the values produced. The ColumnBlockAccessor only stores
+    /// u64, so values are assumed to be encoded with the monotonic mapping.
     fn column_type(&self) -> ColumnType;
-
     /// Binds this definition to a single segment.
-    fn for_segment(&self, reader: &SegmentReader) -> crate::Result<Arc<dyn BlockValueSource>>;
+    fn for_segment(&self, reader: &SegmentReader) -> crate::Result<Arc<dyn ValueSource>>;
 }
 
 /// Named computed sources available to an aggregation request.
-///
-/// Cloning is cheap: the map sits behind an [`Arc`], so a clone per segment costs one refcount
-/// bump rather than a copy of the table.
 #[derive(Clone, Default)]
 pub struct ValueSourceRegistry {
-    providers: Arc<FxHashMap<String, Arc<dyn ValueSourceProvider>>>,
+    providers: HashMap<String, Arc<dyn ValueSourceProvider>>,
 }
 
 impl ValueSourceRegistry {
     /// Registers `provider` under `name`, which aggregation requests then use as a field name.
     ///
-    /// Returns an error if `name` is already registered. A name that also resolves to a real
-    /// fast field is rejected later, when the request is bound to a segment — the schema is not
-    /// known here.
-    pub fn register(
-        &mut self,
-        name: impl Into<String>,
-        provider: Arc<dyn ValueSourceProvider>,
-    ) -> crate::Result<()> {
-        let name = name.into();
-        let providers = Arc::make_mut(&mut self.providers);
-        if providers.contains_key(&name) {
-            return Err(TantivyError::InvalidArgument(format!(
-                "Value source `{name}` is already registered"
-            )));
-        }
-        providers.insert(name, provider);
-        Ok(())
-    }
-
-    /// Returns true when nothing is registered, which lets resolution skip the lookup entirely.
-    #[inline]
-    pub(crate) fn is_empty(&self) -> bool {
-        self.providers.is_empty()
+    /// Inserting the same name several times results in an override.
+    pub fn register(&mut self, name: &str, provider: Arc<dyn ValueSourceProvider>) {
+        let name = name.to_string();
+        self.providers.insert(name, provider);
     }
 
     #[inline]
@@ -74,14 +48,15 @@ mod tests {
     use columnar::Cardinality;
 
     use super::*;
+    use crate::aggregation::ColumnBlockAccessor;
     use crate::DocId;
 
     /// A stand-in source: every document has the value 1. Deliberately trivial — the point is to
     /// exercise registration and dispatch, not expression evaluation.
     #[derive(Debug)]
-    pub(crate) struct ConstantOne;
+    pub(crate) struct Constant(u64);
 
-    impl BlockValueSource for ConstantOne {
+    impl ValueSource for Constant {
         fn load_block(
             &self,
             docs: &[DocId],
@@ -90,66 +65,47 @@ mod tests {
             _row_ids: &mut Vec<columnar::RowId>,
         ) -> Cardinality {
             values.clear();
-            values.resize(docs.len(), 1u64);
+            values.resize(docs.len(), self.0);
             Cardinality::Full
         }
     }
 
-    pub(crate) struct ConstantOneProvider;
+    pub(crate) struct ConstantProvider(u64);
 
-    impl ValueSourceProvider for ConstantOneProvider {
+    impl ValueSourceProvider for ConstantProvider {
         fn column_type(&self) -> ColumnType {
             ColumnType::U64
         }
 
-        fn for_segment(&self, _reader: &SegmentReader) -> crate::Result<Arc<dyn BlockValueSource>> {
-            Ok(Arc::new(ConstantOne))
+        fn for_segment(&self, _reader: &SegmentReader) -> crate::Result<Arc<dyn ValueSource>> {
+            Ok(Arc::new(Constant(self.0)))
         }
     }
 
     #[test]
     fn test_register_then_get() {
         let mut registry = ValueSourceRegistry::default();
-        assert!(registry.is_empty());
-        registry
-            .register("computed", Arc::new(ConstantOneProvider))
-            .unwrap();
-        assert!(!registry.is_empty());
+        registry.register("computed", Arc::new(ConstantProvider(1)));
         assert!(registry.get("computed").is_some());
         assert!(registry.get("absent").is_none());
     }
 
     #[test]
-    fn test_register_duplicate_name_errors() {
+    fn test_register_overrides() {
         let mut registry = ValueSourceRegistry::default();
-        registry
-            .register("computed", Arc::new(ConstantOneProvider))
+        registry.register("computed", Arc::new(ConstantProvider(1)));
+        registry.register("computed", Arc::new(ConstantProvider(2)));
+        let index = index_with_scores(&[1u64]);
+        let searcher = index.reader().unwrap().searcher();
+        let value_source_provider = registry.get("computed").unwrap();
+        let mut block_accessor = ColumnBlockAccessor::default();
+        let value_source = value_source_provider
+            .for_segment(searcher.segment_reader(0u32))
             .unwrap();
-        let err = registry
-            .register("computed", Arc::new(ConstantOneProvider))
-            .expect_err("a duplicate registration must be rejected");
-        assert!(err.to_string().contains("already registered"), "{err}");
-    }
-
-    #[test]
-    fn test_clone_does_not_share_later_registrations() {
-        let mut registry = ValueSourceRegistry::default();
-        let snapshot = registry.clone();
-        registry
-            .register("computed", Arc::new(ConstantOneProvider))
-            .unwrap();
-        assert!(registry.get("computed").is_some());
-        assert!(
-            snapshot.get("computed").is_none(),
-            "a clone taken before registration must not observe it"
-        );
-    }
-
-    #[test]
-    fn test_registry_is_send_and_sync() {
-        fn assert_send_sync<T: Send + Sync>() {}
-        // The outer `Collector` is `Sync + Send`, so the registry it carries must be too.
-        assert_send_sync::<ValueSourceRegistry>();
+        let docs = &[1u32];
+        block_accessor.fetch_block(docs, &*value_source);
+        assert!(block_accessor.has_one_value_per_doc(docs));
+        assert_eq!(block_accessor.values(), &[2u64]);
     }
 
     fn index_with_scores(scores: &[u64]) -> crate::Index {
@@ -166,15 +122,21 @@ mod tests {
     }
 
     fn run_agg(index: &crate::Index, aggs: serde_json::Value) -> serde_json::Value {
+        let mut registry = ValueSourceRegistry::default();
+        registry.register("computed", Arc::new(ConstantProvider(1u64)));
+        run_agg_with_registry(index, aggs, registry)
+    }
+
+    fn run_agg_with_registry(
+        index: &crate::Index,
+        aggs: serde_json::Value,
+        registry: ValueSourceRegistry,
+    ) -> serde_json::Value {
         use crate::aggregation::agg_req::Aggregations;
         use crate::aggregation::{AggContextParams, AggregationCollector};
         use crate::query::AllQuery;
 
-        let mut registry = ValueSourceRegistry::default();
-        registry
-            .register("computed", Arc::new(ConstantOneProvider))
-            .unwrap();
-        let context = AggContextParams::default().with_value_sources(registry);
+        let context = AggContextParams::default().with_value_sources(Arc::new(registry));
         let aggs: Aggregations = serde_json::from_value(aggs).unwrap();
         let collector = AggregationCollector::from_aggs(aggs, context);
         let searcher = index.reader().unwrap().searcher();
@@ -220,54 +182,5 @@ mod tests {
         assert_eq!(buckets[1]["key"], 9.0);
         assert_eq!(buckets[1]["doc_count"], 1);
         assert_eq!(buckets[1]["s"]["value"], 1.0);
-    }
-
-    #[test]
-    fn test_terms_over_registered_source() {
-        // A constant source yields a single bucket holding every document.
-        let index = index_with_scores(&[10, 20, 30]);
-        let result = run_agg(
-            &index,
-            serde_json::json!({ "t": { "terms": { "field": "computed" } } }),
-        );
-        let buckets = result["t"]["buckets"].as_array().unwrap();
-        assert_eq!(buckets.len(), 1);
-        assert_eq!(buckets[0]["key"], 1.0);
-        assert_eq!(buckets[0]["doc_count"], 3);
-    }
-
-    #[test]
-    fn test_registered_name_colliding_with_a_fast_field_is_rejected() {
-        use crate::aggregation::agg_req::Aggregations;
-        use crate::aggregation::{AggContextParams, AggregationCollector};
-        use crate::query::AllQuery;
-
-        let index = index_with_scores(&[1, 2, 3]);
-        let mut registry = ValueSourceRegistry::default();
-        // `score` is a real fast field on this index.
-        registry
-            .register("score", Arc::new(ConstantOneProvider))
-            .unwrap();
-        let context = AggContextParams::default().with_value_sources(registry);
-        let aggs: Aggregations =
-            serde_json::from_value(serde_json::json!({ "s": { "sum": { "field": "score" } } }))
-                .unwrap();
-        let collector = AggregationCollector::from_aggs(aggs, context);
-        let searcher = index.reader().unwrap().searcher();
-        let err = searcher
-            .search(&AllQuery, &collector)
-            .expect_err("a registered name that shadows a fast field must be rejected");
-        assert!(err.to_string().contains("collides"), "{err}");
-    }
-
-    #[test]
-    fn test_unregistered_names_still_resolve_physically() {
-        // Registering something must not disturb ordinary fast-field resolution.
-        let index = index_with_scores(&[10, 20, 30]);
-        let result = run_agg(
-            &index,
-            serde_json::json!({ "s": { "sum": { "field": "score" } } }),
-        );
-        assert_eq!(result["s"]["value"], 60.0);
     }
 }

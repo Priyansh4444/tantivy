@@ -1,30 +1,11 @@
 use std::cmp::Ordering;
-use std::sync::Arc;
 
 use columnar::{Cardinality, Column, ColumnValues, RowId};
 
 use crate::DocId;
 
 /// A source of values for a block of documents.
-///
-/// Implementations replace the contents of `values` and, for non-full sources, `docids`. The
-/// returned cardinality describes how the two buffers are aligned, for the block that was just
-/// loaded:
-///
-/// - [`Cardinality::Full`]: exactly one value per input document, in the same order. `docids` is
-///   left untouched, so the caller pairs `values` positionally with `docs`. This is a promise of
-///   positional alignment, not a hint.
-/// - [`Cardinality::Optional`]: at most one value per input document. `docids` carries one
-///   ascending document id per value.
-/// - [`Cardinality::Multivalued`]: any number of values per document. `docids` carries one
-///   non-decreasing document id per value.
-///
-/// A physical column reports its global cardinality, which is always a valid (if conservative)
-/// answer for any individual block. A computed source reports what it just produced.
-///
-/// `Debug` is required because the aggregation collectors holding a source derive it, by way of
-/// the `SegmentAggregationCollector: Debug` supertrait.
-pub trait BlockValueSource: std::fmt::Debug {
+pub trait ValueSource: std::fmt::Debug {
     /// Loads the values for `docs` into `values`, and for a non-full source the matching document
     /// ids into `docids`, returning how the two are aligned.
     ///
@@ -38,27 +19,15 @@ pub trait BlockValueSource: std::fmt::Debug {
         row_ids: &mut Vec<RowId>,
     ) -> Cardinality;
 
-    /// Returns a materialized fast field, when one can be produced.
-    ///
-    /// This asks "can you give me a column", not "are you literally a column", which is why it is
-    /// a trait method rather than a downcast: a source that merely wraps a column can forward to
-    /// it and keep every fast path that needs column metadata — global bounds, whole-column
-    /// cardinality, value count, per-document random access, codec identity.
-    ///
-    /// Returning `None` is always safe. Callers must then either take a slower path that only
-    /// needs block loading, or reject the request.
-    fn as_physical(&self) -> Option<&Column<u64>> {
+    /// Downcast the BlockValueSource to a Column.
+    fn as_column(&self) -> Option<&Column<u64>> {
         None
     }
 
     /// Global value bounds, for fast paths that need to size or clamp something up front.
-    ///
-    /// Defaults to the bounds of [`Self::as_physical`]. A computed source that happens to know its
-    /// own range may override this to opt back into those fast paths without pretending to be a
-    /// column.
     fn bounds(&self) -> Option<(u64, u64)> {
-        self.as_physical()
-            .map(|column| (column.min_value(), column.max_value()))
+        let column = self.as_column()?;
+        Some((column.min_value(), column.max_value()))
     }
 }
 
@@ -79,17 +48,16 @@ pub(crate) struct ColumnBlockAccessor {
     missing_docids_cache: Vec<DocId>,
     /// Scratch buffer available to sources for translating document IDs into value row IDs.
     row_id_cache: Vec<RowId>,
-    /// How `val_cache` and `docid_cache` are aligned for the latest block, as reported by the
-    /// source that loaded it.
+    /// Cardinality here is describes the relationship with the loaded doc_id_cache and val_cache.
     ///
-    /// For a physical column this is the whole column's cardinality; for a computed source it
-    /// describes the block. Either way it is an upper bound, so a block loaded from an `Optional`
-    /// column may still turn out to hold one value per document — use
-    /// [`Self::has_one_value_per_doc`] rather than this field to detect that.
+    /// For physical columns, we typically set the full column cardinality,
+    /// even though the loaded block might have exactly one value per value.
+    ///
+    /// Use [`Self::has_one_value_per_doc`] rather than this field to detect that.
     cardinality: Cardinality,
 }
 
-impl BlockValueSource for Column<u64> {
+impl ValueSource for Column<u64> {
     #[inline]
     fn load_block(
         &self,
@@ -112,22 +80,14 @@ impl BlockValueSource for Column<u64> {
     }
 
     #[inline]
-    fn as_physical(&self) -> Option<&Column<u64>> {
+    fn as_column(&self) -> Option<&Column<u64>> {
         Some(self)
     }
 }
 
-/// Where one aggregation reads its values from.
-///
-/// A materialized fast field and a column computed at query time are the same kind of thing here:
-/// both are handles that carry everything needed to load a block, so nothing has to be threaded
-/// alongside. Consumers that need more than block loading reach through
-/// [`BlockValueSource::as_physical`].
-pub(crate) type AggregationValueSource = Arc<dyn BlockValueSource>;
-
 impl ColumnBlockAccessor {
     #[inline]
-    pub(crate) fn fetch_block(&mut self, docs: &[DocId], source: &dyn BlockValueSource) {
+    pub(crate) fn fetch_block(&mut self, docs: &[DocId], source: &dyn ValueSource) {
         self.cardinality = source.load_block(
             docs,
             &mut self.val_cache,
@@ -160,7 +120,7 @@ impl ColumnBlockAccessor {
     pub(crate) fn fetch_block_with_missing(
         &mut self,
         docs: &[DocId],
-        source: &dyn BlockValueSource,
+        source: &dyn ValueSource,
         missing_opt: Option<u64>,
     ) {
         self.fetch_block_with_missing_ordered(docs, source, missing_opt, false)
@@ -173,7 +133,7 @@ impl ColumnBlockAccessor {
     pub(crate) fn fetch_block_with_missing_ordered(
         &mut self,
         docs: &[DocId],
-        source: &dyn BlockValueSource,
+        source: &dyn ValueSource,
         missing_opt: Option<u64>,
         ordered: bool,
     ) {
@@ -243,7 +203,7 @@ impl ColumnBlockAccessor {
     pub(crate) fn fetch_block_with_missing_unique_per_doc(
         &mut self,
         docs: &[DocId],
-        source: &dyn BlockValueSource,
+        source: &dyn ValueSource,
         missing: Option<u64>,
         ordered: bool,
     ) {
@@ -427,6 +387,8 @@ fn find_missing_docs(docs: &[u32], hits: &[u32], output: &mut Vec<u32>) {
 #[cfg(test)]
 #[allow(clippy::field_reassign_with_default)]
 mod tests {
+    use std::sync::Arc;
+
     use super::*;
 
     #[derive(Debug)]
@@ -435,7 +397,7 @@ mod tests {
         entries: Vec<(DocId, u64)>,
     }
 
-    impl BlockValueSource for TestValueSource {
+    impl ValueSource for TestValueSource {
         fn load_block(
             &self,
             docs: &[DocId],
@@ -464,7 +426,7 @@ mod tests {
             cardinality: Cardinality::Full,
             entries: vec![(2, 20), (4, 40), (8, 80)],
         };
-        let dyn_source: &dyn BlockValueSource = &source;
+        let dyn_source: &dyn ValueSource = &source;
         let mut accessor = ColumnBlockAccessor::default();
 
         accessor.fetch_block(&docs, dyn_source);
@@ -488,35 +450,18 @@ mod tests {
     }
 
     #[test]
-    fn test_as_physical_distinguishes_the_two_kinds() {
-        let physical: AggregationValueSource = Arc::new(full_column(&[5, 6, 7]));
-        assert!(physical.as_physical().is_some());
-        assert_eq!(physical.bounds(), Some((5, 7)));
+    fn test_as_column_distinguishes_the_two_kinds() {
+        let column: Arc<dyn ValueSource> = Arc::new(full_column(&[5, 6, 7]));
+        assert!(column.as_column().is_some());
+        assert_eq!(column.bounds(), Some((5, 7)));
 
-        let computed: AggregationValueSource = Arc::new(TestValueSource {
+        let computed: Arc<dyn ValueSource> = Arc::new(TestValueSource {
             cardinality: Cardinality::Full,
             entries: vec![(0, 1)],
         });
-        assert!(computed.as_physical().is_none());
+        assert!(computed.as_column().is_none());
         // No global view of a computed source, so no bounds and no bounds-driven fast paths.
         assert_eq!(computed.bounds(), None);
-    }
-
-    #[test]
-    fn test_fetch_source_block_dispatches_both_variants() {
-        let docs = [0, 1, 2];
-        let mut accessor = ColumnBlockAccessor::default();
-
-        let physical: AggregationValueSource = Arc::new(full_column(&[10, 20, 30]));
-        accessor.fetch_block(&docs, &*physical);
-        assert_eq!(accessor.iter_vals().collect::<Vec<_>>(), vec![10, 20, 30]);
-
-        let computed: AggregationValueSource = Arc::new(TestValueSource {
-            cardinality: Cardinality::Full,
-            entries: vec![(0, 1), (1, 1), (2, 1)],
-        });
-        accessor.fetch_block(&docs, &*computed);
-        assert_eq!(accessor.iter_vals().collect::<Vec<_>>(), vec![1, 1, 1]);
     }
 
     #[test]
@@ -524,7 +469,7 @@ mod tests {
         // A computed source reports what it produced: docs 0 and 2 have no value, so they are
         // absent from `docids` and the source is `Optional`.
         let docs = [0, 1, 2, 3];
-        let computed: AggregationValueSource = Arc::new(TestValueSource {
+        let computed: Arc<dyn ValueSource> = Arc::new(TestValueSource {
             cardinality: Cardinality::Optional,
             entries: vec![(1, 11), (3, 33)],
         });
@@ -557,23 +502,18 @@ mod tests {
     fn test_find_missing_docs_empty() {
         let docs: Vec<u32> = Vec::new();
         let hits: Vec<u32> = vec![2, 4, 6, 8, 10];
-
         let mut missing_docs: Vec<u32> = Vec::new();
-
         find_missing_docs(&docs, &hits, &mut missing_docs);
-
         assert_eq!(missing_docs, Vec::<u32>::new());
     }
 
     #[test]
     fn test_find_missing_docs_all_missing() {
-        let docs: Vec<u32> = vec![1, 2, 3, 4, 5];
-        let hits: Vec<u32> = Vec::new();
-
+        let docs: &[u32] = &[1, 2, 3, 4, 5];
+        let hits: &[u32] = &[];
         let mut missing_docs: Vec<u32> = vec![10];
         find_missing_docs(&docs, &hits, &mut missing_docs);
-
-        assert_eq!(missing_docs, vec![1, 2, 3, 4, 5]);
+        assert_eq!(&missing_docs, &[1u32, 2, 3, 4, 5]);
     }
 
     #[test]
@@ -584,9 +524,7 @@ mod tests {
             entries: vec![(2, 20), (4, 40), (8, 80)],
         };
         let mut accessor = ColumnBlockAccessor::default();
-
         accessor.fetch_block(&docs, &source);
-
         assert!(accessor.has_one_value_per_doc(&docs));
         assert_eq!(
             accessor.iter_docid_vals(&docs).collect::<Vec<_>>(),

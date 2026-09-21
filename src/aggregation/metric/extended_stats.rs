@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 use std::mem;
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
@@ -322,7 +323,7 @@ pub(crate) struct SegmentExtendedStatsCollector {
     name: String,
     missing: Option<u64>,
     field_type: ColumnType,
-    accessor: AggregationValueSource,
+    accessor: Arc<dyn ValueSource>,
     buckets: Vec<IntermediateExtendedStats>,
     sigma: Option<f64>,
 }

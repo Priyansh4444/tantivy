@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
@@ -139,7 +140,7 @@ pub(crate) struct SegmentPercentilesCollector {
     /// The missing value normalized to the internal u64 representation of the field type.
     pub missing_u64: Option<u64>,
     /// The column accessor to access the fast field values.
-    pub(crate) accessor: AggregationValueSource,
+    pub(crate) accessor: Arc<dyn ValueSource>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -252,7 +253,7 @@ impl SegmentPercentilesCollector {
     pub fn from_req_and_validate(
         field_type: ColumnType,
         missing_u64: Option<u64>,
-        accessor: AggregationValueSource,
+        accessor: Arc<dyn ValueSource>,
         accessor_idx: usize,
     ) -> Self {
         Self {

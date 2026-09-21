@@ -542,7 +542,7 @@ pub(super) fn maybe_build_flattened_collector(
     // below can be handed a non-full column even by mistake.
     let Some(terms_values) = terms_req_data
         .accessor
-        .as_physical()
+        .as_column()
         .filter(|column| {
             column.get_cardinality().is_full()
                 // The flat counters are `u32`, bumped once per value, so no count can exceed the
@@ -568,7 +568,7 @@ pub(super) fn maybe_build_flattened_collector(
     // Owned rather than borrowed because `hist_req_data` is moved below.
     let Some(hist_values) = hist_req_data
         .accessor
-        .as_physical()
+        .as_column()
         .filter(|column| column.get_cardinality().is_full())
         .map(|column| column.values.clone())
     else {

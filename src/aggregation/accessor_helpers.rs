@@ -3,11 +3,10 @@
 use std::io;
 use std::sync::Arc;
 
-use columnar::{Column, ColumnType};
+use columnar::{Column, ColumnType, DynamicColumn, DynamicColumnHandle};
 
-use crate::aggregation::{f64_to_fastfield_u64, AggregationValueSource, Key, ValueSourceRegistry};
+use crate::aggregation::{f64_to_fastfield_u64, Key, ValueSource, ValueSourceRegistry};
 use crate::index::SegmentReader;
-use crate::TantivyError;
 
 /// Get the missing value as internal u64 representation
 ///
@@ -57,52 +56,40 @@ pub(crate) fn get_numeric_or_date_column_types() -> &'static [ColumnType] {
     ]
 }
 
-/// Get fast field reader or empty as default.
 /// Resolves `field_name` against the registered computed sources.
 ///
-/// Returns `Ok(None)` when the name is not registered, leaving the caller to fall back to the
-/// fast-field reader. The registry is consulted first so that a registered name cannot be
-/// rewritten by the fast-field resolver's JSON-path handling.
+/// The registry is consulted before the fast-field reader, so a registered name takes precedence
+/// over a stored field of the same name.
+///
+/// Returns `Ok(None)` — leaving the caller to fall through to the fast-field reader — when the
+/// name is not registered, or when it is but the source's type is not among
+/// `allowed_column_types_opt`. Note the second case makes such a registration silently inert
+/// rather than an error.
 fn resolve_registered_source(
     reader: &SegmentReader,
     value_sources: &ValueSourceRegistry,
     field_name: &str,
-    allowed_column_types: Option<&[ColumnType]>,
-) -> crate::Result<Option<(AggregationValueSource, ColumnType)>> {
-    if value_sources.is_empty() {
-        return Ok(None);
-    }
+    allowed_column_types_opt: Option<&[ColumnType]>,
+) -> crate::Result<Option<(Arc<dyn ValueSource>, ColumnType)>> {
     let Some(provider) = value_sources.get(field_name) else {
         return Ok(None);
     };
-    // A registered name must never silently change what an existing request means, so a
-    // collision with stored data is an error rather than a precedence rule.
-    let shadows_fast_field = !reader
-        .fast_fields()
-        .u64_lenient_for_type_all(None, field_name)?
-        .is_empty();
-    if shadows_fast_field || reader.schema().get_field(field_name).is_ok() {
-        return Err(TantivyError::InvalidArgument(format!(
-            "Value source `{field_name}` collides with a field or JSON path of the same name"
-        )));
-    }
     let column_type = provider.column_type();
-    if allowed_column_types.is_some_and(|allowed| !allowed.contains(&column_type)) {
-        return Err(TantivyError::InvalidArgument(format!(
-            "Value source `{field_name}` produces {column_type:?}, which this aggregation does \
-             not accept"
-        )));
+    if let Some(allowed_column_types) = allowed_column_types_opt {
+        if !allowed_column_types.contains(&column_type) {
+            return Ok(None);
+        }
     }
     let source = provider.for_segment(reader)?;
     Ok(Some((source, column_type)))
 }
 
-pub(crate) fn get_ff_reader(
+pub(crate) fn get_block_value_source(
     reader: &SegmentReader,
     value_sources: &ValueSourceRegistry,
     field_name: &str,
     allowed_column_types: Option<&[ColumnType]>,
-) -> crate::Result<(AggregationValueSource, ColumnType)> {
+) -> crate::Result<(Arc<dyn ValueSource>, ColumnType)> {
     if let Some(registered) =
         resolve_registered_source(reader, value_sources, field_name, allowed_column_types)?
     {
@@ -118,7 +105,7 @@ pub(crate) fn get_ff_reader(
             )
         });
     // The empty-column shim stays physical on purpose: several fast paths check
-    // `to_physical()` and would otherwise degrade for a merely absent field.
+    // `as_physical()` and would otherwise degrade for a merely absent field.
     Ok((Arc::new(column), column_type))
 }
 
@@ -126,25 +113,26 @@ pub(crate) fn get_dynamic_columns(
     reader: &SegmentReader,
     field_name: &str,
 ) -> crate::Result<Vec<columnar::DynamicColumn>> {
-    let ff_fields = reader.fast_fields().dynamic_column_handles(field_name)?;
-    let cols = ff_fields
+    let dyn_col_handles: Vec<DynamicColumnHandle> =
+        reader.fast_fields().dynamic_column_handles(field_name)?;
+    let dyn_cols: Vec<DynamicColumn> = dyn_col_handles
         .iter()
-        .map(|h| h.open())
+        .map(DynamicColumnHandle::open)
         .collect::<io::Result<_>>()?;
-    assert!(!ff_fields.is_empty(), "field {field_name} not found");
-    Ok(cols)
+    assert!(!dyn_cols.is_empty(), "field {field_name} not found");
+    Ok(dyn_cols)
 }
 
-/// Get all fast field reader or empty as default.
+/// Get all block_value_sources or empty as default.
 ///
 /// Is guaranteed to return at least one column.
-pub(crate) fn get_all_ff_reader_or_empty(
+pub(crate) fn get_all_block_value_sources(
     reader: &SegmentReader,
     value_sources: &ValueSourceRegistry,
     field_name: &str,
     allowed_column_types: Option<&[ColumnType]>,
     fallback_type: ColumnType,
-) -> crate::Result<Vec<(AggregationValueSource, ColumnType)>> {
+) -> crate::Result<Vec<(Arc<dyn ValueSource>, ColumnType)>> {
     // A registered source shadows the physical type fan-out entirely: it contributes exactly one
     // entry. Callers derive "this field has several types" from the length, so a single entry also
     // keeps computed sources off the mixed-type `missing` machinery, which is physical-only.
@@ -154,7 +142,7 @@ pub(crate) fn get_all_ff_reader_or_empty(
         return Ok(vec![registered]);
     }
     let ff_fields = reader.fast_fields();
-    let mut ff_field_with_type =
+    let mut ff_field_with_type: Vec<(Column, ColumnType)> =
         ff_fields.u64_lenient_for_type_all(allowed_column_types, field_name)?;
     if ff_field_with_type.is_empty() {
         ff_field_with_type.push((Column::build_empty_column(reader.num_docs()), fallback_type));
@@ -162,7 +150,7 @@ pub(crate) fn get_all_ff_reader_or_empty(
     Ok(ff_field_with_type
         .into_iter()
         .map(|(column, column_type)| {
-            let source: AggregationValueSource = Arc::new(column);
+            let source: Arc<dyn ValueSource> = Arc::new(column);
             (source, column_type)
         })
         .collect())

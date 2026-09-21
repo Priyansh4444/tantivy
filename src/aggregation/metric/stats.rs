@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::sync::Arc;
 
 use columnar::ColumnType;
 use serde::{Deserialize, Serialize};
@@ -230,7 +231,7 @@ pub(crate) fn build_segment_stats_collector(
 #[derive(Clone, Debug)]
 pub(crate) struct SegmentStatsCollector<const COLUMN_TYPE_ID: u8> {
     pub(crate) missing_u64: Option<u64>,
-    pub(crate) accessor: AggregationValueSource,
+    pub(crate) accessor: Arc<dyn ValueSource>,
     pub(crate) is_number_or_date_type: bool,
     pub(crate) buckets: Vec<IntermediateStats>,
     pub(crate) name: String,
@@ -295,7 +296,7 @@ impl<const COLUMN_TYPE_ID: u8> SegmentAggregationCollector
         // below, which is semantically identical.
         // TODO: remove once we fetch all values for all bucket ids in one go
         if docs.len() == 1 && self.missing_u64.is_none() {
-            if let Some(column) = self.accessor.as_physical() {
+            if let Some(column) = self.accessor.as_column() {
                 collect_stats::<COLUMN_TYPE_ID>(
                     &mut self.buckets[parent_bucket_id as usize],
                     column.values_for_doc(docs[0]),

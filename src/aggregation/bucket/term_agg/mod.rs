@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::net::Ipv6Addr;
+use std::sync::Arc;
 
 use columnar::column_values::CompactSpaceU64Accessor;
 use columnar::{
@@ -26,7 +27,7 @@ use crate::aggregation::intermediate_agg_result::{
     IntermediateKey, IntermediateTermBucketEntry, IntermediateTermBucketResult,
 };
 use crate::aggregation::segment_agg_result::{BucketIdProvider, SegmentAggregationCollector};
-use crate::aggregation::{format_date, AggregationValueSource, BucketId, Key};
+use crate::aggregation::{format_date, BucketId, Key, ValueSource};
 use crate::error::DataCorruption;
 use crate::TantivyError;
 
@@ -37,7 +38,7 @@ mod flattened_term_histogram;
 #[derive(Debug, Clone)]
 pub(crate) struct TermsAggReqData {
     /// The column accessor to access the fast field values.
-    pub(crate) accessor: AggregationValueSource,
+    pub(crate) accessor: Arc<dyn ValueSource>,
     /// The type of the column.
     pub(crate) column_type: ColumnType,
     /// The string dictionary column if the field is of type text.
@@ -427,7 +428,7 @@ pub(crate) fn build_segment_term_collector(
     // which steers the storage choice below to the hash map rather than a dense `Vec`.
     let col_max_value = terms_req_data
         .accessor
-        .as_physical()
+        .as_column()
         .map_or(u64::MAX, |column| column.max_value());
     let max_column_val: u64 =
         col_max_value.max(terms_req_data.missing_value_for_accessor.unwrap_or(0u64));
@@ -1447,7 +1448,7 @@ where
         } else if term_req.column_type == ColumnType::IpAddr {
             let compact_space_accessor = term_req
                 .accessor
-                .as_physical()
+                .as_column()
                 .ok_or_else(|| {
                     TantivyError::AggregationError(
                         crate::aggregation::AggregationError::InternalError(

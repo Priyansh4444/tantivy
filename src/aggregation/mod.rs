@@ -145,9 +145,10 @@ mod segment_agg_result;
 mod value_sources;
 use std::cmp::Ordering;
 use std::fmt::Display;
+use std::sync::Arc;
 
-pub use block_accessor::BlockValueSource;
-pub(crate) use block_accessor::{AggregationValueSource, ColumnBlockAccessor};
+pub(crate) use block_accessor::ColumnBlockAccessor;
+pub use block_accessor::ValueSource;
 pub use value_sources::{ValueSourceProvider, ValueSourceRegistry};
 
 #[cfg(test)]
@@ -195,7 +196,7 @@ pub struct AggContextParams {
     /// Tokenizer manager for query string parsing
     pub tokenizers: TokenizerManager,
     /// Computed columns registered by name, resolved in preference to a fast field.
-    pub value_sources: ValueSourceRegistry,
+    pub value_sources: Arc<ValueSourceRegistry>,
 }
 
 impl AggContextParams {
@@ -204,12 +205,12 @@ impl AggContextParams {
         Self {
             limits,
             tokenizers,
-            value_sources: ValueSourceRegistry::default(),
+            value_sources: Arc::new(ValueSourceRegistry::default()),
         }
     }
 
     /// Attaches named computed columns, which aggregation requests address as field names.
-    pub fn with_value_sources(mut self, value_sources: ValueSourceRegistry) -> Self {
+    pub fn with_value_sources(mut self, value_sources: Arc<ValueSourceRegistry>) -> Self {
         self.value_sources = value_sources;
         self
     }
