@@ -23,7 +23,7 @@ use crate::aggregation::intermediate_agg_result::{
     IntermediateAggregationResult, IntermediateAggregationResults,
 };
 use crate::aggregation::segment_agg_result::{BucketIdProvider, SegmentAggregationCollector};
-use crate::aggregation::value_sources::ColumnBlockAccessor;
+use crate::aggregation::value_source::ColumnBlockAccessor;
 use crate::aggregation::{f64_from_fastfield_u64, BucketId, ValueSource};
 
 /// Maximum number of physical counters in the flattened flat grid. Above this the grid would be too

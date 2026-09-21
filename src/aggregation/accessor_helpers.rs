@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use columnar::{Column, ColumnType, DynamicColumn, DynamicColumnHandle};
 
-use crate::aggregation::value_sources::ValueSource;
+use crate::aggregation::value_source::ValueSource;
 use crate::aggregation::{f64_to_fastfield_u64, Key, ValueSourceRegistry};
 use crate::index::SegmentReader;
 

@@ -45,42 +45,9 @@ impl ValueSourceRegistry {
 
 #[cfg(test)]
 mod tests {
-    use columnar::Cardinality;
-
     use super::*;
+    use crate::aggregation::value_source::tests::ConstantProvider;
     use crate::schema::Schema;
-    use crate::DocId;
-
-    /// A stand-in source: every document has the value 1. Deliberately trivial — the point is to
-    /// exercise registration and dispatch, not expression evaluation.
-    #[derive(Debug)]
-    pub(crate) struct Constant(u64);
-
-    impl ValueSource for Constant {
-        fn load_block(
-            &self,
-            docs: &[DocId],
-            values: &mut Vec<u64>,
-            _docids: &mut Vec<DocId>,
-            _row_ids: &mut Vec<columnar::RowId>,
-        ) -> Cardinality {
-            values.clear();
-            values.resize(docs.len(), self.0);
-            Cardinality::Full
-        }
-    }
-
-    pub(crate) struct ConstantProvider(u64);
-
-    impl ValueSourceProvider for ConstantProvider {
-        fn column_type(&self) -> ColumnType {
-            ColumnType::U64
-        }
-
-        fn for_segment(&self, _reader: &SegmentReader) -> crate::Result<Arc<dyn ValueSource>> {
-            Ok(Arc::new(Constant(self.0)))
-        }
-    }
 
     #[test]
     fn test_register_then_get() {

@@ -1,12 +1,12 @@
 mod block_accessor;
-mod registry;
+mod value_source_registry;
 
 #[cfg(test)]
 pub(crate) mod tests;
 
 pub(crate) use block_accessor::ColumnBlockAccessor;
 use columnar::{Cardinality, Column, ColumnValues, RowId};
-pub use registry::{ValueSourceProvider, ValueSourceRegistry};
+pub use value_source_registry::{ValueSourceProvider, ValueSourceRegistry};
 
 use crate::DocId;
 

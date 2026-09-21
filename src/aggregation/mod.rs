@@ -141,13 +141,13 @@ pub mod intermediate_agg_result;
 pub mod metric;
 
 mod segment_agg_result;
-mod value_sources;
+mod value_source;
 use std::cmp::Ordering;
 use std::fmt::Display;
 use std::sync::Arc;
 
-pub(crate) use value_sources::ColumnBlockAccessor;
-pub use value_sources::{ValueSource, ValueSourceProvider, ValueSourceRegistry};
+pub(crate) use value_source::ColumnBlockAccessor;
+pub use value_source::{ValueSource, ValueSourceProvider, ValueSourceRegistry};
 
 #[cfg(test)]
 mod agg_tests;

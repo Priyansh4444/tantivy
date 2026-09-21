@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use columnar::{Cardinality, ColumnValues, RowId};
 
-use crate::aggregation::value_sources::ValueSource;
+use crate::aggregation::value_source::ValueSource;
 use crate::DocId;
 
 /// Buffers the values associated with a block of documents loaded from a [`BlockValueSource`].

@@ -24,7 +24,7 @@ impl ValueSource for Constant {
     }
 }
 
-pub(crate) struct ConstantProvider(u64);
+pub(crate) struct ConstantProvider(pub u64);
 
 impl ValueSourceProvider for ConstantProvider {
     fn column_type(&self) -> ColumnType {

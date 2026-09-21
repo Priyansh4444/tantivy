@@ -44,7 +44,7 @@ pub use stats::*;
 pub use sum::*;
 pub use top_hits::*;
 
-use crate::aggregation::value_sources::ValueSource;
+use crate::aggregation::value_source::ValueSource;
 use crate::schema::OwnedValue;
 
 /// Contains all information required by metric aggregations like avg, min, max, sum, stats,
