@@ -215,7 +215,7 @@ fn create_collector<const TYPE_ID: u8>(
 pub(crate) fn build_segment_stats_collector(
     req: &MetricAggReqData,
 ) -> crate::Result<Box<dyn SegmentAggregationCollector>> {
-    match req.field_type {
+    match req.accessor.column_type() {
         ColumnType::I64 => Ok(create_collector::<{ ColumnType::I64 as u8 }>(req)),
         ColumnType::U64 => Ok(create_collector::<{ ColumnType::U64 as u8 }>(req)),
         ColumnType::F64 => Ok(create_collector::<{ ColumnType::F64 as u8 }>(req)),

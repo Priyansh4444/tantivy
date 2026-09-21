@@ -39,8 +39,6 @@ mod flattened_term_histogram;
 pub(crate) struct TermsAggReqData {
     /// The column accessor to access the fast field values.
     pub(crate) accessor: Arc<dyn ValueSource>,
-    /// The type of the column.
-    pub(crate) column_type: ColumnType,
     /// The string dictionary column if the field is of type text.
     pub(crate) str_dict_column: Option<StrColumn>,
     /// The missing value as u64 value.
@@ -395,7 +393,7 @@ pub(crate) fn build_segment_term_collector(
     node: &AggRefNode,
 ) -> crate::Result<Box<dyn SegmentAggregationCollector>> {
     let terms_req_data = req_data.get_term_req_data(node.idx_in_req_data).clone();
-    let column_type = terms_req_data.column_type;
+    let column_type = terms_req_data.accessor.column_type();
 
     if column_type == ColumnType::Bytes {
         return Err(TantivyError::InvalidArgument(format!(
@@ -1338,7 +1336,8 @@ where
         let mut out: Vec<(IntermediateKey, IntermediateTermBucketEntry)> =
             Vec::with_capacity(entries.len());
 
-        if term_req.column_type == ColumnType::Str {
+        let column_type = term_req.accessor.column_type();
+        if column_type == ColumnType::Str {
             let fallback_dict = Dictionary::empty();
             let term_dict = term_req
                 .str_dict_column
@@ -1425,7 +1424,7 @@ where
             }
 
             out.extend(dict);
-        } else if term_req.column_type == ColumnType::DateTime {
+        } else if column_type == ColumnType::DateTime {
             for (val, doc_count) in entries {
                 let intermediate_entry = into_intermediate_bucket_entry(
                     doc_count,
@@ -1436,7 +1435,7 @@ where
                 let date = format_date(val)?;
                 out.push((IntermediateKey::Str(date), intermediate_entry));
             }
-        } else if term_req.column_type == ColumnType::Bool {
+        } else if column_type == ColumnType::Bool {
             for (val, doc_count) in entries {
                 let intermediate_entry = into_intermediate_bucket_entry(
                     doc_count,
@@ -1446,7 +1445,7 @@ where
                 let val = bool::from_u64(val);
                 out.push((IntermediateKey::Bool(val), intermediate_entry));
             }
-        } else if term_req.column_type == ColumnType::IpAddr {
+        } else if column_type == ColumnType::IpAddr {
             let compact_space_accessor = term_req
                 .accessor
                 .as_column()
@@ -1479,7 +1478,7 @@ where
                 let val = Ipv6Addr::from_u128(val);
                 out.push((IntermediateKey::IpAddr(val), intermediate_entry));
             }
-        } else if term_req.column_type == ColumnType::F64 {
+        } else if column_type == ColumnType::F64 {
             // -0.0 and +0.0 both normalize to I64(0). Sort by normalized key to merge their
             // buckets below. Other distinct f64 encodings, including NaNs, remain distinct:
             // NaNs are not normalized and IntermediateKey compares them using total_cmp.
@@ -1512,13 +1511,13 @@ where
                     reborrow_opt_collector(&mut sub_agg_collector),
                     agg_data,
                 )?;
-                let key_val: NumericalValue = match term_req.column_type {
+                let key_val: NumericalValue = match column_type {
                     ColumnType::U64 => val.into(),
                     ColumnType::I64 => i64::from_u64(val).into(),
                     _ => {
                         return Err(TantivyError::SchemaError(format!(
                             "unknown key type: {}",
-                            term_req.column_type
+                            column_type
                         )))
                     }
                 };

@@ -97,8 +97,6 @@ pub struct CardinalityAggregationReq {
 pub(crate) struct CardinalityAggReqData {
     /// The column accessor to access the fast field values.
     pub(crate) accessor: Arc<dyn ValueSource>,
-    /// The column_type of the field.
-    pub(crate) column_type: ColumnType,
     /// The string dictionary column if the field is of type string.
     pub(crate) str_dict_column: Option<StrColumn>,
     /// The missing value normalized to the internal u64 representation of the field type.
@@ -451,8 +449,6 @@ pub(crate) struct SegmentCardinalityCollector<S: TermOrdAccumulator> {
     accessor_idx: usize,
     /// The column accessor to access the fast field values.
     accessor: Arc<dyn ValueSource>,
-    /// The column_type of the field.
-    column_type: ColumnType,
     /// The missing value normalized to the internal u64 representation of the field type.
     missing_value_for_accessor: Option<u64>,
     coupon_cache: Option<CouponCache>,
@@ -465,7 +461,7 @@ pub(crate) struct SegmentCardinalityCollector<S: TermOrdAccumulator> {
 impl<S: TermOrdAccumulator> Debug for SegmentCardinalityCollector<S> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         f.debug_struct("SegmentCardinalityCollector")
-            .field("column_type", &self.column_type)
+            .field("column_type", &self.accessor.column_type())
             .field(
                 "missing_value_for_accessor",
                 &self.missing_value_for_accessor,
@@ -616,7 +612,6 @@ fn append_to_sketch<S: TermOrdAccumulator>(
 
 impl<S: TermOrdAccumulator> SegmentCardinalityCollector<S> {
     pub fn from_req(
-        column_type: ColumnType,
         accessor_idx: usize,
         accessor: Arc<dyn ValueSource>,
         missing_value_for_accessor: Option<u64>,
@@ -624,7 +619,6 @@ impl<S: TermOrdAccumulator> SegmentCardinalityCollector<S> {
     ) -> Self {
         Self {
             buckets: Vec::new(),
-            column_type,
             accessor_idx,
             accessor,
             missing_value_for_accessor,
@@ -715,7 +709,7 @@ impl<S: TermOrdAccumulator + 'static> SegmentAggregationCollector
                 entries.extend_from_iter(col_block_accessor.iter_vals());
             }
             SegmentCardinalityCollectorBucket::Numeric(cardinality) => {
-                if self.column_type == ColumnType::IpAddr {
+                if self.accessor.column_type() == ColumnType::IpAddr {
                     let compact_space_accessor = self
                         .accessor
                         .as_column()
@@ -758,7 +752,7 @@ impl<S: TermOrdAccumulator + 'static> SegmentAggregationCollector
         _agg_data: &AggregationsSegmentCtx,
     ) -> crate::Result<()> {
         if max_bucket as usize >= self.buckets.len() {
-            let column_type = self.column_type;
+            let column_type = self.accessor.column_type();
             let max_term_ord_inclusive = self.max_term_ord_inclusive;
             self.buckets.resize_with(max_bucket as usize + 1, || {
                 Some(SegmentCardinalityCollectorBucket::<S>::new(

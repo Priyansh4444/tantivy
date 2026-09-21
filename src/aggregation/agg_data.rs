@@ -7,8 +7,8 @@ use serde::Serialize;
 use tantivy_fst::Regex;
 
 use crate::aggregation::accessor_helpers::{
-    get_all_block_value_sources, get_block_value_source, get_dynamic_columns,
-    get_missing_val_as_u64_lenient, get_numeric_or_date_column_types,
+    get_all_value_sources, get_dynamic_columns, get_missing_val_as_u64_lenient,
+    get_numeric_or_date_column_types, get_value_source,
 };
 use crate::aggregation::agg_req::{Aggregation, AggregationVariants, Aggregations};
 use crate::aggregation::bucket::{
@@ -297,7 +297,7 @@ pub(crate) fn build_segment_agg_collector(
             // For non-str columns the `entries` field is unused (values go
             // straight into the HLL sketch); we still pick `TermOrdSet`
             // because its empty Sparse(FxHashSet) costs nothing.
-            let is_str = req_data.column_type == ColumnType::Str;
+            let is_str = req_data.accessor.column_type() == ColumnType::Str;
             if is_str {
                 let Some(column) = req_data.accessor.as_column() else {
                     return Err(crate::TantivyError::InvalidArgument(
@@ -309,7 +309,6 @@ pub(crate) fn build_segment_agg_collector(
                 // fall through to `TermOrdSet`, whose empty sparse set costs nothing.
                 if max_term_ord_inclusive < BITSET_MAX_TERM_ORD {
                     return Ok(Box::new(SegmentCardinalityCollector::<BitSet>::from_req(
-                        req_data.column_type,
                         node.idx_in_req_data,
                         req_data.accessor.clone(),
                         req_data.missing_value_for_accessor,
@@ -318,7 +317,6 @@ pub(crate) fn build_segment_agg_collector(
                 } else {
                     return Ok(Box::new(
                         SegmentCardinalityCollector::<TermOrdSet>::from_req(
-                            req_data.column_type,
                             node.idx_in_req_data,
                             req_data.accessor.clone(),
                             req_data.missing_value_for_accessor,
@@ -329,7 +327,6 @@ pub(crate) fn build_segment_agg_collector(
             }
             return Ok(Box::new(
                 SegmentCardinalityCollector::<TermOrdSet>::from_req(
-                    req_data.column_type,
                     node.idx_in_req_data,
                     req_data.accessor.clone(),
                     req_data.missing_value_for_accessor,
@@ -353,7 +350,6 @@ pub(crate) fn build_segment_agg_collector(
                     let req_data = req.get_metric_req_data(node.idx_in_req_data);
                     Ok(Box::new(
                         SegmentPercentilesCollector::from_req_and_validate(
-                            req_data.field_type,
                             req_data.missing_u64,
                             req_data.accessor.clone(),
                             node.idx_in_req_data,
@@ -460,11 +456,11 @@ pub(crate) fn build_aggregations_data_from_req(
 /// materialized column. A computed text source therefore cannot support `missing`; for numeric
 /// types the argument is ignored, so any value will do.
 fn missing_value_for_source(
-    column_type: ColumnType,
     accessor: &dyn ValueSource,
     missing: &Key,
     field_name: &str,
 ) -> crate::Result<Option<u64>> {
+    let column_type = accessor.column_type();
     let column_max_value = match accessor.as_column() {
         Some(column) => column.max_value(),
         None if column_type == ColumnType::Str => {
@@ -505,7 +501,7 @@ fn build_nodes(
     let value_sources = &data.context.value_sources;
     match &req.agg {
         Range(range_req) => {
-            let (accessor, field_type) = get_block_value_source(
+            let accessor = get_value_source(
                 reader,
                 &value_sources,
                 &range_req.field,
@@ -513,7 +509,6 @@ fn build_nodes(
             )?;
             let idx_in_req_data = data.push_range_req_data(RangeAggReqData {
                 accessor,
-                field_type,
                 name: agg_name.to_string(),
                 req: range_req.clone(),
                 is_top_level,
@@ -526,7 +521,7 @@ fn build_nodes(
             }])
         }
         Histogram(histo_req) => {
-            let (accessor, field_type) = get_block_value_source(
+            let accessor = get_value_source(
                 reader,
                 &value_sources,
                 &histo_req.field,
@@ -534,7 +529,6 @@ fn build_nodes(
             )?;
             let idx_in_req_data = data.push_histogram_req_data(HistogramAggReqData {
                 accessor,
-                field_type,
                 name: agg_name.to_string(),
                 req: histo_req.clone(),
                 is_date_histogram: false,
@@ -552,7 +546,7 @@ fn build_nodes(
             }])
         }
         DateHistogram(date_req) => {
-            let (accessor, field_type) = get_block_value_source(
+            let accessor = get_value_source(
                 reader,
                 &value_sources,
                 &date_req.field,
@@ -563,7 +557,6 @@ fn build_nodes(
             histo_req.normalize_date_time();
             let idx_in_req_data = data.push_histogram_req_data(HistogramAggReqData {
                 accessor,
-                field_type,
                 name: agg_name.to_string(),
                 req: histo_req,
                 is_date_histogram: true,
@@ -640,11 +633,10 @@ fn build_nodes(
                     ))
                 }
             };
-            let (accessor, field_type) =
-                get_block_value_source(reader, &value_sources, field, allowed_column_types)?;
+            let accessor = get_value_source(reader, &value_sources, field, allowed_column_types)?;
+            let field_type = accessor.column_type();
             let idx_in_req_data = data.push_metric_req_data(MetricAggReqData {
                 accessor,
-                field_type,
                 name: agg_name.to_string(),
                 collecting_for,
                 missing: *missing,
@@ -664,15 +656,15 @@ fn build_nodes(
         // Percentiles handled as Metric as well
         AggregationVariants::Percentiles(percentiles_req) => {
             percentiles_req.validate()?;
-            let (accessor, field_type) = get_block_value_source(
+            let accessor = get_value_source(
                 reader,
                 &value_sources,
                 percentiles_req.field_name(),
                 Some(get_numeric_or_date_column_types()),
             )?;
+            let field_type = accessor.column_type();
             let idx_in_req_data = data.push_metric_req_data(MetricAggReqData {
                 accessor,
-                field_type,
                 name: agg_name.to_string(),
                 collecting_for: StatsType::Percentiles,
                 missing: percentiles_req.missing,
@@ -698,7 +690,7 @@ fn build_nodes(
                 .field_names()
                 .iter()
                 .map(|field| {
-                    let (source, column_type) = get_block_value_source(
+                    let source = get_value_source(
                         reader,
                         &value_sources,
                         field,
@@ -707,7 +699,7 @@ fn build_nodes(
                     // Sort fields are read one document at a time via `values_for_doc`, which has
                     // no block equivalent.
                     let column = require_physical_column(&*source, field, "top_hits")?;
-                    Ok((column, column_type))
+                    Ok((column, source.column_type()))
                 })
                 .collect::<crate::Result<_>>()?;
 
@@ -835,9 +827,9 @@ fn build_multi_terms_nodes(
         let columns =
             get_term_agg_accessors(reader, &value_sources, field_name, &field_def.missing, true)?
                 .into_iter()
-                .map(|(source, column_type)| {
+                .map(|source| {
                     let column = require_physical_column(&*source, field_name, "multi_terms")?;
-                    Ok((column, column_type))
+                    Ok((column, source.column_type()))
                 })
                 .collect::<crate::Result<Vec<_>>>()?;
 
@@ -1057,7 +1049,7 @@ fn get_term_agg_accessors(
     field_name: &str,
     missing: &Option<Key>,
     include_bytes: bool,
-) -> crate::Result<Vec<(Arc<dyn ValueSource>, ColumnType)>> {
+) -> crate::Result<Vec<Arc<dyn ValueSource>>> {
     // `terms` and `multi_terms` both explicitly reject `Bytes` columns downstream, which needs
     // to actually see them as a real column (rather than the empty shim below) to do so.
     // `cardinality` has no such rejection: it would hash raw `Bytes` term ordinals as if they
@@ -1088,7 +1080,7 @@ fn get_term_agg_accessors(
         })
         .unwrap_or(ColumnType::U64);
 
-    let column_and_types = get_all_block_value_sources(
+    let sources = get_all_value_sources(
         reader,
         value_sources,
         field_name,
@@ -1096,7 +1088,7 @@ fn get_term_agg_accessors(
         fallback_type,
     )?;
 
-    Ok(column_and_types)
+    Ok(sources)
 }
 
 enum TermsOrCardinalityRequest {
@@ -1130,13 +1122,13 @@ fn build_terms_or_cardinality_nodes(
     let value_sources = data.context.value_sources.clone();
 
     let include_bytes = matches!(req, TermsOrCardinalityRequest::Terms(_));
-    let column_and_types =
+    let sources =
         get_term_agg_accessors(reader, &value_sources, field_name, missing, include_bytes)?;
 
     // Special handling when missing + multi column or incompatible type on text/date.
-    let missing_and_more_than_one_col = column_and_types.len() > 1 && missing.is_some();
-    let text_on_non_text_col = column_and_types.len() == 1
-        && column_and_types[0].1 != ColumnType::Str
+    let missing_and_more_than_one_col = sources.len() > 1 && missing.is_some();
+    let text_on_non_text_col = sources.len() == 1
+        && sources[0].column_type() != ColumnType::Str
         && matches!(missing, Some(Key::Str(_)));
 
     let use_special_missing_agg = missing_and_more_than_one_col || text_on_non_text_col;
@@ -1157,15 +1149,15 @@ fn build_terms_or_cardinality_nodes(
         // documents are missing across several typed columns. There is no way to ask that through
         // `BlockValueSource`, so it stays physical-only.
         let all_accessors =
-            get_all_block_value_sources(reader, &value_sources, field_name, None, fallback_type)?
+            get_all_value_sources(reader, &value_sources, field_name, None, fallback_type)?
                 .into_iter()
-                .map(|(source, column_type)| {
+                .map(|source| {
                     let column = require_physical_column(
                         &*source,
                         field_name,
                         "terms with `missing` across multiple column types",
                     )?;
-                    Ok((column, column_type))
+                    Ok((column, source.column_type()))
                 })
                 .collect::<crate::Result<Vec<_>>>()?;
         // This case only happens when we have term aggregation, or we fail
@@ -1190,11 +1182,12 @@ fn build_terms_or_cardinality_nodes(
     }
 
     // Add one node per accessor
-    for (accessor, column_type) in column_and_types {
+    for accessor in sources {
+        let column_type = accessor.column_type();
         let missing_value_for_accessor = if use_special_missing_agg {
             None
         } else if let Some(m) = missing.as_ref() {
-            missing_value_for_source(column_type, &*accessor, m, field_name)?
+            missing_value_for_source(&*accessor, m, field_name)?
         } else {
             None
         };
@@ -1221,7 +1214,6 @@ fn build_terms_or_cardinality_nodes(
                 };
                 let idx_in_req_data = data.push_term_req_data(TermsAggReqData {
                     accessor,
-                    column_type,
                     str_dict_column: str_dict_column.clone(),
                     missing_value_for_accessor,
                     name: agg_name.to_string(),
@@ -1245,7 +1237,6 @@ fn build_terms_or_cardinality_nodes(
                 };
                 let idx_in_req_data = data.push_cardinality_req_data(CardinalityAggReqData {
                     accessor,
-                    column_type,
                     str_dict_column: str_dict_column_for_req,
                     missing_value_for_accessor,
                     name: agg_name.to_string(),

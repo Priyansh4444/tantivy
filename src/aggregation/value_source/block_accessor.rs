@@ -5,7 +5,7 @@ use columnar::{Cardinality, ColumnValues, RowId};
 use crate::aggregation::value_source::ValueSource;
 use crate::DocId;
 
-/// Buffers the values associated with a block of documents loaded from a [`BlockValueSource`].
+/// Buffers the values associated with a block of documents loaded from a [`ValueSource`].
 ///
 /// Regardless of their original types, values are loaded in their `u64` representation using the
 /// associated monotonic mapping.
@@ -301,7 +301,7 @@ fn find_missing_docs(docs: &[u32], hits: &[u32], output: &mut Vec<u32>) {
 mod tests {
     use std::sync::Arc;
 
-    use columnar::Column;
+    use columnar::{Column, ColumnType, MonotonicallyMappableToU64};
 
     use super::*;
 
@@ -312,6 +312,10 @@ mod tests {
     }
 
     impl ValueSource for TestValueSource {
+        fn column_type(&self) -> ColumnType {
+            ColumnType::U64
+        }
+
         fn load_block(
             &self,
             docs: &[DocId],
@@ -365,7 +369,7 @@ mod tests {
 
     #[test]
     fn test_as_column_distinguishes_the_two_kinds() {
-        let column: Arc<dyn ValueSource> = Arc::new(full_column(&[5, 6, 7]));
+        let column: Arc<dyn ValueSource> = Arc::new((full_column(&[5, 6, 7]), ColumnType::U64));
         assert!(column.as_column().is_some());
         assert_eq!(column.bounds(), Some((5, 7)));
 
@@ -499,7 +503,12 @@ mod tests {
         let docs = [0, 1, 2, 4, 7, 8];
         let mut accessor = ColumnBlockAccessor::default();
 
-        accessor.fetch_block_with_missing_ordered(&docs, &column, Some(99), true);
+        accessor.fetch_block_with_missing_ordered(
+            &docs,
+            &(&column, ColumnType::U64),
+            Some(99),
+            true,
+        );
 
         assert_eq!(
             accessor.iter_vals().collect::<Vec<_>>(),
@@ -579,7 +588,7 @@ mod tests {
         };
 
         let check = |accessor: &mut ColumnBlockAccessor, docs: &[u32]| {
-            accessor.fetch_block(docs, &column);
+            accessor.fetch_block(docs, &(&column, ColumnType::U64));
             let got: Vec<(u32, u64)> = accessor.iter_docid_vals(docs).collect();
             let expected: Vec<(u32, u64)> = docs.iter().map(|&d| (d, vals[d as usize])).collect();
             assert_eq!(got, expected);

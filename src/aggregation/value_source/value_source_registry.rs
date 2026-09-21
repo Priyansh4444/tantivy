@@ -8,17 +8,14 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use columnar::ColumnType;
-
 use super::ValueSource;
 use crate::SegmentReader;
 
-/// Acts as a ValueSource object factory, producing  value source for a given Segment.
+/// Creates a value source for each segment.
 pub trait ValueSourceProvider: Send + Sync + 'static {
-    /// The type of the values produced. The ColumnBlockAccessor only stores
-    /// u64, so values are assumed to be encoded with the monotonic mapping.
-    fn column_type(&self) -> ColumnType;
     /// Binds this definition to a single segment.
+    ///
+    /// Sources produced by this provider must report the same logical type across segments.
     fn for_segment(&self, reader: &SegmentReader) -> crate::Result<Arc<dyn ValueSource>>;
 }
 

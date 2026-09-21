@@ -71,26 +71,26 @@ fn resolve_registered_source(
     value_sources: &ValueSourceRegistry,
     field_name: &str,
     allowed_column_types_opt: Option<&[ColumnType]>,
-) -> crate::Result<Option<(Arc<dyn ValueSource>, ColumnType)>> {
+) -> crate::Result<Option<Arc<dyn ValueSource>>> {
     let Some(provider) = value_sources.get(field_name) else {
         return Ok(None);
     };
-    let column_type = provider.column_type();
+    let source = provider.for_segment(reader)?;
+    let column_type = source.column_type();
     if let Some(allowed_column_types) = allowed_column_types_opt {
         if !allowed_column_types.contains(&column_type) {
             return Ok(None);
         }
     }
-    let source = provider.for_segment(reader)?;
-    Ok(Some((source, column_type)))
+    Ok(Some(source))
 }
 
-pub(crate) fn get_block_value_source(
+pub(crate) fn get_value_source(
     reader: &SegmentReader,
     value_sources: &ValueSourceRegistry,
     field_name: &str,
     allowed_column_types: Option<&[ColumnType]>,
-) -> crate::Result<(Arc<dyn ValueSource>, ColumnType)> {
+) -> crate::Result<Arc<dyn ValueSource>> {
     if let Some(registered) =
         resolve_registered_source(reader, value_sources, field_name, allowed_column_types)?
     {
@@ -106,8 +106,8 @@ pub(crate) fn get_block_value_source(
             )
         });
     // The empty-column shim stays physical on purpose: several fast paths check
-    // `as_physical()` and would otherwise degrade for a merely absent field.
-    Ok((Arc::new(column), column_type))
+    // `as_column()` and would otherwise degrade for a merely absent field.
+    Ok(Arc::new((column, column_type)))
 }
 
 pub(crate) fn get_dynamic_columns(
@@ -127,13 +127,13 @@ pub(crate) fn get_dynamic_columns(
 /// Get all block_value_sources or empty as default.
 ///
 /// Is guaranteed to return at least one column.
-pub(crate) fn get_all_block_value_sources(
+pub(crate) fn get_all_value_sources(
     reader: &SegmentReader,
     value_sources: &ValueSourceRegistry,
     field_name: &str,
     allowed_column_types: Option<&[ColumnType]>,
     fallback_type: ColumnType,
-) -> crate::Result<Vec<(Arc<dyn ValueSource>, ColumnType)>> {
+) -> crate::Result<Vec<Arc<dyn ValueSource>>> {
     // A registered source shadows the physical type fan-out entirely: it contributes exactly one
     // entry. Callers derive "this field has several types" from the length, so a single entry also
     // keeps computed sources off the mixed-type `missing` machinery, which is physical-only.
@@ -151,8 +151,8 @@ pub(crate) fn get_all_block_value_sources(
     Ok(ff_field_with_type
         .into_iter()
         .map(|(column, column_type)| {
-            let source: Arc<dyn ValueSource> = Arc::new(column);
-            (source, column_type)
+            let source: Arc<dyn ValueSource> = Arc::new((column, column_type));
+            source
         })
         .collect())
 }

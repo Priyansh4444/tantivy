@@ -144,7 +144,7 @@ impl ComputedBucketResolver {
             hist_block: ColumnBlockAccessor::default(),
             next_count_lane: 0,
             column_values: hist_values,
-            field_type: hist_req_data.field_type,
+            field_type: hist_req_data.accessor.column_type(),
             interval: hist_req_data.req.interval,
             offset: hist_req_data.offset,
             base_pos,
@@ -318,10 +318,11 @@ fn first_encoded_value_for_bucket(
     hist_req_data: &HistogramAggReqData,
     base_pos: i64,
 ) -> u64 {
+    let field_type = hist_req_data.accessor.column_type();
     while encoded_lower_bound < encoded_upper_bound {
         let encoded_midpoint =
             encoded_lower_bound + (encoded_upper_bound - encoded_lower_bound) / 2;
-        let val = f64_from_fastfield_u64(encoded_midpoint, hist_req_data.field_type);
+        let val = f64_from_fastfield_u64(encoded_midpoint, field_type);
         let bucket = (get_bucket_pos_f64(val, hist_req_data.req.interval, hist_req_data.offset)
             as i64
             - base_pos) as usize;

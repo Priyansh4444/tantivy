@@ -32,7 +32,6 @@ use std::sync::Arc;
 
 pub use average::*;
 pub use cardinality::*;
-use columnar::ColumnType;
 pub use count::*;
 pub use extended_stats::*;
 pub use max::*;
@@ -53,8 +52,6 @@ use crate::schema::OwnedValue;
 pub(crate) struct MetricAggReqData {
     /// True if the field is of number or date type.
     pub(crate) is_number_or_date_type: bool,
-    /// The type of the field.
-    pub(crate) field_type: ColumnType,
     /// The missing value normalized to the internal u64 representation of the field type.
     pub(crate) missing_u64: Option<u64>,
     /// The column accessor to access the fast field values.

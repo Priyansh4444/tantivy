@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use columnar::ColumnType;
+use columnar::{ColumnType, MonotonicallyMappableToU64};
 
 use super::*;
 use crate::SegmentReader;
@@ -11,6 +11,10 @@ use crate::SegmentReader;
 pub(crate) struct Constant(u64);
 
 impl ValueSource for Constant {
+    fn column_type(&self) -> ColumnType {
+        ColumnType::U64
+    }
+
     fn load_block(
         &self,
         docs: &[DocId],
@@ -27,10 +31,6 @@ impl ValueSource for Constant {
 pub(crate) struct ConstantProvider(pub u64);
 
 impl ValueSourceProvider for ConstantProvider {
-    fn column_type(&self) -> ColumnType {
-        ColumnType::U64
-    }
-
     fn for_segment(&self, _reader: &SegmentReader) -> crate::Result<Arc<dyn ValueSource>> {
         Ok(Arc::new(Constant(self.0)))
     }

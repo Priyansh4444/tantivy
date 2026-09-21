@@ -322,7 +322,6 @@ impl IntermediateExtendedStats {
 pub(crate) struct SegmentExtendedStatsCollector {
     name: String,
     missing: Option<u64>,
-    field_type: ColumnType,
     accessor: Arc<dyn ValueSource>,
     buckets: Vec<IntermediateExtendedStats>,
     sigma: Option<f64>,
@@ -332,10 +331,9 @@ impl SegmentExtendedStatsCollector {
     pub fn from_req(req: &MetricAggReqData, sigma: Option<f64>) -> Self {
         let missing = req
             .missing
-            .and_then(|val| f64_to_fastfield_u64(val, &req.field_type));
+            .and_then(|val| f64_to_fastfield_u64(val, &req.accessor.column_type()));
         Self {
             name: req.name.clone(),
-            field_type: req.field_type,
             accessor: req.accessor.clone(),
             missing,
             buckets: vec![IntermediateExtendedStats::with_sigma(sigma); 16],
@@ -379,8 +377,9 @@ impl SegmentAggregationCollector for SegmentExtendedStatsCollector {
             &*self.accessor,
             self.missing,
         );
+        let field_type = self.accessor.column_type();
         for val in agg_data.column_block_accessor.iter_vals() {
-            let val1 = f64_from_fastfield_u64(val, self.field_type);
+            let val1 = f64_from_fastfield_u64(val, field_type);
             extended_stats.collect(val1);
         }
 

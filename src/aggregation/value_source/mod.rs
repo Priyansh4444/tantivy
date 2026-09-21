@@ -4,14 +4,23 @@ mod value_source_registry;
 #[cfg(test)]
 pub(crate) mod tests;
 
+use std::borrow::Borrow;
+
 pub(crate) use block_accessor::ColumnBlockAccessor;
-use columnar::{Cardinality, Column, ColumnValues, RowId};
+use columnar::{Cardinality, Column, ColumnType, ColumnValues, RowId};
 pub use value_source_registry::{ValueSourceProvider, ValueSourceRegistry};
 
 use crate::DocId;
 
 /// A source of values for a block of documents.
 pub trait ValueSource: std::fmt::Debug {
+    /// Logical type of the encoded values returned by this source.
+    ///
+    /// This type must remain unchanged for the source's lifetime. Numeric values use the
+    /// corresponding monotonic `u64` mapping; string/bytes values are dictionary ordinals and
+    /// IP addresses use the physical column's compact space.
+    fn column_type(&self) -> ColumnType;
+
     /// Loads the values for `docs` into `values`, and for a non-full source the matching document
     /// ids into `docids`, returning how the two are aligned.
     ///
@@ -25,7 +34,7 @@ pub trait ValueSource: std::fmt::Debug {
         row_ids: &mut Vec<RowId>,
     ) -> Cardinality;
 
-    /// Downcast the BlockValueSource to a Column.
+    /// Returns the physical column, if this source is backed by one.
     fn as_column(&self) -> Option<&Column<u64>> {
         None
     }
@@ -37,7 +46,13 @@ pub trait ValueSource: std::fmt::Debug {
     }
 }
 
-impl ValueSource for Column<u64> {
+// Lenient columns have erased their logical type; the tuple retains it alongside the values.
+impl<ColumnRef: Borrow<Column<u64>> + std::fmt::Debug> ValueSource for (ColumnRef, ColumnType) {
+    #[inline]
+    fn column_type(&self) -> ColumnType {
+        self.1
+    }
+
     #[inline]
     fn load_block(
         &self,
@@ -46,22 +61,23 @@ impl ValueSource for Column<u64> {
         docids: &mut Vec<DocId>,
         row_ids: &mut Vec<RowId>,
     ) -> Cardinality {
-        let cardinality = self.index.get_cardinality();
+        let column = self.0.borrow();
+        let cardinality = column.index.get_cardinality();
         if cardinality.is_full() {
-            load_full_column_values(docs, &*self.values, values);
+            load_full_column_values(docs, &*column.values, values);
         } else {
             docids.clear();
             row_ids.clear();
-            self.row_ids_for_docs(docs, docids, row_ids);
+            column.row_ids_for_docs(docs, docids, row_ids);
             values.resize(row_ids.len(), 0u64);
-            self.values.get_vals(row_ids, values);
+            column.values.get_vals(row_ids, values);
         }
         cardinality
     }
 
     #[inline]
     fn as_column(&self) -> Option<&Column<u64>> {
-        Some(self)
+        Some(self.0.borrow())
     }
 }
 
