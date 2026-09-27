@@ -48,15 +48,18 @@ fn load_unaligned_bits(src: &[u8], bit: u32, nbits: u32) -> u64 {
     }
     let byte_idx = (bit / 8) as usize;
     let bit_off = bit % 8;
-    if nbits == 64 {
-        if let Some(bytes) = src.get(byte_idx..byte_idx + 8) {
-            let word = u64::from_le_bytes(bytes.try_into().unwrap());
-            if bit_off == 0 {
-                return word;
-            }
+    if let Some(bytes) = src.get(byte_idx..byte_idx + 8) {
+        let word = u64::from_le_bytes(bytes.try_into().unwrap());
+        let mut bits = word >> bit_off;
+        if bit_off + nbits > 64 {
             let next_byte = src.get(byte_idx + 8).copied().unwrap_or(0);
-            return (word >> bit_off) | (u64::from(next_byte) << (64 - bit_off));
+            bits |= u64::from(next_byte) << (64 - bit_off);
         }
+        return if nbits == 64 {
+            bits
+        } else {
+            bits & ((1u64 << nbits) - 1)
+        };
     }
     // `bit_off + nbits` can be 71, so the scratch word is u128.
     let bytes_needed = ((bit_off + nbits + 7) / 8) as usize;
