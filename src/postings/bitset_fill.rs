@@ -48,6 +48,16 @@ fn load_unaligned_bits(src: &[u8], bit: u32, nbits: u32) -> u64 {
     }
     let byte_idx = (bit / 8) as usize;
     let bit_off = bit % 8;
+    if nbits == 64 {
+        if let Some(bytes) = src.get(byte_idx..byte_idx + 8) {
+            let word = u64::from_le_bytes(bytes.try_into().unwrap());
+            if bit_off == 0 {
+                return word;
+            }
+            let next_byte = src.get(byte_idx + 8).copied().unwrap_or(0);
+            return (word >> bit_off) | (u64::from(next_byte) << (64 - bit_off));
+        }
+    }
     // `bit_off + nbits` can be 71, so the scratch word is u128.
     let bytes_needed = ((bit_off + nbits + 7) / 8) as usize;
     let mut v = 0u128;
@@ -101,6 +111,32 @@ mod tests {
                             "src_from={src_from} dest_from={dest_from} len={len} i={i}"
                         );
                     }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn load_unaligned_bits_matches_bit_walk() {
+        let mut state = 0x2e8b_3b9f_64a5_17cdu64;
+        for src_len in 0..=17usize {
+            let mut src = vec![0u8; src_len];
+            for byte in &mut src {
+                state ^= state << 13;
+                state ^= state >> 7;
+                state ^= state << 17;
+                *byte = state as u8;
+            }
+            for bit in 0..=(src_len as u32 * 8 + 8) {
+                for nbits in 0..=64u32 {
+                    let expected = (0..nbits).fold(0u64, |word, offset| {
+                        word | (u64::from(bit_in_bytes(&src, bit + offset)) << offset)
+                    });
+                    assert_eq!(
+                        load_unaligned_bits(&src, bit, nbits),
+                        expected,
+                        "src_len={src_len} bit={bit} nbits={nbits}"
+                    );
                 }
             }
         }
