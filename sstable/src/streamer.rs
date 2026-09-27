@@ -159,6 +159,7 @@ where
             lower_bound: self.lower,
             upper_bound: self.upper,
             upper_bound_comparator: DeltaKeyComparator::new(),
+            upper_bound_exceeded: false,
             _lifetime: std::marker::PhantomData,
         })
     }
@@ -202,6 +203,7 @@ where
     lower_bound: Bound<Vec<u8>>,
     upper_bound: Bound<Vec<u8>>,
     upper_bound_comparator: DeltaKeyComparator,
+    upper_bound_exceeded: bool,
     // this field is used to please the type-interface of a dictionary in tantivy
     _lifetime: std::marker::PhantomData<&'a ()>,
     lower_bound_reached: bool,
@@ -223,6 +225,7 @@ where TSSTable: SSTable
             lower_bound: Bound::Unbounded,
             upper_bound: Bound::Unbounded,
             upper_bound_comparator: DeltaKeyComparator::new(),
+            upper_bound_exceeded: false,
             _lifetime: std::marker::PhantomData,
         }
     }
@@ -296,6 +299,9 @@ where
     /// Before the first call to `.advance()`, the stream
     /// is an uninitialized state.
     pub fn advance(&mut self) -> bool {
+        if self.upper_bound_exceeded {
+            return false;
+        }
         if !self.lower_bound_reached {
             if !self.initialize() {
                 // no key higher than lower-bound at all
@@ -307,6 +313,7 @@ where
                 0,
                 &self.key,
             ) {
+                self.upper_bound_exceeded = true;
                 return false;
             }
             if self.automaton.is_match(self.states.last().unwrap()) {
@@ -394,13 +401,15 @@ where
         // TODO there is an idea where we only look at the upper bound when our delta_reader
         // reached the last block (if we pruned blocks beforehand (do we always?) we cannot
         // find that key before that block)
-        NO_BOUND
+        let within_upper_bound = NO_BOUND
             || matches_upper_bound(
                 &mut self.upper_bound_comparator,
                 &self.upper_bound,
                 common_prefix_len,
                 self.delta_reader.suffix(),
-            )
+            );
+        self.upper_bound_exceeded = !within_upper_bound;
+        within_upper_bound
     }
 
     /// Returns the `TermOrdinal` of the given term.
@@ -467,6 +476,27 @@ mod tests {
         let buffer = dict_builder.finish()?;
         let owned_bytes = OwnedBytes::new(buffer);
         Dictionary::from_bytes(owned_bytes)
+    }
+
+    #[test]
+    fn test_upper_bound_stays_exhausted() -> io::Result<()> {
+        let mut builder = Dictionary::<MonotonicU64SSTable>::builder(Vec::new())?;
+        for (ord, key) in [b"ab".as_slice(), b"abx", b"abxy"].iter().enumerate() {
+            builder.insert(key, &(ord as u64))?;
+        }
+        let dict =
+            Dictionary::<MonotonicU64SSTable>::from_bytes(OwnedBytes::new(builder.finish()?))?;
+        let mut stream = dict.range().le(b"ab").into_stream()?;
+
+        assert!(stream.advance());
+        assert_eq!(stream.key(), b"ab");
+        assert!(!stream.advance());
+        assert!(!stream.advance());
+
+        let mut empty_range = dict.range().ge(b"abx").le(b"ab").into_stream()?;
+        assert!(!empty_range.advance());
+        assert!(!empty_range.advance());
+        Ok(())
     }
 
     #[test]
