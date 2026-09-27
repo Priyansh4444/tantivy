@@ -66,6 +66,14 @@ pub(crate) fn for_each_pruning_scorer<TScorer: Scorer + ?Sized>(
 ///
 /// See [`Query`](crate::query::Query).
 pub trait Weight: Send + Sync + 'static {
+    /// Returns true only when this weight matches every document in every segment.
+    ///
+    /// Collectors may use this to read segment-wide metadata instead of visiting
+    /// each document. The default is conservative for custom weights.
+    fn matches_all_docs(&self) -> bool {
+        false
+    }
+
     /// Returns the scorer for the given segment.
     ///
     /// `boost` is a multiplier to apply to the score.

@@ -9,7 +9,7 @@ use crate::aggregation::agg_data::{
 };
 use crate::collector::{default_collect_segment_impl, Collector, SegmentCollector};
 use crate::index::SegmentReader;
-use crate::query::{AllScorer, Weight};
+use crate::query::Weight;
 use crate::{DocId, SegmentOrdinal, TantivyError};
 
 /// The default max bucket count, before the aggregation fails.
@@ -182,7 +182,7 @@ impl AggregationSegmentCollector {
         let agg_data =
             build_aggregations_data_from_req(agg, reader, segment_ordinal, context.clone())?;
         // Column statistics include deleted documents and require matching the whole segment.
-        let collect_all = !reader.has_deletes() && weight.scorer(reader, 1.0)?.is::<AllScorer>();
+        let collect_all = !reader.has_deletes() && weight.matches_all_docs();
         let mut collector = Self::from_agg_data(agg_data, collect_all)?;
         default_collect_segment_impl(&mut collector, weight, reader, false)?;
         Ok(collector.harvest())
@@ -359,5 +359,44 @@ fn test_column_stats_filtered_and_deleted_docs() -> crate::Result<()> {
         serde_json::to_value(reader.searcher().search(&AllQuery, &collector)?)?,
         json!({"min": {"value": 2.0}, "max": {"value": 2.0}, "count": {"value": 1.0}}),
     );
+    Ok(())
+}
+
+#[test]
+fn test_column_stats_nan_multivalued_optional() -> crate::Result<()> {
+    use crate::collector::Count;
+    use crate::query::AllQuery;
+    use crate::schema::{Schema, FAST};
+    use crate::{Index, IndexWriter};
+
+    for nan in [f64::NAN, -f64::NAN] {
+        let mut schema_builder = Schema::builder();
+        let value = schema_builder.add_f64_field("value", FAST);
+        let index = Index::create_in_ram(schema_builder.build());
+        let mut writer: IndexWriter = index.writer_for_tests()?;
+        writer.add_document(doc!(value => -7.0, value => 8.0))?;
+        writer.add_document(doc!())?;
+        writer.commit()?;
+        writer.add_document(doc!(value => 4.0, value => 5.0, value => 12.0))?;
+        writer.add_document(doc!(value => nan))?;
+        writer.commit()?;
+
+        let collector = AggregationCollector::from_aggs(
+            serde_json::from_value(json!({
+                "min": {"min": {"field": "value"}},
+                "max": {"max": {"field": "value"}},
+                "count": {"value_count": {"field": "value"}}
+            }))?,
+            Default::default(),
+        );
+        let searcher = index.reader()?.searcher();
+        let optimized = searcher.search(&AllQuery, &collector)?;
+        let (scanned, _) = searcher.search(&AllQuery, &(collector, Count))?;
+        assert_eq!(optimized, scanned);
+        assert_eq!(
+            serde_json::to_value(optimized)?,
+            json!({"min": {"value": -7.0}, "max": {"value": 12.0}, "count": {"value": 6.0}}),
+        );
+    }
     Ok(())
 }

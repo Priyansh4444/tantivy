@@ -236,12 +236,23 @@ pub(crate) fn build_segment_stats_collector(
     req: &MetricAggReqData,
     collect_all: bool,
 ) -> crate::Result<Box<dyn SegmentAggregationCollector>> {
-    let precomputed = collect_all
+    let mut precomputed = collect_all
         && req.missing.is_none()
         && matches!(
             req.collecting_for,
             StatsType::Min | StatsType::Max | StatsType::Count
         );
+    // f64 column extrema can be NaN even when the column also has finite values.
+    // A NaN extremum does not tell us the next finite min/max, so scan that segment.
+    if precomputed
+        && req.field_type == ColumnType::F64
+        && !matches!(req.collecting_for, StatsType::Count)
+        && req.accessor.values.num_vals() != 0
+    {
+        let min = f64_from_fastfield_u64(req.accessor.min_value(), req.field_type);
+        let max = f64_from_fastfield_u64(req.accessor.max_value(), req.field_type);
+        precomputed = !min.is_nan() && !max.is_nan();
+    }
     match req.field_type {
         ColumnType::I64 => Ok(create_collector::<{ ColumnType::I64 as u8 }>(
             req,
