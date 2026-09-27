@@ -25,18 +25,29 @@ pub(crate) fn or_range_into_tinysets(
 
     let mut remaining = len;
     let mut src_bit = src_from;
-    let mut dest_bit = dest_from;
+    let mut dest_idx = (dest_from / 64) as usize;
+    let dest_off = dest_from % 64;
 
-    while remaining > 0 {
-        let dest_off = dest_bit % 64;
-        let dest_idx = (dest_bit / 64) as usize;
-        let space = 64 - dest_off;
-        let take = remaining.min(space);
-        let src_word = load_unaligned_bits(src, src_bit, take);
-        dest[dest_idx].union_mut(TinySet::from_bits(src_word << dest_off));
+    if dest_off != 0 {
+        let take = remaining.min(64 - dest_off);
+        let bits = load_unaligned_bits(src, src_bit, take);
+        dest[dest_idx].union_mut(TinySet::from_bits(bits << dest_off));
         src_bit += take;
-        dest_bit += take;
         remaining -= take;
+        dest_idx += 1;
+    }
+
+    while remaining >= 64 {
+        let bits = load_unaligned_bits(src, src_bit, 64);
+        dest[dest_idx].union_mut(TinySet::from_bits(bits));
+        src_bit += 64;
+        remaining -= 64;
+        dest_idx += 1;
+    }
+
+    if remaining > 0 {
+        let bits = load_unaligned_bits(src, src_bit, remaining);
+        dest[dest_idx].union_mut(TinySet::from_bits(bits));
     }
 }
 
@@ -115,6 +126,51 @@ mod tests {
                         );
                     }
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn or_range_randomized_matches_bit_walk() {
+        fn next(state: &mut u64) -> u64 {
+            *state ^= *state << 13;
+            *state ^= *state >> 7;
+            *state ^= *state << 17;
+            *state
+        }
+
+        let mut state = 0x8a5c_4f2d_19b7_63e1u64;
+        for _ in 0..10_000 {
+            let src_len = (next(&mut state) % 81) as usize;
+            let mut src = vec![0u8; src_len];
+            for byte in &mut src {
+                *byte = next(&mut state) as u8;
+            }
+            let src_from = (next(&mut state) % (src_len as u64 * 8 + 1)) as u32;
+            let dest_from = (next(&mut state) % 321) as u32;
+            let available = (src_len as u32 * 8 - src_from).min(320 - dest_from);
+            let len = (next(&mut state) % (u64::from(available) + 1)) as u32;
+            let mut actual = [TinySet::EMPTY; 5];
+            for bit in 0..320u32 {
+                if next(&mut state) & 7 == 0 {
+                    actual[(bit / 64) as usize].insert_mut(bit % 64);
+                }
+            }
+            let mut expected = actual;
+            for offset in 0..len {
+                if bit_in_bytes(&src, src_from + offset) {
+                    let bit = dest_from + offset;
+                    expected[(bit / 64) as usize].insert_mut(bit % 64);
+                }
+            }
+            or_range_into_tinysets(&src, src_from, &mut actual, dest_from, len);
+            for bit in 0..320u32 {
+                assert_eq!(
+                    actual[(bit / 64) as usize].contains(bit % 64),
+                    expected[(bit / 64) as usize].contains(bit % 64),
+                    "src_len={src_len} src_from={src_from} dest_from={dest_from} len={len} \
+                     bit={bit}"
+                );
             }
         }
     }
