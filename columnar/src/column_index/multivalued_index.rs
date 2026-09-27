@@ -35,9 +35,7 @@ fn exponential_search_first_end_gt(
             }
             return binary_search_first_end_gt(col, lo, next, pos);
         }
-        if next == max_idx {
-            return max_idx;
-        }
+        assert!(next != max_idx, "row rank out of bounds");
         lo = next;
         step = step.saturating_mul(2);
     }
@@ -609,6 +607,20 @@ mod tests {
                 assert_eq!(fast, slow, "doc_start={doc_start} ranks={ranks:?}");
             }
         }
+    }
+
+    #[test]
+    #[should_panic(expected = "row rank out of bounds")]
+    fn select_batch_v1_rejects_rank_after_last_value() {
+        let idx = multivalue_v1_for_test(&[0, 2, 4]);
+        idx.select_batch_in_place(0, &mut vec![4]);
+    }
+
+    #[test]
+    #[should_panic(expected = "row rank out of bounds")]
+    fn select_batch_v2_rejects_rank_after_last_value() {
+        let idx = MultiValueIndex::for_test(&[0, 2, 4]);
+        idx.select_batch_in_place(0, &mut vec![4]);
     }
 
     #[test]
