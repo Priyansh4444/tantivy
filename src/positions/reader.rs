@@ -19,6 +19,7 @@ use crate::postings::compression::{BlockDecoder, VIntDecoder};
 #[derive(Clone)]
 pub struct PositionReader {
     bit_widths: OwnedBytes,
+    exception_counts: Option<OwnedBytes>,
     positions: OwnedBytes,
 
     block_decoder: BlockDecoder,
@@ -35,21 +36,36 @@ pub struct PositionReader {
 
     // These are just copies used for .reset().
     original_bit_widths: OwnedBytes,
+    original_exception_counts: Option<OwnedBytes>,
     original_positions: OwnedBytes,
 }
 
 impl PositionReader {
     /// Open and reads the term positions encoded into the positions_data owned bytes.
     pub fn open(mut positions_data: OwnedBytes) -> io::Result<PositionReader> {
-        let num_positions_bitpacked_blocks = VInt::deserialize(&mut positions_data)?.0 as usize;
+        let first = VInt::deserialize(&mut positions_data)?.0;
+        let patched = first == u64::MAX;
+        let num_positions_bitpacked_blocks = if patched {
+            VInt::deserialize(&mut positions_data)?.0 as usize
+        } else {
+            first as usize
+        };
         let (bit_widths, positions) = positions_data.split(num_positions_bitpacked_blocks);
+        let (exception_counts, positions) = if patched {
+            let (counts, positions) = positions.split(num_positions_bitpacked_blocks);
+            (Some(counts), positions)
+        } else {
+            (None, positions)
+        };
         Ok(PositionReader {
             bit_widths: bit_widths.clone(),
+            exception_counts: exception_counts.clone(),
             positions: positions.clone(),
             block_decoder: BlockDecoder::default(),
             block_offset: i64::MAX as u64,
             anchor_offset: 0u64,
             original_bit_widths: bit_widths,
+            original_exception_counts: exception_counts,
             original_positions: positions,
         })
     }
@@ -57,6 +73,7 @@ impl PositionReader {
     fn reset(&mut self) {
         self.positions = self.original_positions.clone();
         self.bit_widths = self.original_bit_widths.clone();
+        self.exception_counts = self.original_exception_counts.clone();
         self.block_offset = i64::MAX as u64;
         self.anchor_offset = 0u64;
     }
@@ -71,8 +88,22 @@ impl PositionReader {
             .map(|num_bits| num_bits as usize)
             .sum();
         let num_bytes_to_skip = num_bits * COMPRESSION_BLOCK_SIZE / 8;
+        let exception_bytes_to_skip: usize = self
+            .exception_counts
+            .as_ref()
+            .map(|counts| {
+                counts.as_ref()[..num_blocks]
+                    .iter()
+                    .map(|&n| n as usize * 2)
+                    .sum()
+            })
+            .unwrap_or(0);
         self.bit_widths.advance(num_blocks);
-        self.positions.advance(num_bytes_to_skip);
+        if let Some(counts) = self.exception_counts.as_mut() {
+            counts.advance(num_blocks);
+        }
+        self.positions
+            .advance(num_bytes_to_skip + exception_bytes_to_skip);
         self.anchor_offset += (num_blocks * COMPRESSION_BLOCK_SIZE) as u64;
     }
 
@@ -87,12 +118,32 @@ impl PositionReader {
             .sum::<usize>()
             * COMPRESSION_BLOCK_SIZE
             / 8;
-        let compressed_data = &self.positions.as_slice()[byte_offset..];
+        let exception_offset: usize = self
+            .exception_counts
+            .as_ref()
+            .map(|counts| {
+                counts.as_ref()[..block_rel_id]
+                    .iter()
+                    .map(|&count| count as usize * 2)
+                    .sum()
+            })
+            .unwrap_or(0);
+        let compressed_data = &self.positions.as_slice()[byte_offset + exception_offset..];
         if bit_widths.len() > block_rel_id {
             // that block is bitpacked.
             let bit_width = bit_widths[block_rel_id];
             self.block_decoder
                 .uncompress_block_unsorted(compressed_data, bit_width, false);
+            if let Some(counts) = self.exception_counts.as_ref() {
+                let count = counts.as_slice()[block_rel_id] as usize;
+                if count != 0 {
+                    let packed_len = bit_width as usize * COMPRESSION_BLOCK_SIZE / 8;
+                    self.block_decoder.patch_unsorted_exceptions(
+                        &compressed_data[packed_len..packed_len + count * 2],
+                        bit_width,
+                    );
+                }
+            }
         } else {
             // that block is vint encoded.
             self.block_decoder

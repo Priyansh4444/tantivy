@@ -124,6 +124,13 @@ impl BlockEncoder {
         (num_bits, &self.output[..written_size])
     }
 
+    /// Pack 128 values at a chosen width. Used by positions PFOR, where
+    /// exceptional high bits are stored separately.
+    pub fn compress_block_unsorted_at_width(&mut self, block: &[u32], width: u8) -> &[u8] {
+        let written_size = self.bitpacker.compress(block, &mut self.output, width);
+        &self.output[..written_size]
+    }
+
     /// Compress a full block of sorted doc ids as a dense bitset.
     ///
     /// Bit `s` (`s = doc - base`, where `base` is [`bitset_base_doc`]) is
@@ -221,6 +228,13 @@ impl BlockDecoder {
             }
         }
         res
+    }
+
+    /// Restore the exceptional high bits after unpacking a positions block.
+    pub fn patch_unsorted_exceptions(&mut self, exceptions: &[u8], width: u8) {
+        for pair in exceptions.chunks_exact(2) {
+            self.output[pair[0] as usize] |= (pair[1] as u32) << width;
+        }
     }
 
     /// Decompress a dense bitset block written by

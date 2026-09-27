@@ -12,22 +12,18 @@
 //! blocks of 128 deltas. Because we rarely have a multiple of 128, the final block encodes
 //! the remaining values with variable int encoding.
 //!
-//! In order to make reading possible, the term delta positions first encode the number of
-//! bitpacked blocks, then the bitwidth for each block, then the actual bitpacked blocks and finally
-//! the final variable int encoded block.
+//! Each new-format term starts with `VInt(u64::MAX)` followed by the number of full
+//! blocks, a width byte per block, an exception-count byte per block, the blocks,
+//! and finally the variable-int tail. A full block stores 128 low-bit values at
+//! its width, followed by up to seven `(index, high byte)` exception pairs.
+//! The preceding format starts directly with the number of blocks and has no
+//! exception counts; the reader accepts both formats.
 //!
 //! Contrary to postings list, the reader does not have access on the number of positions that is
 //! encoded, and instead stops decoding the last block when its byte slice has been entirely read.
 //!
-//! More formally:
-//! * *Positions* := *NumBitPackedBlocks* *BitPackedPositionBlock*^(P/128)
-//!   *BitPackedPositionsDeltaBitWidth* *VIntPosDeltas*?
-//! * *NumBitPackedBlocks**: := *P* / 128 encoded as a variable byte integer.
-//! * *BitPackedPositionBlock* := bit width encoded block of 128 positions delta
-//! * *BitPackedPositionsDeltaBitWidth* := (*BitWidth*: u8)^*NumBitPackedBlocks*
-//! * *VIntPosDeltas* := *VIntPosDelta*^(*P* % 128).
-//!
-//! The skip widths encoded separately makes it easy and fast to rapidly skip over n positions.
+//! Widths and exception counts are encoded separately so a reader can skip
+//! blocks without decoding their values.
 mod reader;
 mod serializer;
 
@@ -41,12 +37,14 @@ const COMPRESSION_BLOCK_SIZE: usize = BitPacker4x::BLOCK_LEN;
 #[cfg(test)]
 pub(crate) mod tests {
 
+    use common::{BinarySerializable, VInt};
     use proptest::prelude::*;
     use proptest::sample::select;
 
     use super::PositionSerializer;
     use crate::directory::OwnedBytes;
     use crate::positions::reader::PositionReader;
+    use crate::postings::compression::BlockEncoder;
 
     fn create_positions_data(vals: &[u32]) -> crate::Result<OwnedBytes> {
         let mut positions_buffer = vec![];
@@ -230,6 +228,82 @@ pub(crate) mod tests {
             let mut buf = [0u32; 1];
             position_reader.read(offset, &mut buf);
             assert_eq!(buf[0], offset as u32);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_patched_blocks_random_access_and_clone() -> crate::Result<()> {
+        let mut values = Vec::new();
+        let mut seed = 0x9876_5432u32;
+        for block in 0..32usize {
+            let width = 3 + block % 22;
+            for i in 0..128usize {
+                seed ^= seed << 13;
+                seed ^= seed >> 17;
+                seed ^= seed << 5;
+                let mut value = seed & ((1u32 << width) - 1);
+                if i == 7 || i == 63 || i == 121 {
+                    value |= (1 + block as u32 % 8) << width;
+                }
+                values.push(value);
+            }
+        }
+        values.extend([0u32; 128]);
+        values.extend([u32::MAX; 128]);
+        values.extend((0..37).map(|n| n as u32 * 17));
+
+        let data = create_positions_data(&values)?;
+        let mut header = data.as_slice();
+        assert_eq!(VInt::deserialize(&mut header)?.0, u64::MAX);
+        let blocks = VInt::deserialize(&mut header)?.0 as usize;
+        assert_eq!(blocks, 34);
+        let counts = &header[blocks..blocks * 2];
+        assert!(counts.iter().any(|&count| count > 0));
+        assert!(counts.iter().all(|&count| count <= 7));
+
+        let mut reader = PositionReader::open(data)?;
+        let mut clone = reader.clone();
+        for &(offset, len) in &[
+            (0, 128),
+            (120, 24),
+            (3072, 300),
+            (128, 8),
+            (4000, 200),
+            (255, 257),
+            (4, 3),
+            (values.len() - 37, 37),
+        ] {
+            let mut output = vec![0; len];
+            reader.read(offset as u64, &mut output);
+            assert_eq!(output, values[offset..offset + len]);
+            clone.read(offset as u64, &mut output);
+            assert_eq!(output, values[offset..offset + len]);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_legacy_position_term_remains_readable() -> crate::Result<()> {
+        let values: Vec<u32> = (0..300).map(|n| (n * 23) % 1024).collect();
+        let mut old = Vec::new();
+        VInt(2).serialize(&mut old)?;
+        let mut encoder = BlockEncoder::new();
+        let mut payload = Vec::new();
+        for block in values[..256].chunks_exact(128) {
+            let (width, bytes) = encoder.compress_block_unsorted(block, false);
+            old.push(width);
+            payload.extend_from_slice(bytes);
+        }
+        old.extend_from_slice(&payload);
+        for &value in &values[256..] {
+            VInt(value as u64).serialize(&mut old)?;
+        }
+        let mut reader = PositionReader::open(OwnedBytes::new(old))?;
+        for &(offset, len) in &[(0, 128), (123, 140), (280, 20), (5, 9), (253, 47)] {
+            let mut output = vec![0; len];
+            reader.read(offset as u64, &mut output);
+            assert_eq!(output, values[offset..offset + len]);
         }
         Ok(())
     }
