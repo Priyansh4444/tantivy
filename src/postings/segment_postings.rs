@@ -300,6 +300,30 @@ impl DocSet for SegmentPostings {
 }
 
 impl SegmentPostings {
+    /// Membership probe for monotonically increasing COUNT candidates. The caller owns
+    /// this cursor separately from the scorer, since a dense block can stay undecoded.
+    pub(crate) fn contains_doc_for_count(&mut self, target: DocId) -> bool {
+        if target == TERMINATED {
+            return false;
+        }
+        self.block_cursor.seek_block(target);
+        let skip = self.block_cursor.skip_reader();
+        if let BlockInfo::Dense { num_longs, .. } = skip.block_info() {
+            let base = bitset_base_doc(skip.last_doc_in_previous_block);
+            let Some(bit) = target.checked_sub(base) else {
+                return false;
+            };
+            if bit >= num_longs as u32 * 64 {
+                return false;
+            }
+            let bytes = self.block_cursor.postings_bytes();
+            return bytes[skip.byte_offset() + (bit / 8) as usize] & (1 << (bit % 8)) != 0;
+        }
+        self.block_cursor.load_block();
+        let idx = self.block_cursor.seek_within_loaded_block(target);
+        self.block_cursor.doc(idx) == target
+    }
+
     /// If the current (unloaded) block is dense and lies entirely inside
     /// `[min_doc, horizon)`, OR it into `mask` and skip decode. Returns
     /// `Some(TERMINATED)` when postings are exhausted, `Some(0)` when the
@@ -643,6 +667,65 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+
+    #[test]
+    fn count_probe_matches_bit_walk_across_block_boundaries() {
+        fn next(state: &mut u64) -> u64 {
+            *state ^= *state << 13;
+            *state ^= *state >> 7;
+            *state ^= *state << 17;
+            *state
+        }
+
+        let mut state = 0x127d_81a0_f4e8_559bu64;
+        for case in 0..8 {
+            let docs: Vec<DocId> = (0..9_000)
+                .filter(|&doc| {
+                    let chance = match case % 4 {
+                        0 => 985,
+                        1 => 750,
+                        2 => 125,
+                        _ if doc % 1_024 < 512 => 980,
+                        _ => 80,
+                    };
+                    next(&mut state) % 1_000 < chance
+                })
+                .collect();
+            let mut probe = SegmentPostings::create_from_docs(&docs);
+            let mut saw_dense = false;
+            for target in 0..9_100 {
+                assert_eq!(
+                    probe.contains_doc_for_count(target),
+                    docs.binary_search(&target).is_ok(),
+                    "case={case} target={target}"
+                );
+                saw_dense |= matches!(
+                    probe.block_cursor.skip_reader().block_info(),
+                    crate::postings::BlockInfo::Dense { .. }
+                );
+            }
+            if case % 4 == 1 {
+                assert!(saw_dense, "case={case} must test encoded dense blocks");
+            }
+            assert!(!probe.contains_doc_for_count(TERMINATED));
+        }
+
+        // A dense block after a large doc-id jump exercises the previous-block
+        // base, and the final partial block exercises VInt and termination.
+        let docs: Vec<DocId> = (0..128)
+            .chain((100_000..100_200).filter(|doc| doc % 13 != 0))
+            .collect();
+        let mut probe = SegmentPostings::create_from_docs(&docs);
+        for target in [
+            0, 1, 127, 128, 99_999, 100_000, 100_127, 100_199, 100_200, TERMINATED,
+        ] {
+            assert_eq!(
+                probe.contains_doc_for_count(target),
+                docs.binary_search(&target).is_ok(),
+                "target={target}"
+            );
         }
     }
 }

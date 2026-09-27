@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use common::TinySet;
 
 use super::size_hint::estimate_intersection;
@@ -118,7 +120,9 @@ impl<TDocSet: DocSet> Intersection<TDocSet, TDocSet> {
     }
 }
 
-impl<TDocSet: DocSet, TOtherDocSet: DocSet> DocSet for Intersection<TDocSet, TOtherDocSet> {
+impl<TDocSet: DocSet + 'static, TOtherDocSet: DocSet> DocSet
+    for Intersection<TDocSet, TOtherDocSet>
+{
     #[inline]
     fn advance(&mut self) -> DocId {
         let (left, right) = (&mut self.left, &mut self.right);
@@ -241,6 +245,9 @@ impl<TDocSet: DocSet, TOtherDocSet: DocSet> DocSet for Intersection<TDocSet, TOt
             < self.segment_num_docs
         {
             if self.others.is_empty() && self.right.size_hint() > self.segment_num_docs / 2 {
+                if let Some(right) = (&self.right as &dyn Any).downcast_ref::<TermScorer>() {
+                    return self.count_including_deleted_sparse_dense_term(right.clone());
+                }
                 return self.count_including_deleted_sparse_window();
             }
             // Sparse path: if the lead iterator covers less than ~3% of docs,
@@ -270,7 +277,19 @@ fn and_blocks_and_return_is_empty(
     all_empty
 }
 
-impl<TDocSet: DocSet, TOtherDocSet: DocSet> Intersection<TDocSet, TOtherDocSet> {
+impl<TDocSet: DocSet + 'static, TOtherDocSet: DocSet> Intersection<TDocSet, TOtherDocSet> {
+    /// The dense term cursor is a clone so its encoded-block probes cannot leave
+    /// the scorer's visible DocSet cursor in an undecoded block.
+    fn count_including_deleted_sparse_dense_term(&mut self, mut right: TermScorer) -> u32 {
+        let mut count = 0u32;
+        let mut doc = self.left.doc();
+        while doc != TERMINATED {
+            count += right.contains_doc_for_count(doc) as u32;
+            doc = self.left.advance();
+        }
+        count
+    }
+
     /// Probe a dense secondary posting list once per window of sparse candidates.
     /// Its bitset fill can copy dense blocks without expanding them into doc IDs.
     fn count_including_deleted_sparse_window(&mut self) -> u32 {
@@ -348,7 +367,7 @@ impl<TDocSet: DocSet, TOtherDocSet: DocSet> Intersection<TDocSet, TOtherDocSet> 
 
 impl<TScorer, TOtherScorer> Scorer for Intersection<TScorer, TOtherScorer>
 where
-    TScorer: Scorer,
+    TScorer: Scorer + 'static,
     TOtherScorer: Scorer,
 {
     #[inline]
@@ -368,7 +387,8 @@ mod tests {
     use crate::docset::{DocSet, TERMINATED};
     use crate::postings::tests::test_skip_against_unoptimized;
     use crate::postings::SegmentPostings;
-    use crate::query::{QueryParser, VecDocSet};
+    use crate::query::term_query::TermScorer;
+    use crate::query::{Bm25Weight, QueryParser, VecDocSet};
     use crate::schema::{Schema, TEXT};
     use crate::Index;
 
@@ -634,6 +654,74 @@ mod tests {
             max_doc,
         );
         assert_eq!(intersection.count_including_deleted(), expected);
+    }
+
+    #[test]
+    fn test_count_sparse_term_dense_term_probes() {
+        let max_doc = 20_000;
+        let dense_docs: Vec<u32> = (0..max_doc).filter(|doc| doc % 7 != 0).collect();
+        let sparse_docs: Vec<u32> = vec![
+            0, 1, 64, 127, 128, 4095, 4096, 4097, 8191, 8192, 8193, 12_288, 16_383, 19_998, 19_999,
+        ];
+        let fieldnorms = vec![1; max_doc as usize];
+        let make_scorer = |docs: &[u32]| {
+            let docs_with_freqs: Vec<_> = docs.iter().map(|&doc| (doc, 1)).collect();
+            TermScorer::create_for_test(
+                &docs_with_freqs,
+                &fieldnorms,
+                Bm25Weight::for_one_term(docs.len() as u64, max_doc as u64, 1.0),
+            )
+        };
+        let mut intersection = Intersection::new(
+            vec![make_scorer(&sparse_docs), make_scorer(&dense_docs)],
+            max_doc,
+        );
+        let expected = sparse_docs.iter().filter(|doc| **doc % 7 != 0).count() as u32;
+        assert_eq!(intersection.count_including_deleted(), expected);
+    }
+
+    #[test]
+    fn test_count_sparse_dense_term_with_deletes() -> crate::Result<()> {
+        let mut schema_builder = Schema::builder();
+        let field = schema_builder.add_text_field("text", TEXT);
+        let index = Index::create_in_ram(schema_builder.build());
+        let mut writer = index.writer_for_tests()?;
+        let mut expected_before = 0usize;
+        let mut expected_after = 0usize;
+        for doc in 0..5_000 {
+            let sparse = doc % 97 == 0;
+            let dense = doc % 7 != 0;
+            let deleted = doc % 2 == 0;
+            if sparse && dense {
+                expected_before += 1;
+                expected_after += (!deleted) as usize;
+            }
+            let mut terms = Vec::new();
+            if sparse {
+                terms.push("rare");
+            }
+            if dense {
+                terms.push("common");
+            }
+            if deleted {
+                terms.push("kill");
+            }
+            writer.add_document(doc!(field => terms.join(" ")))?;
+        }
+        writer.commit()?;
+        let parser = QueryParser::for_index(&index, vec![field]);
+        let query = parser.parse_query("+rare +common")?;
+        assert_eq!(
+            index.reader()?.searcher().search(&*query, &Count)?,
+            expected_before
+        );
+        writer.delete_term(crate::Term::from_field_text(field, "kill"));
+        writer.commit()?;
+        assert_eq!(
+            index.reader()?.searcher().search(&*query, &Count)?,
+            expected_after
+        );
+        Ok(())
     }
 
     #[test]

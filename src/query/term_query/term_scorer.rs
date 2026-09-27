@@ -15,6 +15,10 @@ pub struct TermScorer {
 }
 
 impl TermScorer {
+    pub(crate) fn contains_doc_for_count(&mut self, target: DocId) -> bool {
+        self.postings.contains_doc_for_count(target)
+    }
+
     pub fn new(
         postings: SegmentPostings,
         fieldnorm_reader: FieldNormReader,
