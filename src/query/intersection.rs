@@ -240,6 +240,9 @@ impl<TDocSet: DocSet, TOtherDocSet: DocSet> DocSet for Intersection<TDocSet, TOt
             .saturating_mul(DENSITY_THRESHOLD_INVERSE)
             < self.segment_num_docs
         {
+            if self.others.is_empty() && self.right.size_hint() > self.segment_num_docs / 2 {
+                return self.count_including_deleted_sparse_window();
+            }
             // Sparse path: if the lead iterator covers less than ~3% of docs,
             // the block approach wastes time on mostly-empty blocks.
             self.count_including_deleted_sparse()
@@ -268,6 +271,31 @@ fn and_blocks_and_return_is_empty(
 }
 
 impl<TDocSet: DocSet, TOtherDocSet: DocSet> Intersection<TDocSet, TOtherDocSet> {
+    /// Probe a dense secondary posting list once per window of sparse candidates.
+    /// Its bitset fill can copy dense blocks without expanding them into doc IDs.
+    fn count_including_deleted_sparse_window(&mut self) -> u32 {
+        let mut count = 0u32;
+        let mut doc = self.left.doc();
+        while doc != TERMINATED {
+            let base = doc;
+            let horizon = base.saturating_add(crate::docset::BLOCK_WINDOW);
+            let mut mask = EMPTY_BLOCK;
+            let right_next = self.right.fill_bitset_block(base, &mut mask);
+            while doc < horizon {
+                let delta = doc - base;
+                count += mask[(delta / 64) as usize].contains(delta % 64) as u32;
+                doc = self.left.advance();
+            }
+            if right_next == TERMINATED {
+                break;
+            }
+            if doc < right_next {
+                doc = self.left.seek(right_next);
+            }
+        }
+        count
+    }
+
     fn count_including_deleted_sparse(&mut self) -> u32 {
         let mut count = 0u32;
         let mut doc = self.doc();
@@ -339,6 +367,7 @@ mod tests {
     use crate::collector::Count;
     use crate::docset::{DocSet, TERMINATED};
     use crate::postings::tests::test_skip_against_unoptimized;
+    use crate::postings::SegmentPostings;
     use crate::query::{QueryParser, VecDocSet};
     use crate::schema::{Schema, TEXT};
     use crate::Index;
@@ -586,6 +615,24 @@ mod tests {
         let a = VecDocSet::from(docs_a);
         let b = VecDocSet::from(docs_b);
         let mut intersection = Intersection::new(vec![a, b], 5000);
+        assert_eq!(intersection.count_including_deleted(), expected);
+    }
+
+    #[test]
+    fn test_count_sparse_leader_dense_secondary_windows() {
+        let max_doc = 20_000;
+        let dense_docs: Vec<u32> = (0..max_doc).filter(|doc| doc % 7 != 0).collect();
+        let sparse_docs: Vec<u32> = vec![
+            0, 1, 64, 127, 128, 4095, 4096, 4097, 8191, 8192, 8193, 12_288, 16_383, 19_998, 19_999,
+        ];
+        let expected = sparse_docs.iter().filter(|doc| **doc % 7 != 0).count() as u32;
+        let mut intersection = Intersection::new(
+            vec![
+                SegmentPostings::create_from_docs(&sparse_docs),
+                SegmentPostings::create_from_docs(&dense_docs),
+            ],
+            max_doc,
+        );
         assert_eq!(intersection.count_including_deleted(), expected);
     }
 
