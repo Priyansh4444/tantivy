@@ -18,6 +18,8 @@ pub struct SegmentPostings {
     pub(crate) block_cursor: BlockSegmentPostings,
     cur: usize,
     position_reader: Option<PositionReader>,
+    // (position offset of the block, cursor within it, sum of preceding frequencies).
+    position_prefix: Option<(u64, usize, u32)>,
 }
 
 impl SegmentPostings {
@@ -27,6 +29,7 @@ impl SegmentPostings {
             block_cursor: BlockSegmentPostings::empty(),
             cur: 0,
             position_reader: None,
+            position_prefix: None,
         }
     }
 
@@ -150,6 +153,7 @@ impl SegmentPostings {
             block_cursor: segment_block_postings,
             cur: 0, // cursor within the block
             position_reader,
+            position_prefix: None,
         }
     }
 }
@@ -346,11 +350,21 @@ impl Postings for SegmentPostings {
                 !self.block_cursor.freqs().is_empty(),
                 "No positions available"
             );
-            let read_offset = self.block_cursor.position_offset()
-                + (self.block_cursor.freqs()[..self.cur]
+            let block_offset = self.block_cursor.position_offset();
+            let (start, prefix) = match self.position_prefix {
+                Some((cached_block, cached_cur, cached_prefix))
+                    if cached_block == block_offset && cached_cur <= self.cur =>
+                {
+                    (cached_cur, cached_prefix)
+                }
+                _ => (0, 0),
+            };
+            let prefix = prefix
+                + self.block_cursor.freqs()[start..self.cur]
                     .iter()
-                    .cloned()
-                    .sum::<u32>() as u64);
+                    .sum::<u32>();
+            self.position_prefix = Some((block_offset, self.cur, prefix));
+            let read_offset = block_offset + prefix as u64;
             // TODO: instead of zeroing the output, we could use MaybeUninit or similar.
             output.resize(prev_len + term_freq as usize, 0u32);
             position_reader.read(read_offset, &mut output[prev_len..]);
@@ -372,7 +386,8 @@ mod tests {
     use crate::docset::{DocSet, TERMINATED};
     use crate::fastfield::AliveBitSet;
     use crate::postings::postings::Postings;
-    use crate::DocId;
+    use crate::schema::{IndexRecordOption, Schema, Term, TEXT};
+    use crate::{doc, DocId, Index};
 
     #[test]
     fn test_empty_segment_postings() {
@@ -404,6 +419,66 @@ mod tests {
         let all_deleted =
             AliveBitSet::for_test_from_deleted_docs(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 12);
         assert_eq!(docs.doc_freq_given_deletes(&all_deleted), 0);
+    }
+
+    #[test]
+    fn position_prefix_tracks_repeated_reads_seeks_blocks_and_clones() -> crate::Result<()> {
+        let mut schema_builder = Schema::builder();
+        let field = schema_builder.add_text_field("text", TEXT);
+        let index = Index::create_in_ram(schema_builder.build());
+        let mut writer = index.writer_for_tests()?;
+        let texts = ["x", "x z x", "z x z x z x", "z z x x"];
+        let expected = [&[0][..], &[0, 2], &[1, 3, 5], &[2, 3]];
+        for doc_id in 0..300 {
+            writer.add_document(doc!(field => texts[doc_id % 4]))?;
+        }
+        writer.commit()?;
+
+        let searcher = index.reader()?.searcher();
+        let term = Term::from_field_text(field, "x");
+        let mut postings = searcher
+            .segment_reader(0)
+            .inverted_index(field)?
+            .read_postings(&term, IndexRecordOption::WithFreqsAndPositions)?
+            .unwrap();
+        let check = |postings: &mut SegmentPostings, doc_id: u32| {
+            assert_eq!(postings.doc(), doc_id);
+            let mut positions = Vec::new();
+            postings.positions(&mut positions);
+            assert_eq!(positions, expected[doc_id as usize % 4]);
+            // A second read of the same cursor and an append with a nonzero offset
+            // must use the same frequency prefix without changing the result.
+            postings.positions(&mut positions);
+            assert_eq!(positions, expected[doc_id as usize % 4]);
+            postings.append_positions_with_offset(10, &mut positions);
+            assert_eq!(
+                &positions[expected[doc_id as usize % 4].len()..],
+                expected[doc_id as usize % 4]
+                    .iter()
+                    .map(|pos| pos + 10)
+                    .collect::<Vec<_>>()
+            );
+        };
+
+        check(&mut postings, 0);
+        assert_eq!(postings.advance(), 1);
+        check(&mut postings, 1);
+        assert_eq!(postings.seek(2), 2);
+        check(&mut postings, 2);
+        let mut clone = postings.clone();
+        assert_eq!(clone.seek(129), 129);
+        check(&mut clone, 129);
+        check(&mut postings, 2);
+        for &target in &[127, 128, 129, 255, 256, 299] {
+            assert_eq!(postings.seek(target), target);
+            check(&mut postings, target);
+            if target == 127 || target == 255 {
+                let mut at_boundary = postings.clone();
+                assert_eq!(at_boundary.advance(), target + 1);
+                check(&mut at_boundary, target + 1);
+            }
+        }
+        Ok(())
     }
 
     fn collect_windows(docs: &[DocId]) -> Vec<(DocId, Vec<DocId>, DocId)> {
