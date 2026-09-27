@@ -108,6 +108,25 @@ impl PositionReader {
         if offset < self.anchor_offset {
             self.reset();
         }
+        if offset >= self.block_offset {
+            let offset_in_block = offset - self.block_offset;
+            if offset_in_block < COMPRESSION_BLOCK_SIZE as u64
+                && output.len() <= COMPRESSION_BLOCK_SIZE - offset_in_block as usize
+            {
+                // The decoded block already contains the entire request. Keep the
+                // anchor on this block, as the regular read path does before copying.
+                if self.anchor_offset != self.block_offset {
+                    let blocks = ((self.block_offset - self.anchor_offset)
+                        / COMPRESSION_BLOCK_SIZE as u64) as usize;
+                    self.advance_num_blocks(blocks);
+                }
+                let start = offset_in_block as usize;
+                output.copy_from_slice(
+                    &self.block_decoder.output_array()[start..start + output.len()],
+                );
+                return;
+            }
+        }
         let delta_to_block_offset = offset as i64 - self.block_offset as i64;
         if !(0..128).contains(&delta_to_block_offset) {
             // The first position is not within the first block.
@@ -145,5 +164,49 @@ impl PositionReader {
             offset += remaining_in_block as u64;
             self.load_block(i);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::PositionReader;
+    use crate::directory::OwnedBytes;
+    use crate::positions::PositionSerializer;
+
+    #[test]
+    fn read_cached_block_preserves_anchor_and_cross_block_reads() -> crate::Result<()> {
+        let values: Vec<u32> = (0..300).collect();
+        let mut encoded = Vec::new();
+        let mut serializer = PositionSerializer::new(&mut encoded);
+        serializer.write_positions_delta(&values);
+        serializer.close_term()?;
+        serializer.close()?;
+        let mut reader = PositionReader::open(OwnedBytes::new(encoded))?;
+
+        let check = |reader: &mut PositionReader, offset: usize, len: usize| {
+            let mut output = vec![0; len];
+            reader.read(offset as u64, &mut output);
+            assert_eq!(output, values[offset..offset + len]);
+        };
+
+        check(&mut reader, 140, 5);
+        assert_eq!(reader.anchor_offset, 128);
+        check(&mut reader, 150, 7);
+        assert_eq!(reader.anchor_offset, 128);
+        check(&mut reader, 254, 4);
+        assert_eq!(reader.block_offset, 256);
+        assert_eq!(reader.anchor_offset, 128);
+        let mut clone = reader.clone();
+        check(&mut reader, 257, 3);
+        assert_eq!(reader.anchor_offset, 256);
+        check(&mut clone, 258, 2);
+        assert_eq!(clone.anchor_offset, 256);
+        check(&mut reader, 297, 3);
+        check(&mut reader, 20, 6);
+        assert_eq!(reader.anchor_offset, 0);
+        check(&mut reader, 127, 3);
+        check(&mut reader, 129, 2);
+        assert_eq!(reader.anchor_offset, 128);
+        Ok(())
     }
 }
