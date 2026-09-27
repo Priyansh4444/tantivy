@@ -454,6 +454,7 @@ mod tests {
     use std::io;
 
     use common::OwnedBytes;
+    use tantivy_fst::Automaton;
 
     use crate::{Dictionary, MonotonicU64SSTable};
 
@@ -505,4 +506,140 @@ mod tests {
 
     // TODO add test for sparse search with a block of poison (starts with 0xffffffff) => such a
     // block instantly causes an unexpected EOF error
+
+    struct PrefixAutomaton {
+        prefix: &'static [u8],
+        hint: bool,
+    }
+
+    impl Automaton for PrefixAutomaton {
+        type State = Option<usize>;
+
+        fn start(&self) -> Self::State {
+            Some(0)
+        }
+        fn is_match(&self, state: &Self::State) -> bool {
+            *state == Some(self.prefix.len())
+        }
+        fn can_match(&self, state: &Self::State) -> bool {
+            state.is_some()
+        }
+        fn will_always_match(&self, state: &Self::State) -> bool {
+            self.hint && self.is_match(state)
+        }
+        fn accept(&self, state: &Self::State, byte: u8) -> Self::State {
+            let pos = (*state)?;
+            if pos == self.prefix.len() {
+                return Some(pos);
+            }
+            (self.prefix[pos] == byte).then_some(pos + 1)
+        }
+    }
+
+    #[test]
+    fn test_streamer_ranges_and_prefix_hints_across_blocks() -> io::Result<()> {
+        let keys: Vec<Vec<u8>> = (0..400)
+            .map(|n| format!("{}{:03}", ["aa", "ab", "ba", "bb"][n / 100], n % 100).into_bytes())
+            .collect();
+        let mut builder = Dictionary::<MonotonicU64SSTable>::builder(Vec::new())?;
+        builder.set_block_len(37);
+        for (ord, key) in keys.iter().enumerate() {
+            builder.insert(key, &(ord as u64))?;
+        }
+        let dict =
+            Dictionary::<MonotonicU64SSTable>::from_bytes(OwnedBytes::new(builder.finish()?))?;
+        assert!(dict.sstable_index.get_block(2).is_some());
+        let bounds: &[&[u8]] = &[
+            b"", b"aa", b"aa000", b"aa055", b"aa099", b"ab", b"ab050", b"ab099", b"az", b"ba",
+            b"ba050", b"bb", b"bb099", b"bz", b"zz",
+        ];
+        for prefix in [
+            b"".as_slice(),
+            b"a".as_slice(),
+            b"ab".as_slice(),
+            b"ba".as_slice(),
+            b"z".as_slice(),
+        ] {
+            for hint in [false, true] {
+                let mut unbounded = dict
+                    .search(PrefixAutomaton { prefix, hint })
+                    .into_stream()?;
+                let mut actual_unbounded = Vec::new();
+                while unbounded.advance() {
+                    actual_unbounded.push((
+                        unbounded.key().to_vec(),
+                        unbounded.term_ord(),
+                        *unbounded.value(),
+                    ));
+                }
+                let expected_unbounded: Vec<_> = keys
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, key)| key.starts_with(prefix))
+                    .map(|(ord, key)| (key.clone(), ord as u64, ord as u64))
+                    .collect();
+                assert_eq!(
+                    actual_unbounded, expected_unbounded,
+                    "unbounded prefix={prefix:?} hint={hint}"
+                );
+                for &low in bounds {
+                    for &high in bounds {
+                        if low > high {
+                            continue;
+                        }
+                        for lower_included in [false, true] {
+                            for upper_included in [false, true] {
+                                let automaton = PrefixAutomaton { prefix, hint };
+                                let range = dict.search(automaton);
+                                let range = if lower_included {
+                                    range.ge(low)
+                                } else {
+                                    range.gt(low)
+                                };
+                                let range = if upper_included {
+                                    range.le(high)
+                                } else {
+                                    range.lt(high)
+                                };
+                                let mut stream = range.into_stream()?;
+                                let mut actual = Vec::new();
+                                while stream.advance() {
+                                    actual.push((
+                                        stream.key().to_vec(),
+                                        stream.term_ord(),
+                                        *stream.value(),
+                                    ));
+                                }
+                                let expected: Vec<_> = keys
+                                    .iter()
+                                    .enumerate()
+                                    .filter(|(_, key)| {
+                                        key.starts_with(prefix)
+                                            && if lower_included {
+                                                key.as_slice() >= low
+                                            } else {
+                                                key.as_slice() > low
+                                            }
+                                            && if upper_included {
+                                                key.as_slice() <= high
+                                            } else {
+                                                key.as_slice() < high
+                                            }
+                                    })
+                                    .map(|(ord, key)| (key.clone(), ord as u64, ord as u64))
+                                    .collect();
+                                assert_eq!(
+                                    actual, expected,
+                                    "prefix={prefix:?} hint={hint} low={low:?} high={high:?} \
+                                     lower_included={lower_included} \
+                                     upper_included={upper_included}"
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
 }
