@@ -254,15 +254,42 @@ impl DocSet for SegmentPostings {
                     let docs = self.block_cursor.docs();
                     let len = self.block_cursor.block_len();
                     let mut i = self.cur;
+                    if docs[len - 1] - docs[i] >= 256 {
+                        while i < len {
+                            let d = docs[i];
+                            if d >= horizon {
+                                self.cur = i;
+                                return d;
+                            }
+                            let delta = d - min_doc;
+                            mask[(delta / 64) as usize].insert_mut(delta % 64);
+                            i += 1;
+                        }
+                        self.block_cursor.advance_skip_only();
+                        self.cur = 0;
+                        continue;
+                    }
+                    let mut bucket = ((docs[i] - min_doc) / 64) as usize;
+                    let mut bits = 0u64;
                     while i < len {
                         let d = docs[i];
                         if d >= horizon {
-                            self.cur = i;
-                            return d;
+                            break;
                         }
                         let delta = d - min_doc;
-                        mask[(delta / 64) as usize].insert_mut(delta % 64);
+                        let next_bucket = (delta / 64) as usize;
+                        if next_bucket != bucket {
+                            mask[bucket].union_mut(TinySet::from_bits(bits));
+                            bucket = next_bucket;
+                            bits = 0;
+                        }
+                        bits |= 1u64 << (delta % 64);
                         i += 1;
+                    }
+                    mask[bucket].union_mut(TinySet::from_bits(bits));
+                    if i < len {
+                        self.cur = i;
+                        return docs[i];
                     }
                     self.block_cursor.advance_skip_only();
                     self.cur = 0;
@@ -557,5 +584,65 @@ mod tests {
             min_doc = postings.fill_bitset_window(min_doc, &mut mask);
         }
         assert_eq!(postings.doc(), TERMINATED);
+    }
+
+    #[test]
+    fn fill_bitset_window_randomized_matches_bit_walk() {
+        fn next(state: &mut u64) -> u64 {
+            *state ^= *state << 13;
+            *state ^= *state >> 7;
+            *state ^= *state << 17;
+            *state
+        }
+
+        let mut state = 0x796a_4e31_a2d5_8b0fu64;
+        for case in 0..12 {
+            let limit = if case == 0 { 120 } else { 4_500 };
+            let docs: Vec<DocId> = (0..limit)
+                .filter(|&doc| {
+                    let threshold = match case % 4 {
+                        0 => 1_024,
+                        1 => 920,
+                        2 => 110,
+                        _ if doc % 512 < 256 => 950,
+                        _ => 45,
+                    };
+                    next(&mut state) % 1_024 < threshold
+                })
+                .collect();
+            assert!(!docs.is_empty());
+
+            for width in [1usize, 2, 7, 64] {
+                let mut postings = SegmentPostings::create_from_docs(&docs);
+                while postings.doc() != TERMINATED {
+                    let min_doc = postings.doc() + (next(&mut state) % 5) as u32;
+                    let horizon = min_doc + width as u32 * 64;
+                    let mut mask = vec![common::TinySet::EMPTY; width];
+                    for tinyset in &mut mask {
+                        tinyset.insert_mut((next(&mut state) % 64) as u32);
+                    }
+                    let mut expected = mask.clone();
+                    for &doc in docs.iter().filter(|&&doc| doc >= min_doc && doc < horizon) {
+                        let delta = doc - min_doc;
+                        expected[(delta / 64) as usize].insert_mut(delta % 64);
+                    }
+                    let expected_next = docs
+                        .iter()
+                        .copied()
+                        .find(|&doc| doc >= horizon)
+                        .unwrap_or(TERMINATED);
+                    assert_eq!(
+                        postings.fill_bitset_window(min_doc, &mut mask),
+                        expected_next,
+                        "case={case} width={width} min_doc={min_doc}"
+                    );
+                    assert_eq!(postings.doc(), expected_next);
+                    assert_eq!(
+                        mask, expected,
+                        "case={case} width={width} min_doc={min_doc}"
+                    );
+                }
+            }
+        }
     }
 }
