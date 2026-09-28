@@ -30,25 +30,6 @@ pub fn num_bitset_longs(doc_range: u32) -> u32 {
     doc_range.div_ceil(64)
 }
 
-/// For each byte value, the positions of its set bits (padded with zeros).
-const fn build_byte_positions() -> [[u8; 8]; 256] {
-    let mut table = [[0u8; 8]; 256];
-    let mut byte = 0usize;
-    while byte < 256 {
-        let mut pos = 0u8;
-        let mut k = 0usize;
-        while pos < 8 {
-            if (byte as u8) & (1 << pos) != 0 {
-                table[byte][k] = pos;
-                k += 1;
-            }
-            pos += 1;
-        }
-        byte += 1;
-    }
-    table
-}
-
 /// Base doc id for a dense bitset block: first doc id that bit 0 represents.
 ///
 /// `offset` is the previous block's last doc (`0` for the first block, where
@@ -240,8 +221,7 @@ impl BlockDecoder {
     /// Decompress a dense bitset block written by
     /// `BlockEncoder::compress_bitset_sorted`.
     ///
-    /// Decoded byte-at-a-time through a 2 KiB lookup table mapping each byte
-    /// value to the positions of its set bits, so the cost is proportional
+    /// Enumerate set bits a word at a time, so the cost is proportional
     /// to the number of docs rather than the span of the block.
     /// Returns the number of bytes consumed (`num_longs * 8`).
     pub fn uncompress_bitset_sorted(
@@ -250,18 +230,17 @@ impl BlockDecoder {
         offset: u32,
         num_longs: usize,
     ) -> usize {
-        const BYTE_POSITIONS: [[u8; 8]; 256] = build_byte_positions();
         let bytes_needed = num_longs * 8;
         debug_assert!(compressed_data.len() >= bytes_needed);
         let base = bitset_base_doc(offset);
         let mut out = 0usize;
-        for (byte_idx, &byte) in compressed_data[..bytes_needed].iter().enumerate() {
-            let positions = &BYTE_POSITIONS[byte as usize];
-            let num_bits = byte.count_ones() as usize;
-            let byte_base = base.wrapping_add((byte_idx * 8) as u32);
-            for k in 0..num_bits {
-                self.output[out] = byte_base.wrapping_add(positions[k] as u32);
+        for (word_idx, word_bytes) in compressed_data[..bytes_needed].chunks_exact(8).enumerate() {
+            let mut bits = u64::from_le_bytes(word_bytes.try_into().unwrap());
+            let word_base = base.wrapping_add((word_idx * 64) as u32);
+            while bits != 0 {
+                self.output[out] = word_base.wrapping_add(bits.trailing_zeros());
                 out += 1;
+                bits &= bits - 1;
             }
         }
         debug_assert_eq!(out, COMPRESSION_BLOCK_SIZE);
