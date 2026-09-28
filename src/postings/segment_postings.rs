@@ -23,6 +23,24 @@ pub struct SegmentPostings {
 }
 
 impl SegmentPostings {
+    fn current_position_read_offset(&mut self) -> u64 {
+        let block_offset = self.block_cursor.position_offset();
+        let (start, prefix) = match self.position_prefix {
+            Some((cached_block, cached_cur, cached_prefix))
+                if cached_block == block_offset && cached_cur <= self.cur =>
+            {
+                (cached_cur, cached_prefix)
+            }
+            _ => (0, 0),
+        };
+        let prefix = prefix
+            + self.block_cursor.freqs()[start..self.cur]
+                .iter()
+                .sum::<u32>();
+        self.position_prefix = Some((block_offset, self.cur, prefix));
+        block_offset + prefix as u64
+    }
+
     /// Returns an empty segment postings object
     pub fn empty() -> Self {
         SegmentPostings {
@@ -372,6 +390,20 @@ impl HasLen for SegmentPostings {
 }
 
 impl Postings for SegmentPostings {
+    fn position_cursor(&mut self, offset: u32) -> Option<super::postings::PositionCursor<'_>> {
+        if self.position_reader.is_none() {
+            return None;
+        }
+        let read_offset = self.current_position_read_offset();
+        let remaining = self.term_freq();
+        Some(super::postings::PositionCursor::new(
+            self.position_reader.as_mut().unwrap(),
+            read_offset,
+            remaining,
+            offset,
+        ))
+    }
+
     /// Returns the frequency associated with the current document.
     /// If the schema is set up so that no frequency have been encoded,
     /// this method should always return 1.
@@ -396,29 +428,18 @@ impl Postings for SegmentPostings {
     fn append_positions_with_offset(&mut self, offset: u32, output: &mut Vec<u32>) {
         let term_freq = self.term_freq();
         let prev_len = output.len();
-        if let Some(position_reader) = self.position_reader.as_mut() {
+        if self.position_reader.is_some() {
             debug_assert!(
                 !self.block_cursor.freqs().is_empty(),
                 "No positions available"
             );
-            let block_offset = self.block_cursor.position_offset();
-            let (start, prefix) = match self.position_prefix {
-                Some((cached_block, cached_cur, cached_prefix))
-                    if cached_block == block_offset && cached_cur <= self.cur =>
-                {
-                    (cached_cur, cached_prefix)
-                }
-                _ => (0, 0),
-            };
-            let prefix = prefix
-                + self.block_cursor.freqs()[start..self.cur]
-                    .iter()
-                    .sum::<u32>();
-            self.position_prefix = Some((block_offset, self.cur, prefix));
-            let read_offset = block_offset + prefix as u64;
+            let read_offset = self.current_position_read_offset();
             // TODO: instead of zeroing the output, we could use MaybeUninit or similar.
             output.resize(prev_len + term_freq as usize, 0u32);
-            position_reader.read(read_offset, &mut output[prev_len..]);
+            self.position_reader
+                .as_mut()
+                .unwrap()
+                .read(read_offset, &mut output[prev_len..]);
             let mut cum = offset;
             for output_mut in output[prev_len..].iter_mut() {
                 cum += *output_mut;
@@ -501,6 +522,12 @@ mod tests {
             // must use the same frequency prefix without changing the result.
             postings.positions(&mut positions);
             assert_eq!(positions, expected[doc_id as usize % 4]);
+            let streamed: Vec<u32> = postings.position_cursor(10).unwrap().collect();
+            let expected_streamed: Vec<u32> = expected[doc_id as usize % 4]
+                .iter()
+                .map(|pos| pos + 10)
+                .collect();
+            assert_eq!(streamed, expected_streamed);
             postings.append_positions_with_offset(10, &mut positions);
             assert_eq!(
                 &positions[expected[doc_id as usize % 4].len()..],

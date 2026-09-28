@@ -111,6 +111,10 @@ impl<TDocSet: DocSet> Intersection<TDocSet, TDocSet> {
 }
 
 impl<TDocSet: DocSet> Intersection<TDocSet, TDocSet> {
+    pub(crate) fn first_two_mut(&mut self) -> (&mut TDocSet, &mut TDocSet) {
+        (&mut self.left, &mut self.right)
+    }
+
     pub(crate) fn docset_mut_specialized(&mut self, ord: usize) -> &mut TDocSet {
         match ord {
             0 => &mut self.left,

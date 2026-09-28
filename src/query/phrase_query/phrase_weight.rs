@@ -84,6 +84,7 @@ impl PhraseWeight {
             fieldnorm_reader,
             self.slop,
             0,
+            false,
             target,
         )))
     }

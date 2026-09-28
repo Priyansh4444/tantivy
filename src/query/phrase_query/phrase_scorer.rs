@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use crate::docset::{DocSet, SeekDangerResult, TERMINATED};
 use crate::fieldnorm::FieldNormReader;
-use crate::postings::{Postings, SegmentPostings};
+use crate::postings::{PositionCursor, Postings, SegmentPostings};
 use crate::query::bm25::Bm25Weight;
 use crate::query::{Intersection, Scorer};
 use crate::{DocId, Score};
@@ -22,6 +22,10 @@ impl<TPostings: Postings> PostingsWithOffset<TPostings> {
 
     pub fn positions(&mut self, output: &mut Vec<u32>) {
         self.postings.positions_with_offset(self.offset, output)
+    }
+
+    fn position_cursor(&mut self) -> Option<PositionCursor<'_>> {
+        self.postings.position_cursor(self.offset)
     }
 
     fn term_freq(&self) -> u32 {
@@ -59,6 +63,7 @@ pub struct PhraseScorer<TPostings: Postings> {
     left_slops: Vec<u8>,
     positions_buffer: Vec<u32>,
     slops_buffer: Vec<u8>,
+    keep_positions_for_prefix: bool,
 }
 
 /// Returns true if and only if the two sorted arrays contain a common element
@@ -362,6 +367,7 @@ impl<TPostings: Postings> PhraseScorer<TPostings> {
             fieldnorm_reader,
             slop,
             0,
+            false,
         )
     }
 
@@ -371,6 +377,7 @@ impl<TPostings: Postings> PhraseScorer<TPostings> {
         fieldnorm_reader: FieldNormReader,
         slop: u32,
         offset: usize,
+        keep_positions_for_prefix: bool,
     ) -> PhraseScorer<TPostings> {
         let (seek_result, mut scorer) = Self::new_danger(
             term_postings_with_offset,
@@ -378,6 +385,7 @@ impl<TPostings: Postings> PhraseScorer<TPostings> {
             fieldnorm_reader,
             slop,
             offset,
+            keep_positions_for_prefix,
             0,
         );
         if let SeekDangerResult::SeekLowerBound(target) = seek_result {
@@ -398,6 +406,7 @@ impl<TPostings: Postings> PhraseScorer<TPostings> {
         fieldnorm_reader: FieldNormReader,
         slop: u32,
         offset: usize,
+        keep_positions_for_prefix: bool,
         target: DocId,
     ) -> (SeekDangerResult, PhraseScorer<TPostings>) {
         for (_, postings) in &mut term_postings_with_offset {
@@ -434,6 +443,7 @@ impl<TPostings: Postings> PhraseScorer<TPostings> {
             slop,
             left_slops: Vec::with_capacity(100),
             slops_buffer: Vec::with_capacity(100),
+            keep_positions_for_prefix,
             positions_buffer: Vec::with_capacity(100),
         };
         let doc = scorer.doc();
@@ -470,6 +480,23 @@ impl<TPostings: Postings> PhraseScorer<TPostings> {
     }
 
     fn phrase_exists(&mut self) -> bool {
+        if self.slop == 0 && self.num_terms == 2 && !self.keep_positions_for_prefix {
+            let (left, right) = self.intersection_docset.first_two_mut();
+            if let (Some(mut left), Some(mut right)) =
+                (left.position_cursor(), right.position_cursor())
+            {
+                let mut left_pos = left.next();
+                let mut right_pos = right.next();
+                while let (Some(l), Some(r)) = (left_pos, right_pos) {
+                    match l.cmp(&r) {
+                        Ordering::Less => left_pos = left.next(),
+                        Ordering::Equal => return true,
+                        Ordering::Greater => right_pos = right.next(),
+                    }
+                }
+                return false;
+            }
+        }
         self.compute_phrase_match();
         if self.has_slop() {
             intersection_exists_with_slop(
