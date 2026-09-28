@@ -3,6 +3,41 @@ use crate::query::term_query::TermScorer;
 use crate::query::Scorer;
 use crate::{DocId, DocSet, Score, TERMINATED};
 
+/// Iterate the rare term directly when the other term covers most of the segment.
+/// In this case the dense term usually matches, so per-block bounds and candidate
+/// buffers cost more than the membership checks they avoid.
+pub(crate) fn sparse_dense_intersection(
+    mut scorers: Vec<TermScorer>,
+    mut threshold: Score,
+    callback: &mut dyn FnMut(DocId, Score) -> Score,
+) {
+    debug_assert_eq!(scorers.len(), 2);
+    scorers.sort_by_key(TermScorer::size_hint);
+    let (leader, secondary) = scorers.split_at_mut(1);
+    let leader = &mut leader[0];
+    let secondary = &mut secondary[0];
+    let max_score = leader.max_score() + secondary.max_score();
+    let secondary_max_score = secondary.max_score();
+
+    let mut doc = leader.doc();
+    while doc < TERMINATED && threshold < max_score {
+        let leader_score = leader.score();
+        if leader_score + secondary_max_score > threshold {
+            if secondary.doc() > doc {
+                doc = leader.advance();
+                continue;
+            }
+            if secondary.seek(doc) == doc {
+                let score = leader_score + secondary.score();
+                if score > threshold {
+                    threshold = callback(doc, score);
+                }
+            }
+        }
+        doc = leader.advance();
+    }
+}
+
 /// Block-max pruning for top-K over intersection of term scorers.
 ///
 /// Uses the least-frequent term as "leader" to define 128-doc processing windows.
@@ -240,6 +275,61 @@ mod tests {
 
         super::block_wand_intersection(term_scorers, Score::MIN, callback);
         checkpoints
+    }
+
+    #[test]
+    fn test_sparse_dense_intersection_matches_exhaustive() {
+        let fieldnorms: Vec<u32> = (0..4096).map(|doc| 20 + doc % 73).collect();
+        let sparse: Vec<(DocId, u32)> = (0..4096)
+            .filter(|doc| doc % 137 == 0)
+            .map(|doc| (doc, 1 + doc % 7))
+            .collect();
+        let dense: Vec<(DocId, u32)> = (0..4096)
+            .filter(|doc| doc % 11 != 0)
+            .map(|doc| (doc, 1 + doc % 5))
+            .collect();
+        let average_fieldnorm = fieldnorms.iter().sum::<u32>() as Score / fieldnorms.len() as Score;
+        let make_scorers = || {
+            [&sparse, &dense]
+                .into_iter()
+                .map(|postings| {
+                    let weight = Bm25Weight::for_one_term(
+                        postings.len() as u64,
+                        fieldnorms.len() as u64,
+                        average_fieldnorm,
+                    );
+                    TermScorer::create_for_test(postings, &fieldnorms, weight)
+                })
+                .collect()
+        };
+
+        for top_k in [1, 5, 10, 20] {
+            let mut heap: BinaryHeap<Float> = BinaryHeap::with_capacity(top_k);
+            let mut checkpoints = Vec::new();
+            super::sparse_dense_intersection(make_scorers(), Score::MIN, &mut |doc, score| {
+                heap.push(Float(score));
+                if heap.len() > top_k {
+                    heap.pop();
+                }
+                let threshold = if heap.len() == top_k {
+                    heap.peek().unwrap().0
+                } else {
+                    Score::MIN
+                };
+                if !nearly_equals(score, threshold) {
+                    checkpoints.push((doc, score));
+                }
+                threshold
+            });
+            let exhaustive = compute_checkpoints_naive_intersection(make_scorers(), top_k);
+            assert_eq!(checkpoints.len(), exhaustive.len());
+            for ((doc, score), (expected_doc, expected_score)) in
+                checkpoints.iter().zip(exhaustive.iter())
+            {
+                assert_eq!(doc, expected_doc);
+                assert!(nearly_equals(*score, *expected_score));
+            }
+        }
     }
 
     /// Naive baseline: intersect by iterating all docs.

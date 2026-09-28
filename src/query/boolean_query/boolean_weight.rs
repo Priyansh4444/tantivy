@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use super::occur_weights::OccurWeights;
-use crate::docset::{SeekDangerResult, COLLECT_BLOCK_BUFFER_LEN};
+use crate::docset::{DocSet, SeekDangerResult, COLLECT_BLOCK_BUFFER_LEN};
 use crate::index::SegmentReader;
 use crate::postings::FreqReadingOption;
 use crate::query::disjunction::Disjunction;
@@ -701,7 +701,25 @@ impl<TScoreCombiner: ScoreCombiner + Sync> Weight for BooleanWeight<TScoreCombin
             // shapes how *should* clauses combine. Block-WAND's summing
             // therefore matches the unpruned scorer here for every combiner.
             SpecializedScorer::TermIntersection(term_scorers) => {
-                super::block_wand_intersection(term_scorers, threshold, callback);
+                if term_scorers.len() == 2 {
+                    let min_df = term_scorers
+                        .iter()
+                        .map(TermScorer::size_hint)
+                        .min()
+                        .unwrap();
+                    let max_df = term_scorers
+                        .iter()
+                        .map(TermScorer::size_hint)
+                        .max()
+                        .unwrap();
+                    if min_df.saturating_mul(64) < num_docs && max_df >= num_docs / 2 {
+                        super::sparse_dense_intersection(term_scorers, threshold, callback);
+                    } else {
+                        super::block_wand_intersection(term_scorers, threshold, callback);
+                    }
+                } else {
+                    super::block_wand_intersection(term_scorers, threshold, callback);
+                }
             }
             SpecializedScorer::Other(mut scorer) => {
                 for_each_pruning_scorer(scorer.as_mut(), threshold, callback);
