@@ -1,8 +1,76 @@
 use std::ops::{Deref, DerefMut};
 
+use super::block_wand_intersection;
 use crate::query::term_query::TermScorer;
 use crate::query::Scorer;
 use crate::{DocId, DocSet, Score, TERMINATED};
+
+/// Score the first candidates without WAND bookkeeping. Once the threshold
+/// rises, visit only documents containing the term that can still win alone,
+/// or intersect when neither term can win alone.
+pub(crate) fn two_term_or_maxscore(
+    mut scorers: Vec<TermScorer>,
+    mut threshold: Score,
+    callback: &mut dyn FnMut(DocId, Score) -> Score,
+) {
+    debug_assert_eq!(scorers.len(), 2);
+    let max_scores = [scorers[0].max_score(), scorers[1].max_score()];
+
+    for _ in 0..128 {
+        let doc = scorers[0].doc().min(scorers[1].doc());
+        if doc == TERMINATED {
+            return;
+        }
+        let mut score = 0.0;
+        for scorer in &mut scorers {
+            if scorer.doc() == doc {
+                score += scorer.score();
+                scorer.advance();
+            }
+        }
+        if score > threshold {
+            threshold = callback(doc, score);
+        }
+        if threshold >= max_scores[0] && threshold >= max_scores[1] {
+            block_wand_intersection(scorers, threshold, callback);
+            return;
+        }
+    }
+
+    if threshold >= max_scores[0] || threshold >= max_scores[1] {
+        // A document without the essential term cannot exceed the current
+        // threshold. Drive its postings and only look up the optional term
+        // for these candidates.
+        let essential_idx = usize::from(threshold >= max_scores[0]);
+        let (essential, optional) = if essential_idx == 0 {
+            let (essential, optional) = scorers.split_at_mut(1);
+            (&mut essential[0], &mut optional[0])
+        } else {
+            let (optional, essential) = scorers.split_at_mut(1);
+            (&mut essential[0], &mut optional[0])
+        };
+        while essential.doc() < TERMINATED {
+            let doc = essential.doc();
+            let mut score = essential.score();
+            if score + optional.max_score() > threshold && optional.doc() <= doc {
+                if optional.seek(doc) == doc {
+                    score += optional.score();
+                }
+            }
+            if score > threshold {
+                threshold = callback(doc, score);
+            }
+            essential.advance();
+            if threshold >= max_scores[essential_idx] {
+                block_wand_intersection(scorers, threshold, callback);
+                return;
+            }
+        }
+        return;
+    }
+
+    block_wand(scorers, threshold, callback);
+}
 
 /// Takes a term_scorers sorted by their current doc() and a threshold and returns
 /// Returns (pivot_len, pivot_ord) defined as follows:
@@ -353,6 +421,8 @@ mod tests {
         if term_scorers.len() == 1 {
             let scorer = term_scorers.pop().unwrap();
             super::block_wand_single_scorer(scorer, Score::MIN, callback);
+        } else if term_scorers.len() == 2 {
+            super::two_term_or_maxscore(term_scorers, Score::MIN, callback);
         } else {
             super::block_wand(term_scorers, Score::MIN, callback);
         }

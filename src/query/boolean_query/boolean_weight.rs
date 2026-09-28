@@ -688,7 +688,11 @@ impl<TScoreCombiner: ScoreCombiner + Sync> Weight for BooleanWeight<TScoreCombin
             // every matching term and falls back to the plain union.
             SpecializedScorer::TermUnion(term_scorers) => {
                 if TScoreCombiner::SUPPORTS_BLOCK_WAND {
-                    super::block_wand(term_scorers, threshold, callback);
+                    if term_scorers.len() == 2 {
+                        super::two_term_or_maxscore(term_scorers, threshold, callback);
+                    } else {
+                        super::block_wand(term_scorers, threshold, callback);
+                    }
                 } else {
                     let mut union_scorer =
                         BufferedUnionScorer::build(term_scorers, &self.score_combiner_fn, num_docs);
