@@ -1,0 +1,34 @@
+module	type	declaration	descriptor
+core	org.apache.lucene.index.CheckIndex	public static void main(java.lang.String[]) throws java.io.IOException, java.lang.InterruptedException;	([Ljava/lang/String;)V
+core	org.apache.lucene.index.IndexUpgrader	public static void main(java.lang.String[]) throws java.io.IOException;	([Ljava/lang/String;)V
+core	org.apache.lucene.store.LockStressTest	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+core	org.apache.lucene.store.LockVerifyServer	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+analysis-kuromoji	org.apache.lucene.analysis.ja.dict.DictionaryBuilder	public static void main(java.lang.String[]) throws java.io.IOException;	([Ljava/lang/String;)V
+analysis-nori	org.apache.lucene.analysis.ko.dict.DictionaryBuilder	public static void main(java.lang.String[]) throws java.io.IOException;	([Ljava/lang/String;)V
+analysis-stempel	org.egothor.stemmer.Compile	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+analysis-stempel	org.egothor.stemmer.DiffIt	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+benchmark	org.apache.lucene.benchmark.byTask.Benchmark	public static void main(java.lang.String[]);	([Ljava/lang/String;)V
+benchmark	org.apache.lucene.benchmark.byTask.programmatic.Sample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+benchmark	org.apache.lucene.benchmark.quality.trec.QueryDriver	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+benchmark	org.apache.lucene.benchmark.quality.utils.QualityQueriesFinder	public static void main(java.lang.String[]) throws java.io.IOException;	([Ljava/lang/String;)V
+benchmark	org.apache.lucene.benchmark.utils.ExtractWikipedia	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.IndexFiles	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.SearchFiles	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.AssociationsFacetsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.CustomFacetSetExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.DistanceFacetsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.DynamicRangeFacetsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.ExpressionAggregationFacetsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.MultiCategoryListsFacetsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.RangeFacetsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.SandboxFacetsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.SimpleFacetsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.SimpleSortedSetFacetsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+demo	org.apache.lucene.demo.facet.StringValueFacetCountsExample	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+facet	org.apache.lucene.facet.taxonomy.PrintTaxonomyStats	public static void main(java.lang.String[]) throws java.io.IOException;	([Ljava/lang/String;)V
+misc	org.apache.lucene.misc.GetTermInfo	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+misc	org.apache.lucene.misc.HighFreqTerms	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+misc	org.apache.lucene.misc.IndexMergeTool	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+misc	org.apache.lucene.misc.index.IndexSplitter	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+misc	org.apache.lucene.misc.index.MultiPassIndexSplitter	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V
+luke	org.apache.lucene.luke.app.desktop.LukeMain	public static void main(java.lang.String[]) throws java.lang.Exception;	([Ljava/lang/String;)V

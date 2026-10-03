@@ -1,0 +1,803 @@
+{
+  "version": "10.4.0",
+  "catalog_url": "https://lucene.apache.org/core/10_4_0/",
+  "lucene_git_tag": "releases/lucene/10.4.0",
+  "lucene_commit": "9983b7ce7fdd04f4d357688fb85c14277c15ea8d",
+  "tantivy_commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+  "tantivy_source_ref": "65c4e15e6",
+  "java_tool": "21.0.12.1",
+  "extraction": "javap -protected -s, all base-version jar classes; documented search-index cross-check",
+  "counts": {
+    "catalogued_modules": 31,
+    "additional_tool_modules": 1,
+    "accounted_modules": 32,
+    "documented_types": 3427,
+    "binary_api_types": 3637,
+    "union_api_types": 3637,
+    "documented_member_labels": 25542,
+    "declared_public_members": 23596,
+    "documented_packages": 292,
+    "declared_protected_members": 3226,
+    "declared_members": 26822,
+    "member_kinds": {
+      "constructor": 4012,
+      "method": 18946,
+      "field": 3864
+    },
+    "source_launchers": 2,
+    "documented_types_not_binary_extracted": 0,
+    "download_failures": 0,
+    "javap_warning_or_failure_batches": 0,
+    "public_main_entrypoints": 33
+  },
+  "downloads": {
+    "raw/catalog.html": {
+      "url": "https://lucene.apache.org/core/10_4_0/",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/",
+      "bytes": 8177,
+      "sha256": "b33f9b5245cfa19ef705ffaea9890a3c07e45f516a3521616693516dd287e014"
+    },
+    "raw/core/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/core/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/core/type-search-index.js",
+      "bytes": 72440,
+      "sha256": "88875607d639c8692594ceb28c7f4048e127b6b45123e9ff720080ade94c8e63"
+    },
+    "raw/analysis-common/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/common/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/common/type-search-index.js",
+      "bytes": 31601,
+      "sha256": "af4a1d5195bb5a0c2927a030024724623bf0d46c0905c8eb1a38d73c14710d37"
+    },
+    "raw/analysis-common/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/common/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/common/member-search-index.js",
+      "bytes": 298395,
+      "sha256": "1aed6d741645cf0ca449b2b56e9cde520b9e48e1c9e5cf06a7baa0f727ad27e7"
+    },
+    "raw/analysis-common/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/common/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/common/package-search-index.js",
+      "bytes": 2906,
+      "sha256": "eee3d5c763a378f5925e3e7224d16f97846f0d82a1b3c840c857a917221a77a4"
+    },
+    "raw/analysis-icu/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/icu/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/icu/type-search-index.js",
+      "bytes": 1430,
+      "sha256": "a4e86b12fb61d9a1448c0b4af09591fc3a4594ef56e1a7b40a5f4d0446e8b24c"
+    },
+    "raw/analysis-icu/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/icu/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/icu/member-search-index.js",
+      "bytes": 10663,
+      "sha256": "210859c9707da0342fb39e6382f9ffc2345fd68337f62f3b54c7be403673acab"
+    },
+    "raw/analysis-icu/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/icu/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/icu/package-search-index.js",
+      "bytes": 241,
+      "sha256": "65744263f02d5046da6ce5dbcfa14540e692007f3ffdf9acbaf8271f1761d2ce"
+    },
+    "raw/analysis-kuromoji/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/kuromoji/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/kuromoji/type-search-index.js",
+      "bytes": 3456,
+      "sha256": "fa7e1adb703a150d8768f46b9a8683a72b73d1e1d94a17f672f4ae904dcd6dd2"
+    },
+    "raw/analysis-kuromoji/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/kuromoji/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/kuromoji/member-search-index.js",
+      "bytes": 30328,
+      "sha256": "a3bdbce4c599edd3467db4b924878fc3e10089ec25f569a4ceeae9be28042ece"
+    },
+    "raw/analysis-kuromoji/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/kuromoji/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/kuromoji/package-search-index.js",
+      "bytes": 279,
+      "sha256": "72c5ee46a5650f09c44e7f680db30fa152855d515e3f6b36e59bd22a13b08a4b"
+    },
+    "jars/lucene-analysis-icu-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-icu/10.4.0/lucene-analysis-icu-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-icu/10.4.0/lucene-analysis-icu-10.4.0.jar",
+      "bytes": 84979,
+      "sha256": "ee1f8e3a9b3e7e1306505ba341789fa234ff1a1db6e752db8005905bbea2e2f2"
+    },
+    "raw/analysis-morfologik/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/morfologik/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/morfologik/type-search-index.js",
+      "bytes": 559,
+      "sha256": "bd571f103ef512d4f77ea3a30c3b9b128839a854e767951ef156fee668f9715b"
+    },
+    "raw/analysis-morfologik/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/morfologik/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/morfologik/member-search-index.js",
+      "bytes": 4246,
+      "sha256": "6991c4deeb8a63e0cce3578ae49324e6d22aa9572383811974a3a1cd18955158"
+    },
+    "raw/analysis-morfologik/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/morfologik/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/morfologik/package-search-index.js",
+      "bytes": 179,
+      "sha256": "289060e89524859e589c970cfd402a7f86f95873fc734eddc52b9399bf346238"
+    },
+    "jars/lucene-analysis-morfologik-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-morfologik/10.4.0/lucene-analysis-morfologik-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-morfologik/10.4.0/lucene-analysis-morfologik-10.4.0.jar",
+      "bytes": 30126,
+      "sha256": "9cc4978cadfaec536abf396e824e910b527d5b8a9d55efdcc7d8f89fdba6524d"
+    },
+    "raw/analysis-nori/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/nori/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/nori/type-search-index.js",
+      "bytes": 2114,
+      "sha256": "e2d2c7f94b905c486eae8771d167241d4d6e1e7e838acd1156dfb23b4da25a95"
+    },
+    "raw/analysis-nori/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/nori/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/nori/member-search-index.js",
+      "bytes": 22826,
+      "sha256": "e6e400fcdafd9d615b0dcf3c133814ce8be6a78ae2917ad5ea2fef725c19d514"
+    },
+    "raw/analysis-nori/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/nori/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/nori/package-search-index.js",
+      "bytes": 230,
+      "sha256": "0bf5d0bb7ff7f622f0f4691beddddeadb5a9f751157097d2d9ee874abb691a33"
+    },
+    "raw/analysis-opennlp/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/opennlp/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/opennlp/type-search-index.js",
+      "bytes": 1336,
+      "sha256": "813cb5ac48fce8d6d6338f83fd444a4ca39241ea6037e5c043e07b96ae2c25cc"
+    },
+    "raw/analysis-opennlp/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/opennlp/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/opennlp/member-search-index.js",
+      "bytes": 11959,
+      "sha256": "e7423c75b17eb114527b6ea308aeaf689622cdd595f489522b5d79c46a3030be"
+    },
+    "raw/analysis-opennlp/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/opennlp/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/opennlp/package-search-index.js",
+      "bytes": 187,
+      "sha256": "b253be5ca0c37b294d0ac932c1c120dc93e95fc2156bd47000d176fa5a3011d8"
+    },
+    "jars/lucene-analysis-opennlp-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-opennlp/10.4.0/lucene-analysis-opennlp-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-opennlp/10.4.0/lucene-analysis-opennlp-10.4.0.jar",
+      "bytes": 40144,
+      "sha256": "5d5a8a152d617400feaab4a7d598fe9f77f5d3b61c84675baf5090e6cb1fa266"
+    },
+    "raw/core/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/core/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/core/member-search-index.js",
+      "bytes": 1139131,
+      "sha256": "a51ff572293fd011efc7195a5b5aa98c611212cb9791c073dffb2594e473659c"
+    },
+    "raw/analysis-smartcn/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/smartcn/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/smartcn/type-search-index.js",
+      "bytes": 768,
+      "sha256": "d237b9e1fc10e59cc9c9ec21746603001adba5769ffdaeb648835fc66bd6837d"
+    },
+    "raw/analysis-phonetic/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/phonetic/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/phonetic/type-search-index.js",
+      "bytes": 699,
+      "sha256": "3a477c2312c15ed4b3584a0e016514417bca5090924fe7621cbfd2443d6c9d1a"
+    },
+    "raw/analysis-smartcn/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/smartcn/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/smartcn/member-search-index.js",
+      "bytes": 6067,
+      "sha256": "6844e1b4291e7e1f4cdd7444c432081514137f095365dfd8aee4d7de09ec6c82"
+    },
+    "raw/analysis-smartcn/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/smartcn/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/smartcn/package-search-index.js",
+      "bytes": 188,
+      "sha256": "6fb0eea52b9cbbee588fab82f912c244d7003137828f91c51f73672afd294842"
+    },
+    "raw/analysis-phonetic/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/phonetic/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/phonetic/member-search-index.js",
+      "bytes": 4989,
+      "sha256": "cd2b57ae6119cb52387fd93dc3cec3931884a5340e03a8398a9caf269ad4eed7"
+    },
+    "raw/analysis-phonetic/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/phonetic/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/phonetic/package-search-index.js",
+      "bytes": 139,
+      "sha256": "7aded80e3fb8de1a99400bf6fbed5e2ddbe88a6379cf4f922d44a2756efdd816"
+    },
+    "jars/lucene-analysis-phonetic-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-phonetic/10.4.0/lucene-analysis-phonetic-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-phonetic/10.4.0/lucene-analysis-phonetic-10.4.0.jar",
+      "bytes": 27593,
+      "sha256": "e9334621661b89f4f8270eaaf534a685983d1bafa4c6f2eed0bb78dee90cf0ae"
+    },
+    "raw/analysis-stempel/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/stempel/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/stempel/type-search-index.js",
+      "bytes": 868,
+      "sha256": "a107a8f8f7cded2709a6cd1b003e54e52c266dbc182b1500afcc598698b6d9b7"
+    },
+    "raw/analysis-stempel/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/stempel/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/stempel/member-search-index.js",
+      "bytes": 8908,
+      "sha256": "edda05a57512af7ed9f5d615790eeec64c22edff26268ef1df28186a95bd77eb"
+    },
+    "raw/analysis-stempel/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/analysis/stempel/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/analysis/stempel/package-search-index.js",
+      "bytes": 204,
+      "sha256": "b1e9306830365c814131b5daaee8edc1c1120f4a42ad01ed1448052fd00c6adb"
+    },
+    "jars/lucene-analysis-stempel-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-stempel/10.4.0/lucene-analysis-stempel-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-stempel/10.4.0/lucene-analysis-stempel-10.4.0.jar",
+      "bytes": 519343,
+      "sha256": "7ce23e021f9e4c72d66d3b618cc66e7fdc9a6a757211b6583e962ae171274623"
+    },
+    "raw/backward-codecs/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/backward-codecs/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/backward-codecs/type-search-index.js",
+      "bytes": 10947,
+      "sha256": "ae094fd71b65bbcd3e796bdc8a82986a9f596a88dd9d32c758fc8c756bb14e52"
+    },
+    "raw/core/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/core/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/core/package-search-index.js",
+      "bytes": 1497,
+      "sha256": "3446ff96c3d3ece02d61d5fe96b27d54676f40e819c18e5a31bdbace513250e0"
+    },
+    "jars/lucene-analysis-common-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-common/10.4.0/lucene-analysis-common-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-common/10.4.0/lucene-analysis-common-10.4.0.jar",
+      "bytes": 1748328,
+      "sha256": "8e768c9b2a3870f1fc2655181516699e719a56b9aaf8664226a11ae7d90cb4e9"
+    },
+    "raw/benchmark/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/benchmark/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/benchmark/type-search-index.js",
+      "bytes": 9222,
+      "sha256": "75623155ee162e02eac86daf2f0d610edf8b02c69cf30f5b641c0fece0762f59"
+    },
+    "raw/benchmark/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/benchmark/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/benchmark/member-search-index.js",
+      "bytes": 83912,
+      "sha256": "b3699712f0bf7cef42b12753afd361795e800ddc988bb883baafe133c5d09c02"
+    },
+    "raw/benchmark/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/benchmark/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/benchmark/package-search-index.js",
+      "bytes": 611,
+      "sha256": "4d6160686fbdb136930b7b44a35535a4cbda5b563d520068edc2f5b52f4d5056"
+    },
+    "raw/backward-codecs/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/backward-codecs/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/backward-codecs/member-search-index.js",
+      "bytes": 132855,
+      "sha256": "29b0bd82be0f983a870703c8fa306418f89782f501d3d84cfcf161cde3151673"
+    },
+    "raw/backward-codecs/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/backward-codecs/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/backward-codecs/package-search-index.js",
+      "bytes": 1396,
+      "sha256": "3ab0149260ce4cb922d9d056de6b527a06f0101e8ad3bb4ff43d4c54d76ab7f7"
+    },
+    "jars/lucene-benchmark-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-benchmark/10.4.0/lucene-benchmark-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-benchmark/10.4.0/lucene-benchmark-10.4.0.jar",
+      "bytes": 283895,
+      "sha256": "8bb4f4f45a97122da127f9a42d22262385879ad80e4fb322626ed0d0b04e3ef7"
+    },
+    "raw/classification/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/classification/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/classification/type-search-index.js",
+      "bytes": 1309,
+      "sha256": "e84dcaaf9b3edf7733924f61e6a3f204b21ae511145e1c18684b136b7cb7c6d6"
+    },
+    "raw/classification/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/classification/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/classification/member-search-index.js",
+      "bytes": 14063,
+      "sha256": "466c1dab124e778631df0daeb59f57e1c3222e3aa6c29ac5737f88a9a337697a"
+    },
+    "raw/classification/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/classification/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/classification/package-search-index.js",
+      "bytes": 233,
+      "sha256": "2a7bb455fd0dcee5378aa1ae21dda79514577a9777cf86fa79feb62e80d23f8a"
+    },
+    "jars/lucene-classification-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-classification/10.4.0/lucene-classification-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-classification/10.4.0/lucene-classification-10.4.0.jar",
+      "bytes": 68330,
+      "sha256": "7e9daaeff60312569968299e60d45e7f9415165ffdc357180af9ba6ef1b6cbda"
+    },
+    "raw/codecs/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/codecs/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/codecs/type-search-index.js",
+      "bytes": 6869,
+      "sha256": "ca88efc1fd861ba50f8ab6fff684f74983fbbfcf9f7ce60e1c0348047852460b"
+    },
+    "jars/lucene-backward-codecs-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-backward-codecs/10.4.0/lucene-backward-codecs-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-backward-codecs/10.4.0/lucene-backward-codecs-10.4.0.jar",
+      "bytes": 933706,
+      "sha256": "4e77973982b8e24e4357b18e75f54cffe74b1ab7a354b1b81e1d23d6265de493"
+    },
+    "raw/demo/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/demo/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/demo/type-search-index.js",
+      "bytes": 1317,
+      "sha256": "c1ca31cdbe27b5a0a342717680e5a717f493810aef3b5a816615c52a83934fa1"
+    },
+    "raw/demo/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/demo/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/demo/member-search-index.js",
+      "bytes": 9630,
+      "sha256": "f571f5c5b6e4bc0036d2415c58933448abf1769ad85279fe78b02d7c17b73ed6"
+    },
+    "raw/demo/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/demo/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/demo/package-search-index.js",
+      "bytes": 198,
+      "sha256": "0681bbe6455480b90b61ec62c79c4bc442990bcb59c13d1a4c72e8c5441a6538"
+    },
+    "raw/codecs/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/codecs/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/codecs/member-search-index.js",
+      "bytes": 98485,
+      "sha256": "291bce7ba725854592ed1bac244f3c30839a8beaf005c25516b8cfb717a3e88a"
+    },
+    "jars/lucene-demo-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-demo/10.4.0/lucene-demo-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-demo/10.4.0/lucene-demo-10.4.0.jar",
+      "bytes": 82059,
+      "sha256": "a4cdcdf7749266069cdc7fbd76c9b460d171b8e7c27554d96e094c2b1a2a57ba"
+    },
+    "raw/codecs/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/codecs/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/codecs/package-search-index.js",
+      "bytes": 457,
+      "sha256": "dde88712e0ff6f302b8a644d9d932cd9f72c84c5499cc9f81536237e502d87fc"
+    },
+    "jars/lucene-codecs-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-codecs/10.4.0/lucene-codecs-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-codecs/10.4.0/lucene-codecs-10.4.0.jar",
+      "bytes": 476635,
+      "sha256": "1046679f2eb254fe59c36112daf05e29fa04fce785d6f9b5cc6ada2e5ba01d32"
+    },
+    "raw/facet/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/facet/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/facet/type-search-index.js",
+      "bytes": 6747,
+      "sha256": "e55c4d0269b1fef2183be672a12ae1966f4253ec0e2fa0e5ec70c44fdbe90dfa"
+    },
+    "raw/facet/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/facet/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/facet/member-search-index.js",
+      "bytes": 96328,
+      "sha256": "4f1f3b624838e5311ef65df3fe45f0d8835bbea155905fd2931cf1cb94146ae4"
+    },
+    "raw/facet/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/facet/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/facet/package-search-index.js",
+      "bytes": 438,
+      "sha256": "bd14d91e899d0693510fe571eb9e10a858724c704059c9207498020355d7649f"
+    },
+    "raw/expressions/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/expressions/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/expressions/type-search-index.js",
+      "bytes": 531,
+      "sha256": "d77b0141c6324b5c608514a592617ee82f8cf672cf55623b6fa34e500282f84e"
+    },
+    "raw/expressions/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/expressions/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/expressions/member-search-index.js",
+      "bytes": 3381,
+      "sha256": "b9592cbe83d8c66d4fce749c7e387e65f44f22564f314367e00aec1f18ab878b"
+    },
+    "raw/expressions/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/expressions/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/expressions/package-search-index.js",
+      "bytes": 174,
+      "sha256": "b916322d9b661fa50ff25f2c40640fa81f747a8ee335ea0da71ab4c9a7398a5c"
+    },
+    "jars/lucene-expressions-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-expressions/10.4.0/lucene-expressions-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-expressions/10.4.0/lucene-expressions-10.4.0.jar",
+      "bytes": 80858,
+      "sha256": "dac5b5ed20fa4677b127d04da78792413d04350b6d7745392fcc13631e0818a5"
+    },
+    "raw/grouping/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/grouping/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/grouping/type-search-index.js",
+      "bytes": 2261,
+      "sha256": "33c6dc7ee5a7ab8864fe59857054909095155ea3c935192a3aa6a05e49772c67"
+    },
+    "raw/grouping/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/grouping/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/grouping/member-search-index.js",
+      "bytes": 26420,
+      "sha256": "5b789c9311cdde46b0a3f2601d91657ff210d071c92e37883109783efd61e4b3"
+    },
+    "raw/grouping/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/grouping/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/grouping/package-search-index.js",
+      "bytes": 137,
+      "sha256": "b859749a9d48512824ee79b834c2c912ba25c21eeb3d649b3958c4e705e18f65"
+    },
+    "jars/lucene-grouping-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-grouping/10.4.0/lucene-grouping-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-grouping/10.4.0/lucene-grouping-10.4.0.jar",
+      "bytes": 97292,
+      "sha256": "5e25c5e52004f8ac6b31912925a5698e43713abbf0b6267c42d58d6496aeb6e4"
+    },
+    "raw/highlighter/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/highlighter/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/highlighter/type-search-index.js",
+      "bytes": 8023,
+      "sha256": "0959391f8ff2b8746c68c940dc15a2ab5e078999a1ca3b8ee24690e0163248b8"
+    },
+    "jars/lucene-analysis-kuromoji-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-kuromoji/10.4.0/lucene-analysis-kuromoji-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-kuromoji/10.4.0/lucene-analysis-kuromoji-10.4.0.jar",
+      "bytes": 4720009,
+      "sha256": "8421d95800c264a048e6a526e21f36e5eee4268f407f3c58fb7a682e96a2c118"
+    },
+    "raw/join/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/join/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/join/type-search-index.js",
+      "bytes": 1200,
+      "sha256": "51c7879bc2a9aef50c220f7f3dfda5dc6ce4344801fd96356c7f663be2ebe4c4"
+    },
+    "raw/join/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/join/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/join/member-search-index.js",
+      "bytes": 19672,
+      "sha256": "f02378739e11044d3c0159a9e9648de918f11dd3e43ef53c70f35f9a0587d575"
+    },
+    "raw/join/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/join/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/join/package-search-index.js",
+      "bytes": 133,
+      "sha256": "f077a31eeb3f2a27b61d8817cfc9b667519b952a1a25e4eacf2a3312cf5aa079"
+    },
+    "raw/highlighter/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/highlighter/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/highlighter/member-search-index.js",
+      "bytes": 106604,
+      "sha256": "f6b594e52cccbcfaffe24a58d97f4a778b9943e5a28f7b70e1989a7a501f533e"
+    },
+    "raw/highlighter/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/highlighter/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/highlighter/package-search-index.js",
+      "bytes": 279,
+      "sha256": "cf534bede46ef19a96b61ee2051f7c9c5939fd65d8e9f1ad46a243781503e18a"
+    },
+    "jars/lucene-join-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-join/10.4.0/lucene-join-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-join/10.4.0/lucene-join-10.4.0.jar",
+      "bytes": 190001,
+      "sha256": "6fdb7e7388d6f3ec015f8159a179b367dbc7e505a6b46ecc4bf5d4a44a6f624b"
+    },
+    "jars/lucene-analysis-smartcn-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-smartcn/10.4.0/lucene-analysis-smartcn-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-smartcn/10.4.0/lucene-analysis-smartcn-10.4.0.jar",
+      "bytes": 3598967,
+      "sha256": "21b83749222278527d6be3b3e9cd93b88a7cc6c18c1456ba5a6aae6c50d26372"
+    },
+    "raw/misc/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/misc/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/misc/type-search-index.js",
+      "bytes": 2969,
+      "sha256": "1960db9f7caa6b6ce869f58f511ab5ce953d96068c378572c2931b9c81a0a50a"
+    },
+    "raw/misc/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/misc/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/misc/member-search-index.js",
+      "bytes": 30097,
+      "sha256": "597de30567b65443a1ac96ba97dc0138d94a3fe63a52bca1d0f4433b5d6bfc38"
+    },
+    "raw/misc/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/misc/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/misc/package-search-index.js",
+      "bytes": 354,
+      "sha256": "ad589ec1b93142ce49343f6e0fb390f5f3331311d1f11388befee6478fa53b78"
+    },
+    "jars/lucene-misc-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-misc/10.4.0/lucene-misc-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-misc/10.4.0/lucene-misc-10.4.0.jar",
+      "bytes": 136661,
+      "sha256": "399f56e1bc2e08d927505139f9f459f1e33059e177eace080ea2bbcd88505fd5"
+    },
+    "raw/monitor/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/monitor/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/monitor/type-search-index.js",
+      "bytes": 2048,
+      "sha256": "abd84c324803eaa661f04ee44e3810077d986c467204d9faf9ee39f249b6ed73"
+    },
+    "raw/monitor/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/monitor/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/monitor/member-search-index.js",
+      "bytes": 23941,
+      "sha256": "e1613c581f39c54e109132835580abb9c2fedcacd9540a96a8cd4845f983a650"
+    },
+    "raw/monitor/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/monitor/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/monitor/package-search-index.js",
+      "bytes": 129,
+      "sha256": "65f0bc642c2f91e4d8c80088f924247aaf2e02bc449e06052f85f0c514ebf6bf"
+    },
+    "jars/lucene-facet-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-facet/10.4.0/lucene-facet-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-facet/10.4.0/lucene-facet-10.4.0.jar",
+      "bytes": 332724,
+      "sha256": "c4d602a389945a8347bc39f904e8bd2504d823333f5cf9da16cda364c6f9eae8"
+    },
+    "raw/queries/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/queries/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/queries/type-search-index.js",
+      "bytes": 10095,
+      "sha256": "90727d2ef73d3e890aff26a1633a5b78d05111dadb454470d32ee104fc567ba0"
+    },
+    "jars/lucene-monitor-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-monitor/10.4.0/lucene-monitor-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-monitor/10.4.0/lucene-monitor-10.4.0.jar",
+      "bytes": 142656,
+      "sha256": "b6857fbf66075d9255ded85fb9854a29b7af1571af1491a498d5b795802aa34d"
+    },
+    "raw/queries/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/queries/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/queries/member-search-index.js",
+      "bytes": 149835,
+      "sha256": "48fe8fabc1d8e6c6df4049d29f8810ebc4a86cbc5df8f72b2f50526879908885"
+    },
+    "raw/queries/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/queries/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/queries/package-search-index.js",
+      "bytes": 445,
+      "sha256": "26a9eef271160ff523325110c80e2bc2c5487fdc8912f3f8c76670db13729d23"
+    },
+    "jars/lucene-highlighter-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-highlighter/10.4.0/lucene-highlighter-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-highlighter/10.4.0/lucene-highlighter-10.4.0.jar",
+      "bytes": 280130,
+      "sha256": "651622d8b1751e644dee68956d74eb8b4c240bd987aa75f682833b4716c8db57"
+    },
+    "raw/replicator/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/replicator/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/replicator/type-search-index.js",
+      "bytes": 644,
+      "sha256": "0536859db2d3319e6197b56c6b37709853749ab031f65873d439db390fa08108"
+    },
+    "raw/replicator/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/replicator/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/replicator/member-search-index.js",
+      "bytes": 12038,
+      "sha256": "feab0e553e67985350eee994aa6ca579fab8ec2660ee38f5e08a844e62f097ed"
+    },
+    "raw/replicator/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/replicator/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/replicator/package-search-index.js",
+      "bytes": 136,
+      "sha256": "f9854064c8e182d63b033bbbe8a20bb2c09508768288c208c2eac3700768d844"
+    },
+    "jars/lucene-replicator-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-replicator/10.4.0/lucene-replicator-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-replicator/10.4.0/lucene-replicator-10.4.0.jar",
+      "bytes": 54669,
+      "sha256": "1afe50a9165edb38ec0fadf966e6260aa9539ff1c7f54a7ea0c718650f199dd5"
+    },
+    "raw/sandbox/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/sandbox/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/sandbox/type-search-index.js",
+      "bytes": 7731,
+      "sha256": "622e03a2c74af8beddeefead30b78b0c00c912b9c0d3bc328fc35728bba52296"
+    },
+    "raw/sandbox/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/sandbox/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/sandbox/member-search-index.js",
+      "bytes": 78705,
+      "sha256": "23541a1e91d21ffb4bfbb7bb8572ac2aaaf35e03b3b5048a4b10b41d3851c430"
+    },
+    "raw/sandbox/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/sandbox/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/sandbox/package-search-index.js",
+      "bytes": 794,
+      "sha256": "48d39ba428db4e23c4ed02e7c30fc72a9c37256ad42d0faef51b864ac5cec664"
+    },
+    "raw/memory/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/memory/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/memory/type-search-index.js",
+      "bytes": 162,
+      "sha256": "ae47535cca2eb9250ce37f803c47e4743cfc4f984b9ea6c4beab42937618e213"
+    },
+    "raw/memory/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/memory/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/memory/member-search-index.js",
+      "bytes": 2669,
+      "sha256": "681b94a9cce889682a755a1dbd67ae78e43eff0861616dac4db0f9c21b464517"
+    },
+    "raw/memory/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/memory/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/memory/package-search-index.js",
+      "bytes": 134,
+      "sha256": "99d21a53a83b76c6d133dc377c16c48f25c4ecb2494a935d3d1985027dc68389"
+    },
+    "jars/lucene-memory-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-memory/10.4.0/lucene-memory-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-memory/10.4.0/lucene-memory-10.4.0.jar",
+      "bytes": 65092,
+      "sha256": "33a51508662eee57c3642288fa6fe7a68951aba7c8def0d26725b4ec022f448e"
+    },
+    "raw/spatial-extras/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/spatial-extras/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/spatial-extras/type-search-index.js",
+      "bytes": 5772,
+      "sha256": "32843db210e0068cea03077ef1d8678568ea9de3094020eaa3d702603e2dde5b"
+    },
+    "jars/lucene-queries-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-queries/10.4.0/lucene-queries-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-queries/10.4.0/lucene-queries-10.4.0.jar",
+      "bytes": 522331,
+      "sha256": "c5cfbb892dfa78d272d6c0b46442159d75f92adfd7577c03bf5fe9e6067b475b"
+    },
+    "raw/spatial3d/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/spatial3d/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/spatial3d/type-search-index.js",
+      "bytes": 3575,
+      "sha256": "5a10ae8d4f62995fe5a9d05fe4ae1b2c9d63d6ccc48eadf3272e8492de03d6cc"
+    },
+    "raw/queryparser/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/queryparser/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/queryparser/type-search-index.js",
+      "bytes": 19287,
+      "sha256": "491c2aa87bb52eab19147fa75c9982c2636293f22f4734281e216e317498a2c8"
+    },
+    "raw/spatial3d/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/spatial3d/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/spatial3d/member-search-index.js",
+      "bytes": 90521,
+      "sha256": "d16628e7ecf67f35e1c12dfd27403ce51834961e916410b98d30e9b9d375b972"
+    },
+    "raw/spatial3d/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/spatial3d/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/spatial3d/package-search-index.js",
+      "bytes": 172,
+      "sha256": "c8e989a6d8390b8e8e40e5090eb7e1cb154b8ee1163ed00ca415e7450d932e20"
+    },
+    "jars/lucene-spatial3d-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-spatial3d/10.4.0/lucene-spatial3d-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-spatial3d/10.4.0/lucene-spatial3d-10.4.0.jar",
+      "bytes": 329800,
+      "sha256": "7e9193c3a7221524d29fc9316e5039240aca80ba6ff7dab8a7d6b365de306d05"
+    },
+    "raw/suggest/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/suggest/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/suggest/type-search-index.js",
+      "bytes": 5937,
+      "sha256": "d6271bbe18bdfd00a77c4b7844e36b4f7daf0eea2f5a6c14df1f69ea5ef9afe5"
+    },
+    "jars/lucene-sandbox-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-sandbox/10.4.0/lucene-sandbox-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-sandbox/10.4.0/lucene-sandbox-10.4.0.jar",
+      "bytes": 384950,
+      "sha256": "49f5aa75aa6eda166652be4f294e2efc720e59b9325ee6f60403166edca0e70c"
+    },
+    "raw/test-framework/type-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/test-framework/type-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/test-framework/type-search-index.js",
+      "bytes": 18362,
+      "sha256": "45222950a374ebcac6b3aa750b0f4016ac91515866e5545c70e1fb2eac99dfa2"
+    },
+    "raw/spatial-extras/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/spatial-extras/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/spatial-extras/member-search-index.js",
+      "bytes": 91262,
+      "sha256": "e1b45d1c4d1c3a13b80743a903ec8a3f9798c80b046a039dc01e553e6a4d9341"
+    },
+    "raw/spatial-extras/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/spatial-extras/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/spatial-extras/package-search-index.js",
+      "bytes": 508,
+      "sha256": "7d37175bf20ee1ecbf42ff5cf1aae7e704c2e6155cc4196eccc29566eb015a3f"
+    },
+    "raw/suggest/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/suggest/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/suggest/member-search-index.js",
+      "bytes": 79217,
+      "sha256": "baa4c8d580924ababe422c9b750d69503b5580d73b79afc3447d70453f04428e"
+    },
+    "raw/suggest/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/suggest/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/suggest/package-search-index.js",
+      "bytes": 366,
+      "sha256": "b1af065cce099451a862cf7069018f6b30ea46b205888ff744f18fee49caf8e7"
+    },
+    "jars/lucene-spatial-extras-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-spatial-extras/10.4.0/lucene-spatial-extras-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-spatial-extras/10.4.0/lucene-spatial-extras-10.4.0.jar",
+      "bytes": 243584,
+      "sha256": "f09037167eda879f973456e13f4b573df09b449cf0994705130796ff72543bb1"
+    },
+    "jars/lucene-suggest-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-suggest/10.4.0/lucene-suggest-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-suggest/10.4.0/lucene-suggest-10.4.0.jar",
+      "bytes": 244238,
+      "sha256": "e767298b23b4cf8a69ca9b27a9c3e22adff1b7c9801d8f76164b5caa1122968b"
+    },
+    "raw/queryparser/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/queryparser/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/queryparser/member-search-index.js",
+      "bytes": 205866,
+      "sha256": "584e23113c805815427e7cbe9ffc2244cb92e4d94ac43c666a350e0a591bec37"
+    },
+    "raw/queryparser/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/queryparser/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/queryparser/package-search-index.js",
+      "bytes": 1631,
+      "sha256": "6221aeb9750e4226ffd7a074d1ba1648eff8a5f5ca0059c00203f11bb5eb5254"
+    },
+    "jars/lucene-core-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-core/10.4.0/lucene-core-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-core/10.4.0/lucene-core-10.4.0.jar",
+      "bytes": 4596517,
+      "sha256": "8f894d211a8123938ccb9ff6827d136747e0eb6b1782ada6ac9086aa911b52e2"
+    },
+    "jars/lucene-queryparser-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-queryparser/10.4.0/lucene-queryparser-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-queryparser/10.4.0/lucene-queryparser-10.4.0.jar",
+      "bytes": 425146,
+      "sha256": "4635f2a14e9c01574c4cf9ad60e018ab2b041b7889369107a991ef950648c847"
+    },
+    "raw/test-framework/member-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/test-framework/member-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/test-framework/member-search-index.js",
+      "bytes": 328864,
+      "sha256": "e95b0ab32b8e5f862ea365eb87b1e4c55e13eb4e00c78418f8788e78ced0f06f"
+    },
+    "raw/test-framework/package-search-index.js": {
+      "url": "https://lucene.apache.org/core/10_4_0/test-framework/package-search-index.js",
+      "effective_url": "https://lucene.apache.org/core/10_4_0/test-framework/package-search-index.js",
+      "bytes": 1164,
+      "sha256": "c7f31fdfef905af77899c3d4b425bed523aa9c2050255ad6d52b578d77603e3d"
+    },
+    "jars/lucene-luke-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-luke/10.4.0/lucene-luke-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-luke/10.4.0/lucene-luke-10.4.0.jar",
+      "bytes": 616497,
+      "sha256": "ec8bab2b95b823f5d29e82b6c0a5dec3293da52b6e1c33dd07396e0ead03e9d4"
+    },
+    "jars/lucene-analysis-nori-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-nori/10.4.0/lucene-analysis-nori-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-nori/10.4.0/lucene-analysis-nori-10.4.0.jar",
+      "bytes": 7824811,
+      "sha256": "20d73821c1cf44f59f89175981560be7c31c9530b92f1a886b8b6ef7c7fec1f8"
+    },
+    "jars/lucene-test-framework-10.4.0.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-test-framework/10.4.0/lucene-test-framework-10.4.0.jar",
+      "effective_url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-test-framework/10.4.0/lucene-test-framework-10.4.0.jar",
+      "bytes": 11417261,
+      "sha256": "0b530e2bbaad53b655ac31c5b3c226a2633010fc5831e6b7c04be1e84942100a"
+    }
+  },
+  "errors": [],
+  "javap_batches_with_stderr": [],
+  "coverage_notes": [
+    "Declared members only; inherited declarations appear on declaring classes, not expanded per receiver.",
+    "Compiler-generated public bridges are included. Annotation defaults, runtime annotations and default constant values are not extracted.",
+    "Nested-class source reachability and enclosing-type accessibility are not resolved; binary flags and documented status remain separate.",
+    "Multi-release alternative implementations are counted but not separately disassembled; API baseline is the base jar view.",
+    "External dependency APIs and java.* inherited APIs are outside Lucene artifact inventory.",
+    "Extraction does not demonstrate behavioral, Rust API, Java source/binary, or index-format compatibility."
+  ],
+  "lucene_tag_object": "c6a89ffb8b4eaa2962a5530fa10012365b6f5c22",
+  "generator_sha256": "5c750e62fb9532b3803e17ba23df8d9e4c84e335049438a79f23ef2330b3a599"
+}

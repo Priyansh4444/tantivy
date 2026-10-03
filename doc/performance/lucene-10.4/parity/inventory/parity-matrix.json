@@ -1,0 +1,1450 @@
+{
+  "lucene_commit": "9983b7ce7fdd04f4d357688fb85c14277c15ea8d",
+  "tantivy_commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+  "source_evidence": {
+    "Cargo.toml": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "7c4de539113ccf0eddd923279bd95bf18a5f3d3b16a14f38b46ae5ddf4f1a191",
+      "bytes": 6019,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "columnar/src/lib.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "13b921074e5f841a4bda22e9070776baa362f7d2488904d8f9ab4c2641beb9d8",
+      "bytes": 3787,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "doc/performance/lucene-10.4/README.md": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "5477e844a09a3bfc840ad3f79e0e08976b643d55fe614dcc083d2efe5e43bd59",
+      "bytes": 9845,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "doc/performance/lucene-10.4/do_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "7567e87a3b850d0385d5d05147e0e58d24f16e7633382e71fe06de5dba2bf2b2",
+      "bytes": 8779,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "doc/performance/lucene-10.4/suite_lucene_interleaved.py": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "aa22aebec543582147e0d8543a81d31b50281a1d35567e541db7d4007511daa2",
+      "bytes": 5235,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "examples/basic_search.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "ba09bab151cbc125d23ad777fd5b5418e3efd9f3b087fc042f859bebef240f2b",
+      "bytes": 8882,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "jitexpr/src/lib.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "49e29ecae4c1be5586fb097e4ad0f15a6b33bc1489b1557ca575d44eb62a8501",
+      "bytes": 908,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "query-grammar/src/lib.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "fd8f5ec01995592a4bec158cd55ba2a006e5872266a19ed57d5df73546d257a3",
+      "bytes": 2217,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "query-grammar/src/occur.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "7a4d309083cac7a4b83f5732d7923831c14f426a4cae756dfc30793a0ac2c28e",
+      "bytes": 2371,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/aggregation/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "03c6b0b68619385cd7d3af4126df8295464b8881d9137492ce962388672d7a15",
+      "bytes": 26440,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/collector/count_collector.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "4725c4fbd400dd861497d8912759ff07d853f667fdc3297eb6104bb65e575f8f",
+      "bytes": 3439,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/collector/facet_collector.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "fdc2cb48a5ccd4db98994b76702e908327e08bf83e250aece6f4ce2abc656ac7",
+      "bytes": 34410,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/collector/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "b384dceca4083a0094f2ff56b921b6a5ed133fa1e5468d0fd0a43efe858c3c75",
+      "bytes": 17839,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/collector/multi_collector.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "1998a856ce9194231f92400ea6ee066e3d91df37f26a02fa9bbbabd3770104a1",
+      "bytes": 10679,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/collector/sort_key/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "b69041dff0125a5f01388d1dad806077a8e144f975c861163c21f14b321aaf7b",
+      "bytes": 15086,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/collector/sort_key_top_collector.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "69f0ad3b568ccc8e829bf15e61f332a2ba5989fb503e346b007ce66e498ea68e",
+      "bytes": 6225,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/collector/tests.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "373fe29bdee191d5a97b3f783df6371a7f84529003c5cb9f4cb886644ed9d580",
+      "bytes": 9393,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/collector/top_score_collector.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "b05114ed7f4af0720d56b28e3bfc8e125b1085822c7d52e6b65135c3e16c925d",
+      "bytes": 70757,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/compat_tests.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "8f257be92d7c63ff21f9f3fc888950e59add1fccbd6cc3fdee830124a1c81c8f",
+      "bytes": 3185,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/core/searcher.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "e42459f7a9d4aaca2e14b00e34f7e627c3f188dca8d2bb969a9bb4a6213cef69",
+      "bytes": 10990,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/directory/directory.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "bedf974779c6f77f74dc3a074e8e8a715ce1fa7585eed0cb41b27f3421256b76",
+      "bytes": 8449,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/directory/directory_lock.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "94a69e0175a5b604fb8384cc66e3429b9ac628e05a4979a324ace4f8dd1ff1b2",
+      "bytes": 2337,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/directory/footer.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "4b1909dac72ab69a85f4e02ccaa60dd530a5e351821766b5e30803c1ace09144",
+      "bytes": 8787,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/directory/managed_directory.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "98d781bb6b55c62636017d50996e1a41c8ed1dd6202abafbc1563c2cf10886c4",
+      "bytes": 16226,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/directory/mmap_directory/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "55b3db16dbd9fef68bf2de793255d44724cc46ce039d2f6e08b8af4a93a0de83",
+      "bytes": 24469,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/directory/ram_directory.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "d048cafabc86eb03163a7395a693fa479a8b1031b0fd7f0705b45e8d3d9c3e45",
+      "bytes": 11493,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/fastfield/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "1668bc22ccb77ef62fb7bfcc0e43af5750a951c572ee361aa43c2690bf9a2664",
+      "bytes": 52262,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/fieldnorm/code.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "49572c49d7908e9f665ad4fba46fcbf305a969bfd48587ceb3c9e4c1abdaf042",
+      "bytes": 5265,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/index/index.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "76eb8e2459c2ba9553fdd8e79cb973d9d51c74aa73da8bb8d357a8686d959ff0",
+      "bytes": 36246,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/index/index_meta.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "0a5efb5d5192c4d11f6c17596c296ce78dcd4eaaaf36ff145f97ddb95eb013c5",
+      "bytes": 26147,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/index/inverted_index_plugin.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "c6e5a38be4fa4163c795775ad6b9a48be3c07c71af5eb95b73f0b5feb7f9a5a7",
+      "bytes": 29127,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/index/inverted_index_reader.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "c4fbc11f25571ac7433a95d93b8fa1f7f41c824dda3a968ec7143d2cbe8121c9",
+      "bytes": 19023,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/index/segment_component.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "4bda35a667525c48215765f517475be6d5fd64218acc76fa4bb6de5fcd37e7bc",
+      "bytes": 2909,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/index/segment_reader.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "34b1f718326412c743187394e2e82c08b61f5d986b5828bf49445d0e6a281903",
+      "bytes": 34243,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/indexer/index_writer.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "15061f5d21ef4588fd9403db1b771fa6311d3f938c9bccdf2bfa6a43d4412b5c",
+      "bytes": 108857,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/plugin.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "3d25cc585041d84849485e21224c6469c29a9e483a48f2bb645e87fa40baeb3d",
+      "bytes": 25536,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/postings/compression/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "47e76e8209ec012a10805250d54e0afe861f39746bec39b23e4b0b1dbb968ddb",
+      "bytes": 28340,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/postings/postings.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "65c925f08fc9dd886e6605bfb0e0c59542d91257b38000169b4195cc5159e788",
+      "bytes": 2897,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/postings/skip.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "530dffb7a047e78260d1df9aa830269f6d05609a62f24b82400c00c8627c00a1",
+      "bytes": 22302,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/automaton_weight.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "bf00a85712e0bcc1bd219df0f5e9b780dd4583e1b0d4d776600cc8ab925bc522",
+      "bytes": 7109,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/bm25.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "e9db69e109fb6eacdd1873fee6ec89e7c123cae98e1c73f88c1ed3a20486b6f1",
+      "bytes": 13458,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/boolean_query/boolean_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "6905f9a33c60c21dafd9c9329fce2c5ccc95c376e2346de456a05e89cca5160b",
+      "bytes": 17913,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/boolean_query/boolean_weight.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "4fedbe2b4283839ec9ed32cb4b436622c3ae7c32eae44279511cae077d0b6e9f",
+      "bytes": 34892,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/const_score_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "580bdb97260f1b0f1160c045c499979e397c91c41685638e57cbdec42b2b190b",
+      "bytes": 11252,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/doc_predicate_query/jitexpr_predicate.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "2ff24412b5f717a032cd3fcb604ec135d44069752dfcaadedbb7c23a73525f2b",
+      "bytes": 23766,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/doc_predicate_query/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "da5043a0a40bd18750f24e7d17a2e9951910353a530ff2592f96c94d99ec0c36",
+      "bytes": 11578,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/exist_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "ceca8659781b40a87a2cc2edb37f33e5f8b04b232de0ac03f151c406c77bb590",
+      "bytes": 20027,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/fuzzy_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "a37e737893b9ee483c927e2e7db6b540c5e127d2cc463327379c899223a4d03c",
+      "bytes": 12491,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "95691fb668efad02c174f86bed9def467447e87b780ae385c8015453a65833aa",
+      "bytes": 7138,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/more_like_this/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "3eb270f5e3c0eafeab531397d0128bbd2ae4cc5d91b3ef00424a785e22d9ab53",
+      "bytes": 204,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/phrase_prefix_query/phrase_prefix_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "bbcc970206c5bcdac09e4061beaa3f16d027de5e0fa342d2de9c70ff4d706ded",
+      "bytes": 5931,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/phrase_query/phrase_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "74fb5880b381da11a238f934879466dff81345d5b765b3b58bf8b51e318935c8",
+      "bytes": 5313,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/phrase_query/phrase_scorer.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "0a9109966df744d100808340d63a50fd9d8fc261838b7009da8f9e4cdcb89559",
+      "bytes": 33131,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/phrase_query/regex_phrase_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "a4c8ed8be1b9266ce3ede46dc616ee86b1cfec440214687727fd3832fc37bfc6",
+      "bytes": 6162,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "460873174a9dc625b73fa9fd65a4eeb051c31b23af10e76a5994aa80a502360a",
+      "bytes": 6997,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/query_parser/query_parser.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "d1d34b9df217ab00f2fa0579908521a2d5f3673d8b1f1712bc541f1d0f324131",
+      "bytes": 90035,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/range_query/range_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "8b3fa5b47f4685d44b499f60f90efaca850208716aaf4286da49fc1f06c78b47",
+      "bytes": 25254,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/range_query/range_query_fastfield.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "210b8a55b09d7fa0387ecfec15788cd5b09fccf77fc7b0a4edc1fc3e3edffb41",
+      "bytes": 63518,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/regex_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "11658d7f5c64b024e2728d165c6070ecd9b96f328debd37e7a4b9e6c726b5d52",
+      "bytes": 6279,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/scorer.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "235743a79bf078121b27746f3c91716a80627b270d655067977087d8cf6d9ad0",
+      "bytes": 575,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/seek_danger_tests.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "fecc27189828c4cc8c848d6350c9221a25f5db8733fdf3d2ccb1e54125df18ed",
+      "bytes": 13623,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/set_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "0cc0313d7f914b7d3c953e3b69f3955eaa7ffd2edccb7e94b522f0e0994872a3",
+      "bytes": 8965,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/term_query/term_query.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "fad93db8dc8e2fe1b691243b9dd544c9e92be5cff09cef9deea857a97bbe72fd",
+      "bytes": 7581,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/query/term_query/term_weight.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "941f17057f73518257b9c11c95988e6ed26d3703b01c08e880dcf08e0f43f116",
+      "bytes": 8153,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/schema/document/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "6b2f3c0bf63f38406f51c976df2aecb0f1a90d45e68a045ece352c7335ee91cc",
+      "bytes": 12330,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/schema/facet.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "f547b4f19c2861e0c9c5ef93fb92a7c6f9b48dcb130164ab106f210ac3999e1a",
+      "bytes": 10750,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/schema/field_type.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "3c912cae77b3c2c4354d2ba515ef5fc366c2148d03e42ea6868cf38145da3217",
+      "bytes": 31538,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/snippet/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "7b2bda5b56fa47489f99253138fef66be62f71297f797ac4195aed70a97fdd94",
+      "bytes": 31929,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/store/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "585c64fc0b2d092c5aff5409d3920e95337a1e384ab5633f84fab44f7ce44aa7",
+      "bytes": 14735,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/termdict/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "37388b7752fcf3658311b46ab11f1e55be368d7560eb1644e695f4c063bc69e9",
+      "bytes": 7413,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/tokenizer/ascii_folding_filter.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "403efac42fd2c33a4803f4cdecef32630f0b3a4ca099134bfe1629738274bbef",
+      "bytes": 203312,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/tokenizer/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "2cdc345bd8a2907abc9a4fed663ce2f6d48775243b7c502433de3ef4a5e2022c",
+      "bytes": 9093,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/tokenizer/stemmer.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "a3aa2eb57b8ec7e663b79eea5543e13f0b63f63f6c88653979b79e8259a30a06",
+      "bytes": 6297,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "src/tokenizer/stop_word_filter/mod.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "18fdba48a2001534f70c6d74d4440f9e1463393cf5cde1f8cfc100b91187eb1f",
+      "bytes": 5364,
+      "verification": "file content inspected; no behavioral tests executed"
+    },
+    "tokenizer-api/src/lib.rs": {
+      "commit": "65c4e15e6afdd078421e360d16e2f480df3c969e",
+      "sha256": "46dacf74617024d5f9e55b36e802a4c2ff5fe4f9c974c85ade4cd7084a367656",
+      "bytes": 5167,
+      "verification": "file content inspected; no behavioral tests executed"
+    }
+  },
+  "generator_sha256": "3aef2fc5822d037360ec4d012d9b8f102438d4695d007e5764d621aa78218ee5",
+  "family_definitions_sha256": "166216f9e959315fa4fc508d24ea5dae02a1efe03ec88f9f99d1ade1f4780207",
+  "feature_families": [
+    {
+      "id": "index-lifecycle",
+      "modules": [
+        "core"
+      ],
+      "family": "Indexing, readers, commits, deletes, merges, NRT",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/index/index.rs",
+        "src/index/segment_reader.rs",
+        "src/indexer/index_writer.rs",
+        "src/core/searcher.rs"
+      ],
+      "gap": "Native index lifecycle exists; Lucene update-doc-values, commit/snapshot, NRT, concurrency and failure contracts are not exhaustively mapped or tested."
+    },
+    {
+      "id": "fulltext-query",
+      "modules": [
+        "core"
+      ],
+      "family": "Term, Boolean, exclusions, minimum SHOULD match",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/term_query/term_query.rs",
+        "src/query/boolean_query/boolean_query.rs",
+        "src/query/boolean_query/boolean_weight.rs",
+        "src/query/const_score_query.rs",
+        "query-grammar/src/occur.rs"
+      ],
+      "gap": "Native term/Boolean APIs exist. FILTER is expressible through zero-score ConstScoreQuery but lacks an occurrence variant. Do not infer all clause rewrite/scoring contracts from tested benchmark queries."
+    },
+    {
+      "id": "phrase-proximity",
+      "modules": [
+        "core",
+        "queries"
+      ],
+      "family": "Exact/sloppy phrases, repeated terms, multiphrases and proximity",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/phrase_query/phrase_query.rs",
+        "src/query/phrase_query/phrase_scorer.rs",
+        "src/query/phrase_prefix_query/phrase_prefix_query.rs",
+        "src/query/phrase_query/regex_phrase_query.rs"
+      ],
+      "gap": "Exact/sloppy phrase surface exists. Sloppy distance-weighted frequency, repeated-term occurrence collision handling, carrying slop width and full MultiPhrase behavior require differential proof."
+    },
+    {
+      "id": "bm25",
+      "modules": [
+        "core"
+      ],
+      "family": "BM25 parameters, field population, norms, score scale and bounds",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/bm25.rs",
+        "src/query/term_query/term_weight.rs",
+        "src/fieldnorm/code.rs",
+        "src/index/inverted_index_plugin.rs"
+      ],
+      "gap": "Native k1/b fixed at 1.2/0.75; raw multiplier is k1+1 (2.2). Field population differs, deleted-merge token totals are approximated, overlap/DOCS-only norm semantics differ. Matched benchmark overrides do not establish native parity."
+    },
+    {
+      "id": "similarities",
+      "modules": [
+        "core"
+      ],
+      "family": "Classic TF-IDF, LM, DFR/IB/DFI and pluggable Similarity",
+      "behavior_status": "missing",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/bm25.rs",
+        "src/query/scorer.rs",
+        "src/query/query.rs"
+      ],
+      "gap": "Custom Rust Query/Scorer extensions are possible; built-in Lucene Similarity model families and their public/protected subclass hooks are absent."
+    },
+    {
+      "id": "multi-term",
+      "modules": [
+        "core",
+        "queries"
+      ],
+      "family": "Automaton, regexp, fuzzy, prefix, wildcard, term sets and rewrites",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/automaton_weight.rs",
+        "src/query/regex_query.rs",
+        "src/query/fuzzy_query.rs",
+        "src/query/set_query.rs"
+      ],
+      "gap": "Several native query families exist; full Lucene automaton/rewrite methods, rewrite limits, Unicode and fuzzy edit contracts remain untested."
+    },
+    {
+      "id": "spans",
+      "modules": [
+        "queries"
+      ],
+      "family": "Span queries and positional/payload spans",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/query/mod.rs",
+        "src/postings/postings.rs"
+      ],
+      "gap": "No built-in SpanQuery/Spans family. PhraseQuery is not a replacement for composable span-near, span-not, span-first and payload spans."
+    },
+    {
+      "id": "intervals",
+      "modules": [
+        "queries"
+      ],
+      "family": "Intervals, sources and interval functions",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/query/mod.rs"
+      ],
+      "gap": "No built-in Lucene interval-source algebra or interval query family; aggregation time intervals are unrelated."
+    },
+    {
+      "id": "knn-vectors",
+      "modules": [
+        "core"
+      ],
+      "family": "Float/byte KNN vectors, vector similarities and filtered search",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/schema/field_type.rs",
+        "src/query/mod.rs",
+        "Cargo.toml"
+      ],
+      "gap": "No built-in vector field or KNN query/search family. Custom field plugins are an extension mechanism, not an implemented equivalent."
+    },
+    {
+      "id": "hnsw",
+      "modules": [
+        "core",
+        "codecs",
+        "backward-codecs"
+      ],
+      "family": "HNSW graphs, vector codecs, quantization and graph extension APIs",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/schema/field_type.rs",
+        "src/plugin.rs",
+        "src/query/mod.rs"
+      ],
+      "gap": "No built-in HNSW indexing/graph navigation, vector format, scalar/binary quantization or backward vector codec parity."
+    },
+    {
+      "id": "bkd-points",
+      "modules": [
+        "core"
+      ],
+      "family": "BKD, multidimensional points, dimensional ranges and geometry indexing",
+      "behavior_status": "missing",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/range_query/range_query.rs",
+        "src/query/range_query/range_query_fastfield.rs",
+        "src/schema/field_type.rs"
+      ],
+      "gap": "Scalar range matching exists via term/fast-field paths; no native BKD point tree or Lucene multidimensional PointValues/shape indexing."
+    },
+    {
+      "id": "geospatial",
+      "modules": [
+        "core",
+        "spatial-extras",
+        "spatial3d"
+      ],
+      "family": "LatLon/XY shapes, spatial strategies and 3D geometry",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/schema/field_type.rs",
+        "src/query/mod.rs"
+      ],
+      "gap": "No built-in geospatial fields, geometry relations, SpatialStrategy or spatial3d topology APIs."
+    },
+    {
+      "id": "numeric-ranges",
+      "modules": [
+        "core"
+      ],
+      "family": "Numeric/date/IP range and exists queries",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/range_query/range_query.rs",
+        "src/query/range_query/range_query_fastfield.rs",
+        "src/query/exist_query.rs"
+      ],
+      "gap": "Scalar ranges/exists exist; missing-value, multivalue, inclusivity, NaN, date resolution and Lucene field-type contracts are not exhaustively tested."
+    },
+    {
+      "id": "doc-values",
+      "modules": [
+        "core"
+      ],
+      "family": "Doc values, sorted fields, multivalues and updates",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/fastfield/mod.rs",
+        "columnar/src/lib.rs",
+        "src/collector/sort_key/mod.rs"
+      ],
+      "gap": "Typed columnar fast fields and sorting exist; full Lucene doc-values update, iterator, ordinal and caching APIs are not native equivalents."
+    },
+    {
+      "id": "stored-fields",
+      "modules": [
+        "core"
+      ],
+      "family": "Stored fields, visitors, documents and term vectors",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/store/mod.rs",
+        "src/schema/document/mod.rs",
+        "src/index/inverted_index_reader.rs"
+      ],
+      "gap": "Stored documents and term postings exist; Lucene per-document term-vector/payload/offset and StoredFieldVisitor contracts need explicit mapping, not postings-name equivalence."
+    },
+    {
+      "id": "collectors",
+      "modules": [
+        "core"
+      ],
+      "family": "Top scores, count, sort, pagination, collector managers and caches",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/collector/top_score_collector.rs",
+        "src/collector/count_collector.rs",
+        "src/collector/multi_collector.rs",
+        "src/collector/sort_key_top_collector.rs"
+      ],
+      "gap": "Native count/top/sort exist. Total-hits thresholds, searchAfter, ties, slice concurrency, query caching and collector callback contracts remain incomplete."
+    },
+    {
+      "id": "join",
+      "modules": [
+        "join"
+      ],
+      "family": "Block joins, parent/child, query-time joins and vector joins",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/query/mod.rs",
+        "src/collector/mod.rs"
+      ],
+      "gap": "No built-in Lucene ToParent/ToChildBlockJoin, JoinUtil or block-join vector-query family."
+    },
+    {
+      "id": "grouping",
+      "modules": [
+        "grouping"
+      ],
+      "family": "Grouped TopDocs, collapse and two-pass grouping",
+      "behavior_status": "missing",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/aggregation/mod.rs",
+        "src/collector/mod.rs"
+      ],
+      "gap": "Aggregation buckets are available; grouped top-document selection, group selectors, first/second-pass contracts and Lucene grouping API are not implemented equivalents."
+    },
+    {
+      "id": "facets",
+      "modules": [
+        "facet"
+      ],
+      "family": "Taxonomy, sorted-set, range, hierarchical and association facets",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/collector/facet_collector.rs",
+        "src/schema/facet.rs",
+        "src/aggregation/mod.rs"
+      ],
+      "gap": "Hierarchical facet counting and aggregation exist; taxonomy readers/writers, drill-sideways, associations and full Lucene facet lifecycle differ or are absent."
+    },
+    {
+      "id": "highlighter",
+      "modules": [
+        "highlighter"
+      ],
+      "family": "Classic, vector and unified highlighters, passages and offsets",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/snippet/mod.rs"
+      ],
+      "gap": "SnippetGenerator exists. Phrase/offset-aware unified highlighting, term vectors, passage scoring, break iterators and all protected formatter hooks need separate implementation/testing."
+    },
+    {
+      "id": "analysis-core",
+      "modules": [
+        "core",
+        "analysis-common"
+      ],
+      "family": "Token streams, attributes, filters and general/language analyzers",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/tokenizer/mod.rs",
+        "tokenizer-api/src/lib.rs",
+        "src/tokenizer/stemmer.rs",
+        "src/tokenizer/stop_word_filter/mod.rs"
+      ],
+      "gap": "Token/filter/analyzer extensions, stemming and common filters exist; Lucene's complete analyzer catalog, char filters, attributes, token graph, position/offset and lifecycle contracts are not equivalent."
+    },
+    {
+      "id": "analysis-icu",
+      "modules": [
+        "analysis-icu"
+      ],
+      "family": "ICU analysis, collation, normalization and segmentation",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/tokenizer/mod.rs",
+        "src/tokenizer/ascii_folding_filter.rs",
+        "Cargo.toml"
+      ],
+      "gap": "ASCII folding is not ICU normalization, segmentation or collation. No built-in ICU analyzer suite."
+    },
+    {
+      "id": "analysis-kuromoji",
+      "modules": [
+        "analysis-kuromoji"
+      ],
+      "family": "Japanese morphological analysis and dictionaries",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/tokenizer/mod.rs",
+        "Cargo.toml"
+      ],
+      "gap": "No built-in Kuromoji-equivalent morphological analyzer/dictionary API."
+    },
+    {
+      "id": "analysis-morfologik",
+      "modules": [
+        "analysis-morfologik"
+      ],
+      "family": "Morfologik dictionary stemming",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/tokenizer/stemmer.rs",
+        "Cargo.toml"
+      ],
+      "gap": "Generic stemmer support does not provide Morfologik dictionary behavior/API."
+    },
+    {
+      "id": "analysis-nori",
+      "modules": [
+        "analysis-nori"
+      ],
+      "family": "Korean morphological analysis and dictionaries",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/tokenizer/mod.rs",
+        "Cargo.toml"
+      ],
+      "gap": "No built-in Nori-equivalent morphological analyzer/dictionary API."
+    },
+    {
+      "id": "analysis-opennlp",
+      "modules": [
+        "analysis-opennlp"
+      ],
+      "family": "OpenNLP sentence/token/POS/chunk/lemma analysis",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/tokenizer/mod.rs",
+        "Cargo.toml"
+      ],
+      "gap": "No built-in OpenNLP model-loading and token-attribute analyzer suite."
+    },
+    {
+      "id": "analysis-phonetic",
+      "modules": [
+        "analysis-phonetic"
+      ],
+      "family": "Phonetic token filters and algorithms",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/tokenizer/mod.rs",
+        "Cargo.toml"
+      ],
+      "gap": "No built-in Lucene phonetic encoder/filter suite."
+    },
+    {
+      "id": "analysis-smartcn",
+      "modules": [
+        "analysis-smartcn"
+      ],
+      "family": "Chinese dictionary segmentation",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/tokenizer/mod.rs",
+        "Cargo.toml"
+      ],
+      "gap": "No built-in SmartChinese analyzer/dictionary behavior/API."
+    },
+    {
+      "id": "analysis-stempel",
+      "modules": [
+        "analysis-stempel"
+      ],
+      "family": "Stempel Polish stemming",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/tokenizer/stemmer.rs",
+        "Cargo.toml"
+      ],
+      "gap": "No built-in Stempel table-driven Polish stemmer API; generic Language enum is not equivalent."
+    },
+    {
+      "id": "queryparsers",
+      "modules": [
+        "queryparser"
+      ],
+      "family": "Classic, flexible, simple, complex-phrase, surround and XML parsers",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/query_parser/query_parser.rs",
+        "query-grammar/src/lib.rs"
+      ],
+      "gap": "A native parser exists, but full Lucene grammar/modes, XML builders, extension subclasses and rewrite rules are not covered. Pure-negative strict parsing differs."
+    },
+    {
+      "id": "expressions",
+      "modules": [
+        "expressions"
+      ],
+      "family": "Expression compilation, bindings and expression sorting/scoring",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "jitexpr/src/lib.rs",
+        "src/query/doc_predicate_query/jitexpr_predicate.rs",
+        "src/collector/sort_key/mod.rs"
+      ],
+      "gap": "Optional Rust JIT expressions/predicates exist; Lucene JavaScript compiler, Bindings, function registry, value-source and bytecode extension contracts differ."
+    },
+    {
+      "id": "value-sources",
+      "modules": [
+        "queries"
+      ],
+      "family": "Function queries, value sources, custom scores and MoreLikeThis",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/more_like_this/mod.rs",
+        "src/query/doc_predicate_query/mod.rs",
+        "src/collector/top_score_collector.rs"
+      ],
+      "gap": "MoreLikeThis/custom scoring/predicates exist; full Lucene ValueSource/DoubleValuesSource algebra and Java subclass contracts are missing."
+    },
+    {
+      "id": "suggest",
+      "modules": [
+        "suggest"
+      ],
+      "family": "Autocomplete, FST suggesters, spellchecking and lookup",
+      "behavior_status": "missing",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/termdict/mod.rs",
+        "src/query/fuzzy_query.rs"
+      ],
+      "gap": "FST dictionaries and fuzzy queries are primitives, not Lucene suggesters, weighted/contextual completion, spellcheck or lookup behavior."
+    },
+    {
+      "id": "classification",
+      "modules": [
+        "classification"
+      ],
+      "family": "Bayes/KNN/perceptron document classification",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/core/searcher.rs",
+        "src/query/mod.rs"
+      ],
+      "gap": "Search primitives are present; no built-in Lucene classification algorithms or classifier contracts."
+    },
+    {
+      "id": "monitor",
+      "modules": [
+        "monitor"
+      ],
+      "family": "Reverse search, stored query monitoring and presearchers",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/core/searcher.rs",
+        "src/query/mod.rs"
+      ],
+      "gap": "No built-in Monitor query persistence, candidate presearching, matcher and update lifecycle."
+    },
+    {
+      "id": "replicator",
+      "modules": [
+        "replicator"
+      ],
+      "family": "Index replication, revision/session lifecycle and copy recovery",
+      "behavior_status": "missing",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/directory/directory.rs",
+        "src/directory/managed_directory.rs"
+      ],
+      "gap": "Directory APIs permit application-level copying; no built-in Lucene revision/session/replication client-handler protocol or recovery semantics."
+    },
+    {
+      "id": "single-doc-memory",
+      "modules": [
+        "memory"
+      ],
+      "family": "Single-document MemoryIndex",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/directory/ram_directory.rs",
+        "src/index/index.rs"
+      ],
+      "gap": "In-memory indexes exist; that does not establish MemoryIndex reset/freeze/offset/term-vector/scoring API semantics or comparable lifecycle cost."
+    },
+    {
+      "id": "codec-formats",
+      "modules": [
+        "core",
+        "codecs",
+        "backward-codecs"
+      ],
+      "family": "Postings, terms, doc values, stored fields, codec SPI and backward formats",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/postings/compression/mod.rs",
+        "src/postings/skip.rs",
+        "src/termdict/mod.rs",
+        "src/store/mod.rs",
+        "src/compat_tests.rs",
+        "src/plugin.rs"
+      ],
+      "gap": "Native Rust codecs/backward Tantivy formats exist; Lucene codecs/SPI/legacy Lucene formats are not supported. 128-doc vs 256-doc blocks and flat vs hierarchical skip execution differ."
+    },
+    {
+      "id": "directories",
+      "modules": [
+        "core"
+      ],
+      "family": "Directory, locks, FS/mmap/RAM I/O and failure contracts",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/directory/directory.rs",
+        "src/directory/mmap_directory/mod.rs",
+        "src/directory/ram_directory.rs",
+        "src/directory/directory_lock.rs"
+      ],
+      "gap": "Corresponding native storage primitives exist; Lucene file lifecycle/locking/crash consistency and Java public/protected extension contracts remain untested."
+    },
+    {
+      "id": "misc-tools",
+      "modules": [
+        "misc"
+      ],
+      "family": "Index maintenance, integrity checks, rearranging and miscellaneous utilities",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/index/index.rs",
+        "src/indexer/index_writer.rs",
+        "src/compat_tests.rs"
+      ],
+      "gap": "Some indexing/merge operations exist; complete Lucene misc tools, CheckIndex-style reports and CLI behaviors are not native equivalents."
+    },
+    {
+      "id": "sandbox",
+      "modules": [
+        "sandbox"
+      ],
+      "family": "Experimental queries, facets, sorting, tracing and utilities",
+      "behavior_status": "unverified",
+      "rust_api_status": "unverified",
+      "sources": [
+        "src/query/mod.rs",
+        "src/aggregation/mod.rs",
+        "src/collector/mod.rs"
+      ],
+      "gap": "Module fully inventoried at type/member level. Individual experimental behavior contracts need explicit review; no family-level parity claim."
+    },
+    {
+      "id": "benchmark",
+      "modules": [
+        "benchmark"
+      ],
+      "family": "Benchmark tasks, feeds, parsers and quality evaluation",
+      "behavior_status": "missing",
+      "rust_api_status": "partial",
+      "sources": [
+        "doc/performance/lucene-10.4/README.md",
+        "doc/performance/lucene-10.4/suite_lucene_interleaved.py"
+      ],
+      "gap": "A project-specific comparison harness exists, not Lucene benchmark task-language/feed/quality APIs. Matched scoring overrides must remain disclosed."
+    },
+    {
+      "id": "demo",
+      "modules": [
+        "demo"
+      ],
+      "family": "IndexFiles/SearchFiles demos and CLI examples",
+      "behavior_status": "partial",
+      "rust_api_status": "partial",
+      "sources": [
+        "examples/basic_search.rs",
+        "doc/performance/lucene-10.4/do_query.rs"
+      ],
+      "gap": "Rust examples/adapters exist; Java demo classes, command-line flags, output and file compatibility are not provided."
+    },
+    {
+      "id": "test-framework",
+      "modules": [
+        "test-framework"
+      ],
+      "family": "Randomized, codec, analyzer, directory and fault-injection test framework",
+      "behavior_status": "missing",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/compat_tests.rs",
+        "src/query/seek_danger_tests.rs",
+        "src/collector/tests.rs",
+        "Cargo.toml"
+      ],
+      "gap": "Rust tests/proptest exist; Lucene's reusable Java randomized base classes, mock wrappers, assertions and subclass hooks are not equivalents."
+    },
+    {
+      "id": "luke",
+      "modules": [
+        "luke"
+      ],
+      "family": "Luke Swing GUI, index inspection and tools",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/index/index.rs",
+        "src/index/inverted_index_reader.rs"
+      ],
+      "gap": "Reader primitives do not constitute the Luke GUI, tool workflows or Java model/presenter APIs."
+    },
+    {
+      "id": "java-extension",
+      "modules": [
+        "core",
+        "codecs",
+        "test-framework"
+      ],
+      "family": "Java public/protected extensibility, subclassing and SPI",
+      "behavior_status": "missing",
+      "rust_api_status": "partial",
+      "sources": [
+        "src/query/query.rs",
+        "src/query/scorer.rs",
+        "src/plugin.rs",
+        "src/directory/directory.rs",
+        "tokenizer-api/src/lib.rs"
+      ],
+      "gap": "Rust traits/plugins support native extensions; no Java facade/JNI class hierarchy, inherited protected hooks, exceptions, serialization, module exports or binary ABI compatibility."
+    },
+    {
+      "id": "index-file-compatibility",
+      "modules": [
+        "core",
+        "codecs",
+        "backward-codecs",
+        "luke",
+        "misc",
+        "replicator"
+      ],
+      "family": "Read/write Lucene 10.4 and older index files",
+      "behavior_status": "missing",
+      "rust_api_status": "missing",
+      "sources": [
+        "src/index/index_meta.rs",
+        "src/index/segment_component.rs",
+        "src/directory/footer.rs",
+        "src/postings/skip.rs"
+      ],
+      "gap": "Native Tantivy files/meta/codec are incompatible with Lucene's segment formats. Shared algorithm names do not establish on-disk interchange."
+    }
+  ],
+  "module_coverage": [
+    {
+      "module": "core",
+      "families": "index-lifecycle;fulltext-query;phrase-proximity;bm25;similarities;multi-term;knn-vectors;hnsw;bkd-points;geospatial;numeric-ranges;doc-values;stored-fields;collectors;analysis-core;codec-formats;directories;java-extension;index-file-compatibility",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 10154
+    },
+    {
+      "module": "analysis-common",
+      "families": "analysis-core",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 2426
+    },
+    {
+      "module": "analysis-icu",
+      "families": "analysis-icu",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 84
+    },
+    {
+      "module": "analysis-kuromoji",
+      "families": "analysis-kuromoji",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 235
+    },
+    {
+      "module": "analysis-morfologik",
+      "families": "analysis-morfologik",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 33
+    },
+    {
+      "module": "analysis-nori",
+      "families": "analysis-nori",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 222
+    },
+    {
+      "module": "analysis-opennlp",
+      "families": "analysis-opennlp",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 90
+    },
+    {
+      "module": "analysis-phonetic",
+      "families": "analysis-phonetic",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 41
+    },
+    {
+      "module": "analysis-smartcn",
+      "families": "analysis-smartcn",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 60
+    },
+    {
+      "module": "analysis-stempel",
+      "families": "analysis-stempel",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 83
+    },
+    {
+      "module": "backward-codecs",
+      "families": "hnsw;codec-formats;index-file-compatibility",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 1016
+    },
+    {
+      "module": "benchmark",
+      "families": "benchmark",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 702
+    },
+    {
+      "module": "classification",
+      "families": "classification",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 91
+    },
+    {
+      "module": "codecs",
+      "families": "hnsw;codec-formats;java-extension;index-file-compatibility",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 707
+    },
+    {
+      "module": "demo",
+      "families": "demo",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 85
+    },
+    {
+      "module": "expressions",
+      "families": "expressions",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 129
+    },
+    {
+      "module": "facet",
+      "families": "facets",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 660
+    },
+    {
+      "module": "grouping",
+      "families": "grouping",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 223
+    },
+    {
+      "module": "highlighter",
+      "families": "highlighter",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 730
+    },
+    {
+      "module": "join",
+      "families": "join",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 92
+    },
+    {
+      "module": "memory",
+      "families": "single-doc-memory",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 18
+    },
+    {
+      "module": "misc",
+      "families": "misc-tools;index-file-compatibility",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 240
+    },
+    {
+      "module": "monitor",
+      "families": "monitor",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 207
+    },
+    {
+      "module": "queries",
+      "families": "phrase-proximity;multi-term;spans;intervals;value-sources",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 1161
+    },
+    {
+      "module": "queryparser",
+      "families": "queryparsers",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 1499
+    },
+    {
+      "module": "replicator",
+      "families": "replicator;index-file-compatibility",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 118
+    },
+    {
+      "module": "sandbox",
+      "families": "sandbox",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 575
+    },
+    {
+      "module": "spatial-extras",
+      "families": "geospatial",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 681
+    },
+    {
+      "module": "spatial3d",
+      "families": "geospatial",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 575
+    },
+    {
+      "module": "suggest",
+      "families": "suggest",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 579
+    },
+    {
+      "module": "test-framework",
+      "families": "test-framework;java-extension",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 2552
+    },
+    {
+      "module": "luke",
+      "families": "luke;index-file-compatibility",
+      "accounted": true,
+      "behavioral_parity": "not exhaustively verified",
+      "java_facade": "missing",
+      "declared_members": 754
+    }
+  ],
+  "remaining_work": {
+    "unaccounted_modules": 0,
+    "unextracted_documented_types": 0,
+    "feature_families_without_exhaustive_behavioral_verification": 47,
+    "type_contracts_without_member_level_parity_review": 3637,
+    "declared_member_contracts_without_differential_tests": 26822,
+    "java_facade_implemented": false,
+    "lucene_index_read_write_implemented": false
+  },
+  "family_status_counts": {
+    "partial": 20,
+    "missing": 26,
+    "unverified": 1
+  },
+  "scope_notes": [
+    "Missing means no built-in equivalent identified in the pinned source; external plugins are outside the audit.",
+    "Verified refers only to pinned source evidence. No family is marked verified behavioral parity.",
+    "Per-member worklist includes binary-visible extras and compiler bridges; refine exported/source-reachable scope before compatibility certification."
+  ]
+}

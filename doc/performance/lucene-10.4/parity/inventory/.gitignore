@@ -1,0 +1,9 @@
+/raw/
+/jars/
+/ship/
+/inventory.json
+/types.tsv
+/members.tsv
+/api-worklist.tsv
+/documented-member-labels.tsv
+/__pycache__/
