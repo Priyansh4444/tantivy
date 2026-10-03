@@ -221,6 +221,14 @@ impl Bm25Weight {
         self.weight.max(0.0)
     }
 
+    pub(crate) fn can_use_stored_block_max(&self, segment_average_fieldnorm: Score) -> bool {
+        self.weight.is_finite()
+            && self.weight >= 0.0
+            && self.average_fieldnorm.is_finite()
+            && self.average_fieldnorm > 0.0
+            && self.average_fieldnorm == segment_average_fieldnorm
+    }
+
     #[inline]
     pub(crate) fn tf_factor(&self, fieldnorm_id: u8, term_freq: u32) -> Score {
         let term_freq = term_freq as Score;

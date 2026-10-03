@@ -223,7 +223,10 @@ impl SkipReader {
                 block_wand_fieldnorm_id,
                 block_wand_term_freq,
                 ..
-            } => Some(bm25_weight.score(block_wand_fieldnorm_id, block_wand_term_freq)),
+            } if block_wand_term_freq != 0 => {
+                Some(bm25_weight.score(block_wand_fieldnorm_id, block_wand_term_freq))
+            }
+            BlockInfo::BitPacked { .. } | BlockInfo::Dense { .. } => None,
             BlockInfo::VInt { .. } => None,
         }
     }

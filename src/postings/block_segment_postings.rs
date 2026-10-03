@@ -164,22 +164,39 @@ impl BlockSegmentPostings {
         fieldnorm_reader: &FieldNormReader,
         bm25_weight: &Bm25Weight,
     ) -> Score {
+        // This public API accepts a different weight on each call. A cached
+        // maximum computed for an earlier weight cannot be reused.
+        self.block_max_score_cache = None;
+        self.block_max_score_with_stored_max(fieldnorm_reader, bm25_weight, false)
+    }
+
+    pub(crate) fn block_max_score_with_stored_max(
+        &mut self,
+        fieldnorm_reader: &FieldNormReader,
+        bm25_weight: &Bm25Weight,
+        use_stored_max: bool,
+    ) -> Score {
+        if !use_stored_max && self.skip_reader.last_doc_in_block() != TERMINATED {
+            return bm25_weight.max_score();
+        }
         if let Some(score) = self.block_max_score_cache {
             return score;
         }
-        if let Some(skip_reader_max_score) = self.skip_reader.block_max_score(bm25_weight) {
-            // if we are on a full block, the skip reader should have the block max information
-            // for us
-            self.block_max_score_cache = Some(skip_reader_max_score);
-            return skip_reader_max_score;
+        if use_stored_max {
+            if let Some(skip_reader_max_score) = self.skip_reader.block_max_score(bm25_weight) {
+                // if we are on a full block, the skip reader should have the block max information
+                // for us
+                self.block_max_score_cache = Some(skip_reader_max_score);
+                return skip_reader_max_score;
+            }
         }
-        // this is the last block of the segment posting list.
-        // If it is actually loaded, we can compute block max manually.
+        // When stored metadata cannot be trusted, a loaded block still allows
+        // an exact maximum using the query statistics.
         if self.block_is_loaded() {
             let docs = self.doc_decoder.output_array().iter().cloned();
-            let freqs = self.freq_decoder.output_array().iter().cloned();
-            let bm25_scores = docs.zip(freqs).map(|(doc, term_freq)| {
+            let bm25_scores = docs.enumerate().map(|(idx, doc)| {
                 let fieldnorm_id = fieldnorm_reader.fieldnorm_id(doc);
+                let term_freq = self.freq_decoder.output(idx);
                 bm25_weight.score(fieldnorm_id, term_freq)
             });
             let block_max_score = max_score(bm25_scores).unwrap_or(0.0);
