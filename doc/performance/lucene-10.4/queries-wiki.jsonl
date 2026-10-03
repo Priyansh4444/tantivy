@@ -1,0 +1,20 @@
+{"query": "the", "tags": ["term", "high", "luceneutil:HighTerm"]}
+{"query": "of", "tags": ["term", "high"]}
+{"query": "and", "tags": ["term", "high"]}
+{"query": "united", "tags": ["term", "med"]}
+{"query": "states", "tags": ["term", "med"]}
+{"query": "american", "tags": ["term", "med"]}
+{"query": "york", "tags": ["term", "med"]}
+{"query": "saxophone", "tags": ["term", "low"]}
+{"query": "+the +of", "tags": ["intersection", "andHighHigh", "luceneutil:AndHighHigh"]}
+{"query": "+united +states", "tags": ["intersection", "andHighHigh"]}
+{"query": "+new +york", "tags": ["intersection", "andHighMed"]}
+{"query": "+the +american", "tags": ["intersection", "andHighMed", "luceneutil:AndHighMed"]}
+{"query": "+the +saxophone", "tags": ["intersection", "andHighLow", "luceneutil:AndHighLow"]}
+{"query": "the of", "tags": ["union", "orHighHigh", "luceneutil:OrHighHigh"]}
+{"query": "united states", "tags": ["union", "orHighHigh"]}
+{"query": "the american", "tags": ["union", "orHighMed", "luceneutil:OrHighMed"]}
+{"query": "\"united states\"", "tags": ["phrase"]}
+{"query": "\"new york\"", "tags": ["phrase"]}
+{"query": "+griffith +observatory", "tags": ["intersection", "aol"]}
+{"query": "griffith observatory", "tags": ["union", "aol"]}
