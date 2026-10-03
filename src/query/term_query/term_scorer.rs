@@ -13,6 +13,7 @@ pub struct TermScorer {
     fieldnorm_reader: FieldNormReader,
     similarity_weight: Bm25Weight,
     use_stored_block_max: bool,
+    use_alternate_mask: bool,
 }
 
 impl TermScorer {
@@ -25,11 +26,15 @@ impl TermScorer {
         fieldnorm_reader: FieldNormReader,
         similarity_weight: Bm25Weight,
     ) -> TermScorer {
+        // Dense terms mostly copy encoded bitsets directly. Sparse-to-medium
+        // terms benefit from independent mask lanes for their decoded doc IDs.
+        let use_alternate_mask = postings.size_hint() <= fieldnorm_reader.num_docs() / 4;
         TermScorer {
             postings,
             fieldnorm_reader,
             similarity_weight,
             use_stored_block_max: false,
+            use_alternate_mask,
         }
     }
 
@@ -149,7 +154,8 @@ impl DocSet for TermScorer {
     }
 
     fn fill_bitset_window(&mut self, min_doc: DocId, mask: &mut [TinySet]) -> DocId {
-        self.postings.fill_bitset_window(min_doc, mask)
+        self.postings
+            .fill_bitset_window_impl(min_doc, mask, self.use_alternate_mask)
     }
 }
 
@@ -220,6 +226,27 @@ mod tests {
         term_scorer.seek(1289);
         assert_eq!(term_scorer.doc(), 1290);
         Ok(())
+    }
+
+    #[test]
+    fn test_term_scorer_mask_lanes_follow_density() {
+        for (num_docs, expected_alternate) in [(256, false), (1_024, true)] {
+            let docs: Vec<_> = (0..128).map(|doc| (doc * 2, 1)).collect();
+            let mut scorer = TermScorer::create_for_test(
+                &docs,
+                &vec![10; num_docs],
+                Bm25Weight::for_one_term(128, num_docs as u64, 10.0),
+            );
+            assert_eq!(scorer.use_alternate_mask, expected_alternate);
+            let mut mask = [common::TinySet::from_bits(1 << 63); 64];
+            let mut expected = mask;
+            for &(doc, _) in &docs {
+                expected[(doc / 64) as usize].insert_mut(doc % 64);
+            }
+            assert_eq!(scorer.fill_bitset_window(0, &mut mask), TERMINATED);
+            assert_eq!(scorer.doc(), TERMINATED);
+            assert_eq!(mask, expected);
+        }
     }
 
     #[test]

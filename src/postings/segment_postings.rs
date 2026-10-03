@@ -224,6 +224,17 @@ impl DocSet for SegmentPostings {
     }
 
     fn fill_bitset_window(&mut self, min_doc: DocId, mask: &mut [TinySet]) -> DocId {
+        self.fill_bitset_window_impl(min_doc, mask, false)
+    }
+}
+
+impl SegmentPostings {
+    pub(crate) fn fill_bitset_window_impl(
+        &mut self,
+        min_doc: DocId,
+        mask: &mut [TinySet],
+        use_lanes: bool,
+    ) -> DocId {
         if mask.is_empty() {
             return self.doc();
         }
@@ -233,11 +244,12 @@ impl DocSet for SegmentPostings {
         let horizon = min_doc
             .saturating_add(mask.len() as u32 * 64)
             .min(TERMINATED);
-        loop {
+        let mut alternate_mask: Option<[TinySet; 64]> = None;
+        let next_doc = 'fill: loop {
             if !self.block_cursor.block_is_loaded() {
                 if let Some(next) = self.try_or_unloaded_dense_block(min_doc, horizon, mask) {
                     if next == TERMINATED {
-                        return TERMINATED;
+                        break TERMINATED;
                     }
                     continue;
                 }
@@ -247,7 +259,7 @@ impl DocSet for SegmentPostings {
 
             let doc = self.doc();
             if doc >= horizon {
-                return doc;
+                break doc;
             }
 
             match self.block_cursor.skip_reader().block_info() {
@@ -268,18 +280,32 @@ impl DocSet for SegmentPostings {
                         continue;
                     }
                     self.cur = self.block_cursor.seek_within_loaded_block(horizon);
-                    return self.doc();
+                    break self.doc();
                 }
                 BlockInfo::BitPacked { .. } | BlockInfo::VInt { .. } => {
                     let docs = self.block_cursor.docs();
                     let len = self.block_cursor.block_len();
                     let mut i = self.cur;
                     if docs[len - 1] - docs[i] >= 256 {
+                        if use_lanes && mask.len() == 64 {
+                            // Consecutive postings often hit the same mask word.
+                            // Alternate between independent lanes to avoid a chain
+                            // of dependent memory ORs, then merge once per window.
+                            let alternate =
+                                alternate_mask.get_or_insert_with(|| [TinySet::EMPTY; 64]);
+                            while i + 2 <= len && docs[i + 1] < horizon {
+                                let left = docs[i] - min_doc;
+                                let right = docs[i + 1] - min_doc;
+                                mask[(left / 64) as usize].insert_mut(left % 64);
+                                alternate[(right / 64) as usize].insert_mut(right % 64);
+                                i += 2;
+                            }
+                        }
                         while i < len {
                             let d = docs[i];
                             if d >= horizon {
                                 self.cur = i;
-                                return d;
+                                break 'fill d;
                             }
                             let delta = d - min_doc;
                             mask[(delta / 64) as usize].insert_mut(delta % 64);
@@ -309,17 +335,21 @@ impl DocSet for SegmentPostings {
                     mask[bucket].union_mut(TinySet::from_bits(bits));
                     if i < len {
                         self.cur = i;
-                        return docs[i];
+                        break docs[i];
                     }
                     self.block_cursor.advance_skip_only();
                     self.cur = 0;
                 }
             }
+        };
+        if let Some(alternate) = &alternate_mask {
+            for (word, &other) in mask.iter_mut().zip(alternate) {
+                word.union_mut(other);
+            }
         }
+        next_doc
     }
-}
 
-impl SegmentPostings {
     /// Membership probe for monotonically increasing COUNT candidates. The caller owns
     /// this cursor separately from the scorer, since a dense block can stay undecoded.
     pub(crate) fn contains_doc_for_count(&mut self, target: DocId) -> bool {
@@ -622,6 +652,53 @@ mod tests {
     }
 
     #[test]
+    fn fill_bitset_window_two_lanes_matches_bit_walk() {
+        for base in [0, TERMINATED - 40_000] {
+            for gap in [3, 17, 61] {
+                let mut docs: Vec<DocId> = (0..600).map(|i| base + i * gap).collect();
+                if base != 0 {
+                    docs.push(TERMINATED - 1);
+                }
+                for width in [1usize, 2, 7, 64] {
+                    let mut postings = SegmentPostings::create_from_docs(&docs);
+                    while postings.doc() != TERMINATED {
+                        let min_doc = postings.doc().saturating_add(1);
+                        let horizon = min_doc.saturating_add(width as u32 * 64).min(TERMINATED);
+                        let mut mask =
+                            vec![common::TinySet::from_bits(0x9249_2492_4924_9249); width];
+                        let mut expected = mask.clone();
+                        for &doc in docs.iter().filter(|&&doc| doc >= min_doc && doc < horizon) {
+                            let delta = doc - min_doc;
+                            expected[(delta / 64) as usize].insert_mut(delta % 64);
+                        }
+                        let next = docs
+                            .iter()
+                            .copied()
+                            .find(|&doc| doc >= horizon)
+                            .unwrap_or(TERMINATED);
+                        assert_eq!(
+                            postings.fill_bitset_window_impl(min_doc, &mut mask, true),
+                            next
+                        );
+                        assert_eq!(postings.doc(), next);
+                        assert_eq!(mask, expected);
+                    }
+                    for min_doc in [TERMINATED, TERMINATED + 1, u32::MAX] {
+                        let mut mask =
+                            vec![common::TinySet::from_bits(0x9249_2492_4924_9249); width];
+                        let expected = mask.clone();
+                        assert_eq!(
+                            postings.fill_bitset_window_impl(min_doc, &mut mask, true),
+                            TERMINATED
+                        );
+                        assert_eq!(mask, expected);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
     fn fill_bitset_window_sparse_near_terminated_preserves_masks() {
         let docs: Vec<DocId> = (0..512u32)
             .map(|i| TERMINATED - 12_000 + i * 23)
@@ -655,7 +732,6 @@ mod tests {
             }
         }
     }
-
 
     #[test]
     fn fill_bitset_window_burst() {
