@@ -1,5 +1,10 @@
 # Wikipedia 1M comparison with Lucene 10.4
 
+The [October 3 verified run](results/2026-10-03/README.md) includes corrected
+code, matching collection statistics, cross-engine correctness checks, both
+process orders, and raw samples. TOP_10 leads on all 20 queries in both orders;
+COUNT leads overall, while `+new +york` remains order-sensitive.
+
 These tools compare COUNT and TOP_10 for the fixed 20 queries in
 [`queries-wiki.jsonl`](queries-wiki.jsonl). Use the same first one million Wikipedia
 documents in both indexes, one segment per index, and no query cache. Existing

@@ -1,0 +1,9 @@
+{
+  "source_revision": "e1a1ebcf6",
+  "harness_revision": "27ea716cd",
+  "start_utc": "2026-10-03T07:47:13Z",
+  "loadavg_start": "1.00 1.16 1.48 3/2348 281951",
+  "background_processes": "left untouched per user request",
+  "limitation": "Desktop background load uncontrolled. Oct03 load lower than Oct02 Steam-heavy run. Small differences remain provisional.",
+  "loadavg_end": "5.76 2.60 1.94 1/2454 283208"
+}

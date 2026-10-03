@@ -1,0 +1,7 @@
+{
+  "user_authorized_existing_load": true,
+  "start_utc": "2026-10-03T07:46:08Z",
+  "loadavg_start": "0.98 1.16 1.50 2/2257 281105",
+  "limitation": "Processes left untouched. Background load differs from Oct02 Steam-heavy run; small changes require repeated paired evidence. Both adapters pinned to CPU4.",
+  "loadavg_end": "1.24 1.21 1.50 4/2396 281849"
+}

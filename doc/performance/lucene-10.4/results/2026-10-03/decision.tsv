@@ -1,0 +1,2 @@
+id	hypothesis	change	before_us	after_us	delta	tests	verdict	note
+load-block-inline	out-of-line block loading slows medium-density COUNT	force inline load_block	250.288 forward;266.499 reverse	253.20600000000002 forward;274.7045 reverse	+1.17% forward;+3.08% reverse	paired COUNT equality 5 queries 512 samples each order	reverted	assembly removed calls but fill function grew1617 to3987 bytes; no production mutation retained
