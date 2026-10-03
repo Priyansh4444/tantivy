@@ -14,6 +14,19 @@ pub fn compressed_block_size(num_bits: u8) -> usize {
     (num_bits as usize) * COMPRESSION_BLOCK_SIZE / 8
 }
 
+/// Byte length of a full term-frequency block. Legacy headers 0..=32
+/// store only the FOR width. Larger headers pack 1..=7 exception pairs
+/// in the high three bits and the low-bit width in the low five bits.
+/// Header 32 stays reserved for legacy full-width u32 values.
+#[inline]
+pub fn compressed_freq_block_size(header: u8) -> usize {
+    if header == 32 {
+        compressed_block_size(32)
+    } else {
+        compressed_block_size(header & 31) + usize::from(header >> 5) * 2
+    }
+}
+
 /// Returns the size in bytes of a dense bitset block with `num_longs` u64s.
 ///
 /// Each bit `s` represents doc `bitset_base_doc(offset) + s`.
@@ -103,6 +116,63 @@ impl BlockEncoder {
             .bitpacker
             .compress(block, &mut self.output[..], num_bits);
         (num_bits, &self.output[..written_size])
+    }
+
+    /// Compress a full term-frequency block, subtracting one before packing.
+    /// At most seven outliers store their index and eight high bits separately.
+    /// Only choose PFOR when it saves bytes, without enlarging skip metadata.
+    pub fn compress_term_freqs(&mut self, block: &[u32]) -> (u8, &[u8]) {
+        debug_assert_eq!(block.len(), COMPRESSION_BLOCK_SIZE);
+        debug_assert!(!block.contains(&0));
+        let mut values = [0u32; COMPRESSION_BLOCK_SIZE];
+        let mut widths = [0u8; 33];
+        let mut width = 0u8;
+        for (&frequency, value) in block.iter().zip(values.iter_mut()) {
+            *value = frequency - 1;
+            let value_width = (u32::BITS - value.leading_zeros()) as u8;
+            widths[value_width as usize] += 1;
+            width = width.max(value_width);
+        }
+        let mut best_width = width;
+        let mut best_count = 0u8;
+        let mut best_size = compressed_block_size(width);
+        let mut exceptions = 0usize;
+        for candidate in (width.saturating_sub(8)..width).rev() {
+            exceptions += widths[(candidate + 1) as usize] as usize;
+            if exceptions > 7 {
+                break;
+            }
+            // n=1,width=0 would collide with the legacy 32-bit header.
+            if exceptions == 1 && candidate == 0 {
+                continue;
+            }
+            let size = compressed_block_size(candidate) + exceptions * 2;
+            if size < best_size {
+                best_size = size;
+                best_width = candidate;
+                best_count = exceptions as u8;
+            }
+        }
+        if best_count == 0 {
+            self.bitpacker.compress(&values, &mut self.output, width);
+            return (width, &self.output[..best_size]);
+        }
+        let mask = (1u32 << best_width) - 1;
+        let mut lows = values;
+        for value in &mut lows {
+            *value &= mask;
+        }
+        let mut cursor = self.bitpacker.compress(&lows, &mut self.output, best_width);
+        for (index, &value) in values.iter().enumerate() {
+            let high = value >> best_width;
+            if high != 0 {
+                self.output[cursor] = index as u8;
+                self.output[cursor + 1] = high as u8;
+                cursor += 2;
+            }
+        }
+        debug_assert_eq!(cursor, best_size);
+        (best_count << 5 | best_width, &self.output[..cursor])
     }
 
     /// Pack 128 values at a chosen width. Used by positions PFOR, where
@@ -209,6 +279,28 @@ impl BlockDecoder {
             }
         }
         res
+    }
+
+    /// Decode legacy FOR or patched FOR term frequencies. Increment packed
+    /// lows before restoring exceptions to avoid vector reads after scalar stores.
+    pub fn uncompress_term_freqs(
+        &mut self,
+        compressed_data: &[u8],
+        header: u8,
+        minus_one_encoded: bool,
+    ) -> usize {
+        if header <= 32 {
+            return self.uncompress_block_unsorted(compressed_data, header, minus_one_encoded);
+        }
+        let width = header & 31;
+        let packed_size = self.uncompress_block_unsorted(compressed_data, width, minus_one_encoded);
+        let size = compressed_freq_block_size(header);
+        for pair in compressed_data[packed_size..size].chunks_exact(2) {
+            // Addition preserves carries from low + 1 across the packed width.
+            // The final value cannot overflow for a valid encoded frequency.
+            self.output[pair[0] as usize] += (pair[1] as u32) << width;
+        }
+        size
     }
 
     /// Restore the exceptional high bits after unpacking a positions block.
@@ -447,6 +539,85 @@ pub(crate) mod tests {
                 assert_eq!(vals[i], decoder.output(i));
             }
         }
+    }
+
+    #[test]
+    fn test_frequency_pfor_payload_sizes_all_headers() {
+        for header in 0u8..=255 {
+            let expected = if header <= 32 {
+                usize::from(header) * COMPRESSION_BLOCK_SIZE / 8
+            } else {
+                usize::from(header & 31) * COMPRESSION_BLOCK_SIZE / 8 + usize::from(header >> 5) * 2
+            };
+            assert_eq!(
+                compressed_freq_block_size(header),
+                expected,
+                "header {header}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_frequency_pfor_roundtrip_widths_and_exception_counts() {
+        let mut encoder = BlockEncoder::new();
+        let mut decoder = BlockDecoder::default();
+        for width in 0..32 {
+            for exception_count in 1..=7 {
+                let low = if width == 0 { 0 } else { (1u32 << width) - 1 };
+                let high = (1u32 << width).saturating_add(low);
+                let mut frequencies = [low + 1; COMPRESSION_BLOCK_SIZE];
+                for frequency in &mut frequencies[..exception_count] {
+                    *frequency = high.saturating_add(1);
+                }
+                let (header, bytes) = encoder.compress_term_freqs(&frequencies);
+                assert_eq!(bytes.len(), compressed_freq_block_size(header));
+                let mut with_junk = bytes.to_vec();
+                with_junk.push(173);
+                for minus_one in [false, true] {
+                    let consumed = decoder.uncompress_term_freqs(&with_junk, header, minus_one);
+                    assert_eq!(with_junk[consumed], 173);
+                    let expected = frequencies.map(|frequency| frequency - u32::from(!minus_one));
+                    assert_eq!(decoder.output_array(), &expected);
+                }
+                if width == 0 && exception_count == 1 {
+                    assert_eq!(header, 1, "reserved legacy header 32 cannot encode PFOR");
+                } else if width < 31 {
+                    assert_eq!(header, (exception_count as u8) << 5 | width as u8);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_frequency_pfor_full_u32_and_legacy_encodings() {
+        let mut encoder = BlockEncoder::new();
+        let mut decoder = BlockDecoder::default();
+        let mut frequencies = [1; COMPRESSION_BLOCK_SIZE];
+        frequencies[127] = u32::MAX;
+        let (header, bytes) = encoder.compress_term_freqs(&frequencies);
+        assert!(header > 32);
+        assert_eq!(
+            decoder.uncompress_term_freqs(bytes, header, true),
+            bytes.len()
+        );
+        assert_eq!(decoder.output_array(), &frequencies);
+        for minus_one in [false, true] {
+            for frequency in [1u32, 2, 257, u32::MAX] {
+                let original = [frequency; COMPRESSION_BLOCK_SIZE];
+                let (header, bytes) = encoder.compress_block_unsorted(&original, minus_one);
+                assert!(header <= 32);
+                assert_eq!(
+                    decoder.uncompress_term_freqs(bytes, header, minus_one),
+                    bytes.len()
+                );
+                assert_eq!(decoder.output_array(), &original);
+            }
+        }
+        let original = [u32::MAX; COMPRESSION_BLOCK_SIZE];
+        let (header, bytes) = encoder.compress_term_freqs(&original);
+        assert_eq!(header, 32);
+        decoder.uncompress_term_freqs(bytes, header, true);
+        assert_eq!(decoder.output_array(), &original);
     }
 
     #[test]

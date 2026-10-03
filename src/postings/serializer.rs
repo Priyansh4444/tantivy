@@ -443,7 +443,7 @@ impl PostingsSerializer {
             // encode the term frequencies
             let (num_bits, block_encoded): (u8, &[u8]) = self
                 .block_encoder
-                .compress_block_unsorted(self.block.term_freqs(), true);
+                .compress_term_freqs(self.block.term_freqs());
             self.postings_write.extend(block_encoded);
             self.skip_write.write_term_freq(num_bits);
             if self.mode.has_positions() {

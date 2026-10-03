@@ -1,6 +1,6 @@
 use crate::directory::OwnedBytes;
 use crate::postings::compression::{
-    compressed_block_size, dense_block_size, COMPRESSION_BLOCK_SIZE,
+    compressed_block_size, compressed_freq_block_size, dense_block_size, COMPRESSION_BLOCK_SIZE,
 };
 use crate::query::Bm25Weight;
 use crate::schema::IndexRecordOption;
@@ -375,7 +375,8 @@ impl SkipReader {
                 ..
             } => {
                 self.remaining_docs -= COMPRESSION_BLOCK_SIZE as u32;
-                self.byte_offset += compressed_block_size(doc_num_bits + tf_num_bits);
+                self.byte_offset +=
+                    compressed_block_size(doc_num_bits) + compressed_freq_block_size(tf_num_bits);
                 self.position_offset += tf_sum as u64;
             }
             BlockInfo::Dense {
@@ -386,7 +387,7 @@ impl SkipReader {
             } => {
                 self.remaining_docs -= COMPRESSION_BLOCK_SIZE as u32;
                 self.byte_offset +=
-                    dense_block_size(num_longs) + compressed_block_size(tf_num_bits);
+                    dense_block_size(num_longs) + compressed_freq_block_size(tf_num_bits);
                 self.position_offset += tf_sum as u64;
             }
             BlockInfo::VInt { num_docs } => {

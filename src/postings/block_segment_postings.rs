@@ -45,11 +45,7 @@ fn decode_bitpacked_block(
     let num_consumed_bytes =
         doc_decoder.uncompress_block_sorted(data, doc_offset, doc_num_bits, strict_delta);
     if let Some(freq_decoder) = freq_decoder_opt {
-        freq_decoder.uncompress_block_unsorted(
-            &data[num_consumed_bytes..],
-            tf_num_bits,
-            strict_delta,
-        );
+        freq_decoder.uncompress_term_freqs(&data[num_consumed_bytes..], tf_num_bits, strict_delta);
     }
 }
 
@@ -64,7 +60,7 @@ fn decode_dense_block(
     let num_consumed_bytes =
         doc_decoder.uncompress_bitset_sorted(data, doc_offset, num_longs as usize);
     if let Some(freq_decoder) = freq_decoder_opt {
-        freq_decoder.uncompress_block_unsorted(&data[num_consumed_bytes..], tf_num_bits, true);
+        freq_decoder.uncompress_term_freqs(&data[num_consumed_bytes..], tf_num_bits, true);
     }
 }
 
@@ -608,6 +604,74 @@ mod tests {
         let block_postings = inverted_index
             .read_block_postings_from_terminfo(&term_info, IndexRecordOption::Basic)?;
         Ok(block_postings)
+    }
+
+    #[test]
+    fn test_frequency_pfor_skipped_blocks_dense_and_for() -> crate::Result<()> {
+        use crate::directory::FileSlice;
+        use crate::postings::serializer::PostingsSerializer;
+
+        // Dense first block, sparse FOR second block, and a VInt tail.
+        let mut docs: Vec<u32> = (0..64).chain(192..256).collect();
+        docs.extend((0..128).map(|index| 300 + index * 100));
+        docs.extend([13_100, 13_200, 13_300]);
+        let frequencies: Vec<u32> = (0..docs.len())
+            .map(|index| if index % 128 < 7 { 97 } else { 2 })
+            .collect();
+        for mode in [
+            IndexRecordOption::WithFreqs,
+            IndexRecordOption::WithFreqsAndPositions,
+        ] {
+            let mut serializer = PostingsSerializer::new(1.0, mode, None);
+            serializer.new_term(docs.len() as u32, true);
+            for (&doc, &frequency) in docs.iter().zip(&frequencies) {
+                serializer.write_doc(doc, frequency);
+            }
+            let mut bytes = Vec::new();
+            serializer.close_term(docs.len() as u32, &mut bytes)?;
+            for requested in [IndexRecordOption::Basic, IndexRecordOption::WithFreqs] {
+                let mut postings = BlockSegmentPostings::open(
+                    docs.len() as u32,
+                    FileSlice::from(bytes.clone()),
+                    mode,
+                    requested,
+                )?;
+                let mut seen = 0;
+                while !postings.docs().is_empty() {
+                    let count = postings.docs().len();
+                    assert_eq!(postings.docs(), &docs[seen..seen + count]);
+                    if requested == IndexRecordOption::WithFreqs {
+                        assert_eq!(postings.freqs(), &frequencies[seen..seen + count]);
+                    }
+                    assert_eq!(
+                        postings.skip_reader.position_offset(),
+                        if mode.has_positions() {
+                            frequencies[..seen]
+                                .iter()
+                                .map(|&freq| u64::from(freq))
+                                .sum()
+                        } else {
+                            0
+                        }
+                    );
+                    seen += count;
+                    postings.advance();
+                }
+                assert_eq!(seen, docs.len());
+                let mut postings = BlockSegmentPostings::open(
+                    docs.len() as u32,
+                    FileSlice::from(bytes.clone()),
+                    mode,
+                    requested,
+                )?;
+                let index = postings.seek(13_200);
+                assert_eq!(postings.doc(index), 13_200);
+                if requested == IndexRecordOption::WithFreqs {
+                    assert_eq!(postings.freq(index), frequencies[257]);
+                }
+            }
+        }
+        Ok(())
     }
 
     #[test]
