@@ -293,12 +293,16 @@ impl SegmentPostings {
                             // of dependent memory ORs, then merge once per window.
                             let alternate =
                                 alternate_mask.get_or_insert_with(|| [TinySet::EMPTY; 64]);
-                            while i + 2 <= len && docs[i + 1] < horizon {
-                                let left = docs[i] - min_doc;
-                                let right = docs[i + 1] - min_doc;
-                                mask[(left / 64) as usize].insert_mut(left % 64);
-                                alternate[(right / 64) as usize].insert_mut(right % 64);
-                                i += 2;
+                            while i + 4 <= len && docs[i + 3] < horizon {
+                                let first = docs[i] - min_doc;
+                                let second = docs[i + 1] - min_doc;
+                                let third = docs[i + 2] - min_doc;
+                                let fourth = docs[i + 3] - min_doc;
+                                mask[(first / 64) as usize].insert_mut(first % 64);
+                                alternate[(second / 64) as usize].insert_mut(second % 64);
+                                mask[(third / 64) as usize].insert_mut(third % 64);
+                                alternate[(fourth / 64) as usize].insert_mut(fourth % 64);
+                                i += 4;
                             }
                         }
                         while i < len {
