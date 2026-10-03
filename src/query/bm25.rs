@@ -214,7 +214,11 @@ impl Bm25Weight {
 
     /// Compute the maximum possible BM25 score given this weight.
     pub fn max_score(&self) -> Score {
-        self.score(255u8, 2_013_265_944)
+        // With a nonnegative norm, tf / (tf + norm) is at most one.
+        // A synthetic (length, frequency) pair is not a bound: quantized
+        // lengths and token overlaps can make frequency exceed that length.
+        // Negative boosts have nonpositive scores and therefore upper bound zero.
+        self.weight.max(0.0)
     }
 
     #[inline]
@@ -267,6 +271,29 @@ mod tests {
     fn test_idf() {
         let score: Score = 2.0;
         assert_nearly_equals!(idf(1, 2), score.ln());
+    }
+
+    #[test]
+    fn test_max_score_bounds_quantized_lengths_and_overlapping_tokens() {
+        for avg_fieldnorm in [0.01, 1.0, 100.0, 10_000.0] {
+            let base = Bm25Weight::for_one_term_without_explain(2, 256, avg_fieldnorm);
+            for boost in [-1.0, 0.0, 0.5, 1.0, 10.0] {
+                let weight = base.boost_by(boost);
+                for fieldnorm_id in 0..=u8::MAX {
+                    // Do not assume frequency <= decoded fieldnorm: fieldnorms
+                    // round down and overlapping tokens may repeat a term.
+                    for term_freq in [1, 2, 62, 63, 128, 100_000, u32::MAX] {
+                        let score = weight.score(fieldnorm_id, term_freq);
+                        assert!(
+                            score <= weight.max_score(),
+                            "avg={avg_fieldnorm} boost={boost} norm={fieldnorm_id} \
+                             tf={term_freq}: {score} > {}",
+                            weight.max_score()
+                        );
+                    }
+                }
+            }
+        }
     }
 
     #[test]

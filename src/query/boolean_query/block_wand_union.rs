@@ -464,6 +464,56 @@ mod tests {
 
     const MAX_TERM_FREQ: u32 = 100u32;
 
+    #[test]
+    fn test_two_term_or_preserves_single_term_winner_with_sparse_quantized_field(
+    ) -> crate::Result<()> {
+        use crate::collector::TopDocs;
+        use crate::query::{BooleanQuery, Occur, Query, TermQuery};
+        use crate::schema::{IndexRecordOption, Schema, TEXT};
+        use crate::{Index, Term};
+
+        let mut schema = Schema::builder();
+        let field = schema.add_text_field("text", TEXT);
+        let index = Index::create_in_ram(schema.build());
+        let mut writer = index.writer_for_tests()?;
+        writer.add_document(
+            doc!(field => std::iter::repeat_n("a", 62).collect::<Vec<_>>().join(" ")),
+        )?;
+        writer.add_document(
+            doc!(field => std::iter::repeat_n("a", 63).collect::<Vec<_>>().join(" ")),
+        )?;
+        for _ in 0..128 {
+            writer.add_document(doc!(field => "b"))?;
+        }
+        for _ in 0..126 {
+            writer.add_document(crate::TantivyDocument::default())?;
+        }
+        writer.commit()?;
+        let searcher = index.reader()?.searcher();
+        assert_eq!(searcher.segment_readers().len(), 1);
+        let query = BooleanQuery::new(
+            ["a", "b"]
+                .into_iter()
+                .map(|term| {
+                    (
+                        Occur::Should,
+                        Box::new(TermQuery::new(
+                            Term::from_field_text(field, term),
+                            IndexRecordOption::WithFreqs,
+                        )) as Box<dyn Query>,
+                    )
+                })
+                .collect(),
+        );
+        let top = searcher.search(&query, &TopDocs::with_limit(1).order_by_score())?;
+        assert_eq!(top.len(), 1);
+        assert_eq!(
+            top[0].1.doc_id, 1,
+            "the later a-only document must not be discarded by OR-to-AND pruning"
+        );
+        Ok(())
+    }
+
     fn posting_list(max_doc: u32) -> BoxedStrategy<Vec<(DocId, u32)>> {
         (1..max_doc + 1)
             .prop_flat_map(move |doc_freq| {

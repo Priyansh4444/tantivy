@@ -177,7 +177,7 @@ mod tests {
             bm25_weight,
         );
         let max_scorer = term_scorer.max_score();
-        crate::assert_nearly_equals!(max_scorer, 1.3990127);
+        crate::assert_nearly_equals!(max_scorer, 1.5249238);
         assert_eq!(term_scorer.doc(), 2);
         assert_eq!(term_scorer.term_freq(), 3);
         assert_nearly_equals!(term_scorer.block_max_score(), 1.3676447);
