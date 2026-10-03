@@ -245,6 +245,20 @@ mod tests {
     }
 
     #[test]
+    fn test_negative_boost_tail_block_max_includes_absent_contribution() {
+        let mut scorer = TermScorer::create_for_test(
+            &[(0, 1), (1, 2), (2, 3)],
+            &[10; 3],
+            Bm25Weight::for_one_term(3, 1024, 10.0).boost_by(-1.0),
+        );
+        assert_eq!(scorer.block_max_score(), 0.0);
+        for _ in 0..3 {
+            assert!(scorer.score() < 0.0);
+            scorer.advance();
+        }
+    }
+
+    #[test]
     fn test_public_block_max_does_not_reuse_another_weights_cache() {
         let norms = [10; 3];
         let postings =

@@ -199,7 +199,9 @@ impl BlockSegmentPostings {
                 let term_freq = self.freq_decoder.output(idx);
                 bm25_weight.score(fieldnorm_id, term_freq)
             });
-            let block_max_score = max_score(bm25_scores).unwrap_or(0.0);
+            // A document without this term contributes zero to a union, so
+            // even an all-negative block needs a nonnegative contribution bound.
+            let block_max_score = max_score(bm25_scores).unwrap_or(0.0).max(0.0);
             self.block_max_score_cache = Some(block_max_score);
             return block_max_score;
         }
