@@ -165,6 +165,85 @@ mod tests {
     use crate::{DocSet, Index, Score, Term};
 
     #[test]
+    fn test_lucene_sloppy_repeat_requires_distinct_positions() -> crate::Result<()> {
+        use crate::collector::Count;
+        use crate::query::Query;
+        let index = create_index(&["alpha", "alpha alpha", "alpha padding alpha"])?;
+        let field = index.schema().get_field("text")?;
+        let searcher = index.reader()?.searcher();
+        let mut query = PhraseQuery::new(vec![
+            Term::from_field_text(field, "alpha"),
+            Term::from_field_text(field, "alpha"),
+        ]);
+        query.set_slop(1);
+        assert_eq!(searcher.search(&query, &Count)?, 2);
+        assert_eq!(query.count(&searcher)?, 2);
+        let weight = query.phrase_weight(EnableScoring::enabled_from_searcher(&searcher))?;
+        let mut scorer = weight.scorer(searcher.segment_reader(0), 1.0)?;
+        let mut docs = Vec::new();
+        while scorer.doc() != TERMINATED {
+            docs.push(scorer.doc());
+            scorer.advance();
+        }
+        assert_eq!(docs, vec![1, 2]);
+        Ok(())
+    }
+
+    #[test]
+    fn test_lucene_sloppy_full_width_slop() -> crate::Result<()> {
+        use crate::collector::Count;
+        let text = format!("alpha {}beta x gamma", "x ".repeat(256));
+        let index = create_index(&[&text])?;
+        let field = index.schema().get_field("text")?;
+        let searcher = index.reader()?.searcher();
+        let mut query = PhraseQuery::new(
+            ["alpha", "beta", "gamma"]
+                .into_iter()
+                .map(|term| Term::from_field_text(field, term))
+                .collect(),
+        );
+        for (slop, expected) in [(255, 0), (256, 0), (257, 1), (u32::MAX, 1)] {
+            query.set_slop(slop);
+            assert_eq!(searcher.search(&query, &Count)?, expected, "slop={slop}");
+            let weight = query.phrase_weight(EnableScoring::enabled_from_searcher(&searcher))?;
+            let mut scorer = weight.scorer(searcher.segment_reader(0), 1.0)?;
+            let mut seen = 0;
+            while scorer.doc() != TERMINATED {
+                seen += 1;
+                scorer.advance();
+            }
+            assert_eq!(seen, expected, "scored slop={slop}");
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_lucene_sloppy_distance_weighted_frequency() -> crate::Result<()> {
+        let index = create_index(&["alpha beta", "alpha x beta"])?;
+        let field = index.schema().get_field("text")?;
+        let searcher = index.reader()?.searcher();
+        let terms: Vec<_> = ["alpha", "beta"]
+            .into_iter()
+            .map(|term| Term::from_field_text(field, term))
+            .collect();
+        let mut query = PhraseQuery::new(terms.clone());
+        query.set_slop(1);
+        let weight = query.phrase_weight(EnableScoring::enabled_from_searcher(&searcher))?;
+        let mut scorer = weight.scorer(searcher.segment_reader(0), 1.0)?;
+        assert_eq!(scorer.seek(1), 1);
+        // Lucene's one-gap occurrence has frequency 1/(1+1), rather than 1.
+        // max_score supplies the current BM25 numerator convention unchanged.
+        let numerator = crate::query::Bm25Weight::for_terms(&searcher, &terms)?.max_score();
+        let expected = numerator * 0.5 / (0.5 + 1.2 * (0.25 + 0.75 * 3.0 / 2.5));
+        assert!(
+            (scorer.score() - expected).abs() < 1e-6,
+            "{} != {expected}",
+            scorer.score()
+        );
+        Ok(())
+    }
+
+    #[test]
     pub fn test_phrase_count() -> crate::Result<()> {
         let index = create_index(&["a c", "a a b d a b c", " a b"])?;
         let schema = index.schema();
