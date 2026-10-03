@@ -214,6 +214,11 @@ impl Bm25Weight {
 
     /// Compute the maximum possible BM25 score given this weight.
     pub fn max_score(&self) -> Score {
+        // Public constructors may receive invalid custom statistics. Such
+        // normalization can exceed saturation, so no finite bound is safe.
+        if !self.average_fieldnorm.is_finite() || self.average_fieldnorm <= 0.0 {
+            return Score::INFINITY;
+        }
         // With a nonnegative norm, tf / (tf + norm) is at most one.
         // A synthetic (length, frequency) pair is not a bound: quantized
         // lengths and token overlaps can make frequency exceed that length.
@@ -300,6 +305,17 @@ mod tests {
                         );
                     }
                 }
+            }
+        }
+    }
+
+    #[test]
+    fn test_invalid_average_has_no_finite_score_bound() {
+        for average in [0.0, -1.0, f32::NEG_INFINITY, f32::INFINITY, f32::NAN] {
+            for boost in [-1.0, 0.0, 1.0] {
+                let weight = Bm25Weight::for_one_term(1, 10, average).boost_by(boost);
+                assert_eq!(weight.max_score(), f32::INFINITY);
+                assert!(!weight.can_use_stored_block_max(average));
             }
         }
     }

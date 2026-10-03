@@ -223,9 +223,12 @@ impl SkipReader {
                 block_wand_fieldnorm_id,
                 block_wand_term_freq,
                 ..
-            } if block_wand_term_freq != 0 => {
+            } if block_wand_term_freq != 0 && block_wand_term_freq != u32::MAX => {
                 Some(bm25_weight.score(block_wand_fieldnorm_id, block_wand_term_freq))
             }
+            // Zero means absent metadata. Saturated frequencies decode to
+            // u32::MAX, but f32 division need not increase monotonically when
+            // its rounded denominator changes. Use an exact or global bound.
             BlockInfo::BitPacked { .. } | BlockInfo::Dense { .. } => None,
             BlockInfo::VInt { .. } => None,
         }
@@ -429,6 +432,33 @@ mod tests {
             assert_eq!(super::decode_block_wand_max_tf(tf), tf as u32);
         }
         assert_eq!(super::decode_block_wand_max_tf(255), u32::MAX);
+    }
+
+    #[test]
+    fn test_saturated_frequency_has_no_stored_score_bound() {
+        // Raising the frequency to the saturation sentinel can lower the
+        // computed f32 factor by an ulp, despite the mathematical monotonicity.
+        let original_freq = 4_294_967_040u32 as f32;
+        let saturated_freq = u32::MAX as f32;
+        let norm = 512.0f32;
+        assert!(original_freq / (original_freq + norm) > saturated_freq / (saturated_freq + norm));
+        let weight = crate::query::Bm25Weight::for_one_term(128, 1024, 10.0);
+        for dense in [false, true] {
+            let mut serializer = SkipSerializer::new();
+            if dense {
+                serializer.write_doc_dense(200, 4);
+            } else {
+                serializer.write_doc(200, 2);
+            }
+            serializer.write_term_freq(32);
+            serializer.write_blockwand_max(255, 4_294_967_040);
+            let reader = SkipReader::new(
+                OwnedBytes::new(serializer.data().to_vec()),
+                COMPRESSION_BLOCK_SIZE as u32,
+                IndexRecordOption::WithFreqs,
+            );
+            assert_eq!(reader.block_max_score(&weight), None);
+        }
     }
 
     #[test]
