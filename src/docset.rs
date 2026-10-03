@@ -192,9 +192,11 @@ pub trait DocSet: Send {
             return self.doc();
         }
         if self.doc() < min_doc {
-            self.seek(min_doc);
+            self.seek(min_doc.min(TERMINATED));
         }
-        let horizon = min_doc.saturating_add(mask.len() as u32 * 64);
+        let horizon = min_doc
+            .saturating_add(mask.len() as u32 * 64)
+            .min(TERMINATED);
         loop {
             let doc = self.doc();
             if doc >= horizon {

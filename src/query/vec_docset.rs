@@ -87,4 +87,22 @@ pub(crate) mod tests {
         }
         assert_eq!(postings.fill_buffer(&mut buffer), 9);
     }
+
+    #[test]
+    fn fill_bitset_window_does_not_insert_terminated() {
+        for width in [1usize, 2, 7, 64] {
+            let mut postings = VecDocSet::from(vec![TERMINATED - 2, TERMINATED - 1]);
+            let mut mask = vec![common::TinySet::EMPTY; width];
+            assert_eq!(
+                postings.fill_bitset_window(TERMINATED - 2, &mut mask),
+                TERMINATED
+            );
+            assert_eq!(mask[0], common::TinySet::from_bits(3));
+            for min_doc in [TERMINATED - 2, TERMINATED, TERMINATED + 1, u32::MAX] {
+                let expected = mask.clone();
+                assert_eq!(postings.fill_bitset_window(min_doc, &mut mask), TERMINATED);
+                assert_eq!(mask, expected);
+            }
+        }
+    }
 }

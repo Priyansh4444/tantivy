@@ -228,9 +228,11 @@ impl DocSet for SegmentPostings {
             return self.doc();
         }
         if self.doc() < min_doc {
-            self.seek(min_doc);
+            self.seek(min_doc.min(TERMINATED));
         }
-        let horizon = min_doc.saturating_add(mask.len() as u32 * 64);
+        let horizon = min_doc
+            .saturating_add(mask.len() as u32 * 64)
+            .min(TERMINATED);
         loop {
             if !self.block_cursor.block_is_loaded() {
                 if let Some(next) = self.try_or_unloaded_dense_block(min_doc, horizon, mask) {
@@ -618,6 +620,42 @@ mod tests {
         let docs: Vec<DocId> = (0..2_000u32).map(|i| i * 17).collect();
         assert_eq!(collect_windows(&docs), expected_windows(&docs));
     }
+
+    #[test]
+    fn fill_bitset_window_sparse_near_terminated_preserves_masks() {
+        let docs: Vec<DocId> = (0..512u32)
+            .map(|i| TERMINATED - 12_000 + i * 23)
+            .chain([TERMINATED - 1])
+            .collect();
+        for width in [1usize, 2, 7, 64] {
+            let mut postings = SegmentPostings::create_from_docs(&docs);
+            while postings.doc() != TERMINATED {
+                let min_doc = postings.doc().saturating_add(1);
+                let horizon = min_doc.saturating_add(width as u32 * 64);
+                let mut mask = vec![common::TinySet::from_bits(0x9249_2492_4924_9249); width];
+                let mut expected = mask.clone();
+                for &doc in docs.iter().filter(|&&doc| doc >= min_doc && doc < horizon) {
+                    let delta = doc - min_doc;
+                    expected[(delta / 64) as usize].insert_mut(delta % 64);
+                }
+                let next = docs
+                    .iter()
+                    .copied()
+                    .find(|&doc| doc >= horizon)
+                    .unwrap_or(TERMINATED);
+                assert_eq!(postings.fill_bitset_window(min_doc, &mut mask), next);
+                assert_eq!(postings.doc(), next);
+                assert_eq!(mask, expected);
+            }
+            for min_doc in [TERMINATED, TERMINATED + 1, u32::MAX] {
+                let mut mask = vec![common::TinySet::from_bits(0x9249_2492_4924_9249); width];
+                let expected = mask.clone();
+                assert_eq!(postings.fill_bitset_window(min_doc, &mut mask), TERMINATED);
+                assert_eq!(mask, expected);
+            }
+        }
+    }
+
 
     #[test]
     fn fill_bitset_window_burst() {

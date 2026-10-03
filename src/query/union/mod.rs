@@ -21,6 +21,22 @@ mod tests {
     use crate::query::{BitSetDocSet, ConstScorer, VecDocSet};
     use crate::{tests, DocId};
 
+    #[test]
+    fn scoring_union_near_terminated() {
+        use crate::query::score_combiner::SumCombiner;
+        use crate::query::Scorer;
+
+        let a = ConstScorer::new(VecDocSet::from(vec![TERMINATED - 2, TERMINATED - 1]), 1.0);
+        let b = ConstScorer::new(VecDocSet::from(vec![TERMINATED - 1]), 2.0);
+        let mut union = BufferedUnionScorer::build(vec![a, b], SumCombiner::default, TERMINATED);
+        assert_eq!(union.doc(), TERMINATED - 2);
+        assert_eq!(union.score(), 1.0);
+        assert_eq!(union.advance(), TERMINATED - 1);
+        assert_eq!(union.score(), 3.0);
+        assert_eq!(union.advance(), TERMINATED);
+        assert_eq!(union.advance(), TERMINATED);
+    }
+
     fn vec_doc_set_from_docs_list(
         docs_list: &[Vec<DocId>],
     ) -> impl Iterator<Item = VecDocSet> + '_ {

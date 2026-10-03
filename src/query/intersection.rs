@@ -301,7 +301,9 @@ impl<TDocSet: DocSet + 'static, TOtherDocSet: DocSet> Intersection<TDocSet, TOth
         let mut doc = self.left.doc();
         while doc != TERMINATED {
             let base = doc;
-            let horizon = base.saturating_add(crate::docset::BLOCK_WINDOW);
+            let horizon = base
+                .saturating_add(crate::docset::BLOCK_WINDOW)
+                .min(TERMINATED);
             let mut mask = EMPTY_BLOCK;
             let right_next = self.right.fill_bitset_block(base, &mut mask);
             while doc < horizon {
@@ -424,6 +426,15 @@ mod tests {
         let mut intersection = Intersection::new(vec![left, right], 10);
         assert_eq!(intersection.doc(), 0);
         assert_eq!(intersection.advance(), TERMINATED);
+    }
+
+    #[test]
+    fn sparse_window_count_near_terminated() {
+        let left = VecDocSet::from(vec![TERMINATED - 200, TERMINATED - 1]);
+        let right = VecDocSet::from(vec![TERMINATED - 200, TERMINATED - 2, TERMINATED - 1]);
+        let mut intersection = Intersection::new(vec![left, right], TERMINATED);
+        assert_eq!(intersection.count_including_deleted_sparse_window(), 2);
+        assert_eq!(intersection.left.doc(), TERMINATED);
     }
 
     #[test]

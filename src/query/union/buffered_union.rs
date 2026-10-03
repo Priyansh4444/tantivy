@@ -56,7 +56,7 @@ fn refill<TScorer: Scorer, TScoreCombiner: ScoreCombiner>(
         scorers.retain(|scorer| scorer.doc() != TERMINATED);
         return;
     }
-    let horizon = min_doc + HORIZON;
+    let horizon = min_doc.saturating_add(HORIZON).min(TERMINATED);
     for scorer in scorers.iter_mut() {
         loop {
             let doc = scorer.doc();
