@@ -1,0 +1,13 @@
+{
+  "name": "two-lanes-borrow",
+  "command": "COUNT",
+  "start_utc": "2026-10-03T08:45:35Z",
+  "loadavg_start": "3.06 3.39 3.12 2/2141 490877",
+  "background_processes": "left untouched",
+  "baseline": "/home/pronsh/Coding/playground/search/bench/do_query-e1a1ebcf6-native-oct02",
+  "candidate": "/home/pronsh/Coding/playground/search/bench/do_query-count-two-lanes-borrow-native-oct03",
+  "baseline_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "candidate_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "reverse_note": "reverse labels swap: ratio to baseline is baseline/candidate",
+  "loadavg_end": "4.72 3.87 3.30 3/2110 500016"
+}

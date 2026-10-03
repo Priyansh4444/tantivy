@@ -1,0 +1,13 @@
+{
+  "name": "two-lanes",
+  "command": "COUNT",
+  "start_utc": "2026-10-03T08:34:55Z",
+  "loadavg_start": "8.67 4.19 2.61 2/2240 308940",
+  "background_processes": "left untouched",
+  "baseline": "/home/pronsh/Coding/playground/search/bench/do_query-e1a1ebcf6-native-oct02",
+  "candidate": "/home/pronsh/Coding/playground/search/bench/do_query-count-two-lanes-native-oct03",
+  "baseline_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "candidate_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "reverse_note": "reverse labels swap: ratio to baseline is baseline/candidate",
+  "loadavg_end": "6.71 4.25 2.70 4/2291 309764"
+}

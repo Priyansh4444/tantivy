@@ -1,0 +1,118 @@
+warning: `package.homepage` is redundant with `package.repository`
+ --> columnar/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-columnar` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> tokenizer-api/Cargo.toml:7:12
+  |
+7 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+8 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-tokenizer-api` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> jitexpr/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `jitexpr` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> ownedbytes/Cargo.toml:9:12
+   |
+ 9 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `ownedbytes` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> sstable/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-sstable` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> Cargo.toml:9:12
+   |
+ 9 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> query-grammar/Cargo.toml:8:12
+  |
+8 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+9 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-query-grammar` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> bitpacker/Cargo.toml:12:12
+   |
+ 9 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+...
+12 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-bitpacker` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> common/Cargo.toml:9:12
+   |
+ 9 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-common` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> stacker/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-stacker` (manifest) generated 1 warning
+   Compiling tantivy v0.27.0 (/home/pronsh/Coding/playground/search/tantivy-pr2937)
+    Finished `release` profile [optimized] target(s) in 29.51s
+     Running tests/query_pruning_correctness.rs (target/release/build/tantivy/a96d4a0aa4357714/out/query_pruning_correctness-a96d4a0aa4357714)
+
+running 8 tests
+........
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s

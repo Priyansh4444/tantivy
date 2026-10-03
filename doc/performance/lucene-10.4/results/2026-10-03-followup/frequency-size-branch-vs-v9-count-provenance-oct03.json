@@ -1,0 +1,13 @@
+{
+  "name": "frequency-size-branch-vs-v9",
+  "command": "COUNT",
+  "start_utc": "2026-10-03T09:20:42Z",
+  "loadavg_start": "8.05 13.56 10.34 5/2529 710841",
+  "background_processes": "left untouched",
+  "baseline": "/home/pronsh/Coding/playground/search/bench/do_query-frequency-pfor-v9-native-oct03",
+  "candidate": "/home/pronsh/Coding/playground/search/bench/do_query-frequency-pfor-size-branch-native-oct03",
+  "baseline_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-frequency-pfor-v9-oct03.idx",
+  "candidate_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-frequency-pfor-v9-oct03.idx",
+  "reverse_note": "reverse labels swap: ratio to baseline is baseline/candidate",
+  "loadavg_end": "10.62 13.51 10.50 5/2557 718791"
+}

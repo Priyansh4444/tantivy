@@ -1,0 +1,7 @@
+{
+  "name": "final-unroll4",
+  "start_utc": "2026-10-03T12:45:56Z",
+  "loadavg_start": "4.78 3.75 3.20 1/2147 963398",
+  "background_processes": "left untouched per user request",
+  "loadavg_end": "4.28 4.25 3.52 5/2096 964089"
+}

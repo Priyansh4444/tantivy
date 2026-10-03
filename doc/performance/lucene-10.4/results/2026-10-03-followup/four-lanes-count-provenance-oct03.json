@@ -1,0 +1,13 @@
+{
+  "name": "four-lanes",
+  "command": "COUNT",
+  "start_utc": "2026-10-03T09:10:35Z",
+  "loadavg_start": "12.51 10.25 7.17 18/2512 602266",
+  "background_processes": "left untouched",
+  "baseline": "/home/pronsh/Coding/playground/search/bench/do_query-e1a1ebcf6-native-oct02",
+  "candidate": "/home/pronsh/Coding/playground/search/bench/do_query-count-four-lanes-native-oct03",
+  "baseline_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "candidate_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "reverse_note": "reverse labels swap: ratio to baseline is baseline/candidate",
+  "loadavg_end": "10.13 9.93 7.21 3/2466 608232"
+}

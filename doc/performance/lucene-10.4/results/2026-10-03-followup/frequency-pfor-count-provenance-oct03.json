@@ -1,0 +1,13 @@
+{
+  "name": "frequency-pfor",
+  "command": "COUNT",
+  "start_utc": "2026-10-03T08:42:18Z",
+  "loadavg_start": "2.80 4.25 3.29 2/2150 467436",
+  "background_processes": "left untouched",
+  "baseline": "/home/pronsh/Coding/playground/search/bench/do_query-e1a1ebcf6-native-oct02",
+  "candidate": "/home/pronsh/Coding/playground/search/bench/do_query-frequency-pfor-native-oct03",
+  "baseline_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "candidate_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-frequency-pfor-oct03.idx",
+  "reverse_note": "reverse labels swap: ratio to baseline is baseline/candidate",
+  "loadavg_end": "2.76 3.99 3.25 3/2116 468176"
+}

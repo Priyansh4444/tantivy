@@ -1,0 +1,78 @@
+{
+  "old_reader_rejects_v9": {
+    "returncode": 101,
+    "stdout": "",
+    "stderr": "\nthread 'main' (591033) panicked at src/bin/do_query.rs:16:37:\ncalled `Result::unwrap()` on an `Err` value: OpenReadError(IncompatibleIndex(Library version: 8, index version: 9. Change tantivy to a version compatible with index format 9 (e.g. 0.27.x) and rebuild your project.))\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+  },
+  "new_reader_accepts_v8": {
+    "returncode": 0,
+    "stdout": "52208\n",
+    "stderr": ""
+  },
+  "old": {
+    ".fieldnorm": {
+      "bytes": 1000105,
+      "body_sha256": "2503a451eb72044fff387cf192dd9bdfba75e3936448ab4e021f2d4c787fa449",
+      "format_version": 8
+    },
+    ".term": {
+      "bytes": 19178450,
+      "body_sha256": "0083c32be52fc11684f3f277debd2ce8c899f51b315487dadfc5612786acf51d",
+      "format_version": 8
+    },
+    ".idx": {
+      "bytes": 227295182,
+      "body_sha256": "42db270c4788a77ba7c1c152813c259a2f72c1083ee78a124ecb65f49994c679",
+      "format_version": 8
+    },
+    ".pos": {
+      "bytes": 379021013,
+      "body_sha256": "b4d87f8627b1ffc35492b120af593955be71253680590e401f0d9c80f5d9f80a",
+      "format_version": 8
+    },
+    ".fast": {
+      "bytes": 4000187,
+      "body_sha256": "0394215f751b5e52bfe268bccf9af4614fe973dd3dabf014db75677dd7a9ba8e",
+      "format_version": 8
+    },
+    ".store": {
+      "bytes": 10676974,
+      "body_sha256": "18ce84b623dd140ad6092d0fc25f56778f8b065f753e2d90f3146544dd29b127",
+      "format_version": 8
+    }
+  },
+  "new": {
+    ".fieldnorm": {
+      "bytes": 1000105,
+      "body_sha256": "2503a451eb72044fff387cf192dd9bdfba75e3936448ab4e021f2d4c787fa449",
+      "format_version": 9
+    },
+    ".term": {
+      "bytes": 19162195,
+      "body_sha256": "ed4bd8a88a4ab275ba982606dacbdab7544b8d3ae1d91365327f2d225d6eb880",
+      "format_version": 9
+    },
+    ".idx": {
+      "bytes": 208886912,
+      "body_sha256": "71b631f706f99bea574755daf68e0de46810f0219b159898406ab140548ea334",
+      "format_version": 9
+    },
+    ".pos": {
+      "bytes": 379021013,
+      "body_sha256": "b4d87f8627b1ffc35492b120af593955be71253680590e401f0d9c80f5d9f80a",
+      "format_version": 9
+    },
+    ".fast": {
+      "bytes": 4000187,
+      "body_sha256": "0394215f751b5e52bfe268bccf9af4614fe973dd3dabf014db75677dd7a9ba8e",
+      "format_version": 9
+    },
+    ".store": {
+      "bytes": 10676974,
+      "body_sha256": "18ce84b623dd140ad6092d0fc25f56778f8b065f753e2d90f3146544dd29b127",
+      "format_version": 9
+    }
+  },
+  "old_total_bytes": 641173024,
+  "new_total_bytes": 622748560
+}

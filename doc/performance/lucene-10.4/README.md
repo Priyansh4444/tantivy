@@ -1,9 +1,10 @@
 # Wikipedia 1M comparison with Lucene 10.4
 
-The [October 3 verified run](results/2026-10-03/README.md) includes corrected
-code, matching collection statistics, cross-engine correctness checks, both
-process orders, and raw samples. TOP_10 leads on all 20 queries in both orders;
-COUNT leads overall, while `+new +york` remains order-sensitive.
+The [October 3 follow-up](results/2026-10-03-followup/README.md) adds measured
+COUNT improvements and smaller frequency blocks to the
+[corrected baseline](results/2026-10-03/README.md). Both reports include matching
+collection statistics, cross-engine correctness checks, both process orders,
+and raw samples.
 
 These tools compare COUNT and TOP_10 for the fixed 20 queries in
 [`queries-wiki.jsonl`](queries-wiki.jsonl). Use the same first one million Wikipedia
@@ -64,6 +65,7 @@ and emits stored external IDs and scores for cross-engine checks.
 ```bash
 cp "$PERF_TOOLS/do_query.rs" "$PERF_ADAPTER/src/bin/do_query.rs"
 cp "$PERF_TOOLS/validate_index.rs" "$PERF_ADAPTER/src/bin/validate_index.rs"
+cp "$PERF_TOOLS/reencode_index.rs" "$PERF_ADAPTER/src/bin/reencode_index.rs"
 cat > "$PERF_ADAPTER/Cargo.toml" <<EOF
 [package]
 name = "wiki-perf-adapter"
@@ -83,8 +85,22 @@ overflow-checks = false
 EOF
 RUSTFLAGS='-C target-cpu=native' cargo build \
   --manifest-path "$PERF_ADAPTER/Cargo.toml" --release \
-  --bin do_query --bin validate_index
+  --bin do_query --bin validate_index --bin reencode_index
 ```
+
+This fork writes [format-9 frequency blocks](../../frequency-pfor.md) and still
+reads supported older indexes. To measure the storage savings using the frozen
+existing index, rewrite its segments without retokenizing into a **new, absent**
+output directory:
+
+```bash
+PERF_REENCODED="/absolute/path/to/wiki-1m-frequency-pfor-v9.idx"
+"$PERF_ADAPTER/target/release/reencode_index" "$PERF_INDEX" "$PERF_REENCODED"
+PERF_INDEX="$PERF_REENCODED"
+```
+
+Readers limited to format 8 reject newly written format-9 segment files. Keep
+the source index if older deployments still need it.
 
 Record the Rust toolchain, fork commit, JVM and CPU used for the run. The result
 JSON also records hashes of the binary, query suite, Java classes, dependency
@@ -151,6 +167,23 @@ iterations shuffles the query suite with fixed seed 23 and alternates engine
 order for each pair. Results include every sample, per-query medians and the
 geometric mean of Tantivy/Lucene latency ratios. TOP_10's protocol reply is `1`;
 the separate correctness gate provides ranking verification.
+
+## Snapshot warmed query-process memory
+
+Run this separately from latency measurements and builds:
+
+```bash
+python "$PERF_TOOLS/compare_process_memory.py" \
+  --tantivy-binary "$PERF_ADAPTER/target/release/do_query" \
+  --tantivy-index "$PERF_INDEX" --lucene-dir "$PERF_LUCENE" \
+  --lucene-classes "$PERF_CLASSES" --cpu-core 4 --warmup-seconds 20 \
+  --output "$PERF_RESULTS/process-memory.json"
+```
+
+The snapshot includes mapped index pages and records RSS, resident anonymous and
+file pages, and process high-water RSS. It uses the default JVM heap and disabled
+query cache, as in the latency comparison. These are warmed query-process
+measurements, not indexing throughput or a universal peak-memory claim.
 
 ## Why the statistics and boost are matched
 

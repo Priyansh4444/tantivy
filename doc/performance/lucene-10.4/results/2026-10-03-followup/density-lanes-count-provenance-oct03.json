@@ -1,0 +1,13 @@
+{
+  "name": "density-lanes",
+  "command": "COUNT",
+  "start_utc": "2026-10-03T09:04:18Z",
+  "loadavg_start": "2.91 4.46 4.55 4/2292 571904",
+  "background_processes": "left untouched",
+  "baseline": "/home/pronsh/Coding/playground/search/bench/do_query-e1a1ebcf6-native-oct02",
+  "candidate": "/home/pronsh/Coding/playground/search/bench/do_query-count-density-lanes-native-oct03",
+  "baseline_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "candidate_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "reverse_note": "reverse labels swap: ratio to baseline is baseline/candidate",
+  "loadavg_end": "4.69 4.71 4.63 19/2356 572911"
+}

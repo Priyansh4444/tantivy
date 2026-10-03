@@ -1,0 +1,13 @@
+{
+  "name": "runtime-lanes",
+  "command": "COUNT",
+  "start_utc": "2026-10-03T09:19:40Z",
+  "loadavg_start": "13.48 15.28 10.63 3/2532 707885",
+  "background_processes": "left untouched",
+  "baseline": "/home/pronsh/Coding/playground/search/bench/do_query-e1a1ebcf6-native-oct02",
+  "candidate": "/home/pronsh/Coding/playground/search/bench/do_query-count-runtime-lanes-native-oct03",
+  "baseline_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "candidate_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-position-pfor-current.idx",
+  "reverse_note": "reverse labels swap: ratio to baseline is baseline/candidate",
+  "loadavg_end": "9.87 14.18 10.48 4/2493 710626"
+}

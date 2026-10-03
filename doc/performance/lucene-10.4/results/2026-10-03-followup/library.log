@@ -1,0 +1,143 @@
+warning: `package.homepage` is redundant with `package.repository`
+ --> columnar/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-columnar` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> tokenizer-api/Cargo.toml:7:12
+  |
+7 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+8 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-tokenizer-api` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> jitexpr/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `jitexpr` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> ownedbytes/Cargo.toml:9:12
+   |
+ 9 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `ownedbytes` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> sstable/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-sstable` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> Cargo.toml:9:12
+   |
+ 9 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> query-grammar/Cargo.toml:8:12
+  |
+8 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+9 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-query-grammar` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> bitpacker/Cargo.toml:12:12
+   |
+ 9 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+...
+12 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-bitpacker` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> common/Cargo.toml:9:12
+   |
+ 9 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-common` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> stacker/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-stacker` (manifest) generated 1 warning
+   Compiling tantivy v0.27.0 (/home/pronsh/Coding/playground/search/tantivy-pr2937)
+warning: unused import: `doc`
+   --> src/postings/segment_postings.rs:498:17
+    |
+498 |     use crate::{doc, DocId, Index};
+    |                 ^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `tantivy` (lib test) generated 1 warning (run `cargo fix --lib -p tantivy --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.25s
+     Running unittests src/lib.rs (target/debug/build/tantivy/e1c0d00d3720dc5b/out/tantivy-e1c0d00d3720dc5b)
+
+running 1335 tests
+....................................................................................... 87/1335
+....................................................................................... 174/1335
+....................................................................................... 261/1335
+....................................................................................... 348/1335
+....................................................................................... 435/1335
+................................................................................iii.... 522/1335
+..........................................................ii........................... 609/1335
+....................................................................................... 696/1335
+....................................................................................... 783/1335
+...................................i................................................... 870/1335
+..............................................................i........................ 957/1335
+....................................................................................... 1044/1335
+.........................i............................................................. 1131/1335
+....................................................................................... 1218/1335
+....................................................................................... 1305/1335
+.............................test aggregation::bucket::histogram::histogram::tests::histogram_dense_storage_test has been running for over 60 seconds
+.
+test result: ok. 1327 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out; finished in 75.15s

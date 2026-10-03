@@ -1,0 +1,104 @@
+{
+  "method": "COUNT and TOP_10 over the same query suite, warmed serially per engine; snapshot includes mmap pages; default JVM heap; query cache disabled. This is not an indexing or universal peak-memory measurement.",
+  "warmup_seconds": 20,
+  "tantivy_binary_sha256": "4d137b62a472de03ff6fda611f56bb73280488eb014da347dbee8eb1fc72450d",
+  "query_file_sha256": "47feb065c35e50ef465beab072ae8549ffef9dd23e20e708c458139adcfccfc5",
+  "loadavg_start": "3.77 4.00 3.53 3/2091 964615",
+  "engine_commands": {
+    "tantivy": [
+      "taskset",
+      "-c",
+      "4",
+      "/home/pronsh/Coding/playground/search/bench/do_query-final-unroll4-native-oct03",
+      "/home/pronsh/Coding/playground/search/bench/wiki-1m-frequency-pfor-v9-oct03.idx"
+    ],
+    "lucene": [
+      "taskset",
+      "-c",
+      "4",
+      "java",
+      "-XX:+UseParallelGC",
+      "--add-modules",
+      "jdk.incubator.vector",
+      "--enable-native-access=ALL-UNNAMED",
+      "-cp",
+      "/tmp:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+      "DoQueryMatched",
+      "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx",
+      "294826965"
+    ]
+  },
+  "engines": {
+    "tantivy": {
+      "rounds": 939,
+      "status": {
+        "VmRSS": "15220 kB",
+        "VmHWM": "15220 kB",
+        "VmSize": "752920 kB",
+        "RssAnon": "620 kB",
+        "RssFile": "14600 kB"
+      },
+      "smaps_rollup": {
+        "60ba82d1a000-7fff435b7000 ---p 00000000 00": "00 0                          [rollup]",
+        "Rss": "15220 kB",
+        "Pss": "12573 kB",
+        "Pss_Dirty": "620 kB",
+        "Pss_Anon": "620 kB",
+        "Pss_File": "11953 kB",
+        "Pss_Shmem": "0 kB",
+        "Shared_Clean": "2672 kB",
+        "Shared_Dirty": "0 kB",
+        "Private_Clean": "11928 kB",
+        "Private_Dirty": "620 kB",
+        "Referenced": "15220 kB",
+        "Anonymous": "620 kB",
+        "KSM": "0 kB",
+        "LazyFree": "0 kB",
+        "AnonHugePages": "0 kB",
+        "ShmemPmdMapped": "0 kB",
+        "FilePmdMapped": "0 kB",
+        "Shared_Hugetlb": "0 kB",
+        "Private_Hugetlb": "0 kB",
+        "Swap": "0 kB",
+        "SwapPss": "0 kB",
+        "Locked": "0 kB"
+      }
+    },
+    "lucene": {
+      "rounds": 284,
+      "status": {
+        "VmRSS": "631472 kB",
+        "VmHWM": "632196 kB",
+        "VmSize": "11388568 kB",
+        "RssAnon": "600016 kB",
+        "RssFile": "31424 kB"
+      },
+      "smaps_rollup": {
+        "614200000-7fff8b508000 ---p 00000000 00": "00 0                             [rollup]",
+        "Rss": "631472 kB",
+        "Pss": "626839 kB",
+        "Pss_Dirty": "600048 kB",
+        "Pss_Anon": "600016 kB",
+        "Pss_File": "26791 kB",
+        "Pss_Shmem": "32 kB",
+        "Shared_Clean": "4760 kB",
+        "Shared_Dirty": "0 kB",
+        "Private_Clean": "26664 kB",
+        "Private_Dirty": "600048 kB",
+        "Referenced": "631472 kB",
+        "Anonymous": "600016 kB",
+        "KSM": "0 kB",
+        "LazyFree": "0 kB",
+        "AnonHugePages": "479232 kB",
+        "ShmemPmdMapped": "0 kB",
+        "FilePmdMapped": "0 kB",
+        "Shared_Hugetlb": "0 kB",
+        "Private_Hugetlb": "0 kB",
+        "Swap": "0 kB",
+        "SwapPss": "0 kB",
+        "Locked": "0 kB"
+      }
+    }
+  },
+  "loadavg_end": "5.04 4.31 3.66 10/2087 964670"
+}

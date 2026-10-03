@@ -1,0 +1,13 @@
+{
+  "name": "unroll4-vs-final",
+  "command": "COUNT",
+  "start_utc": "2026-10-03T09:35:02Z",
+  "loadavg_start": "12.57 11.35 11.70 3/2454 866953",
+  "background_processes": "left untouched",
+  "baseline": "/home/pronsh/Coding/playground/search/bench/do_query-final-combined-native-oct03",
+  "candidate": "/home/pronsh/Coding/playground/search/bench/do_query-count-unroll4-combined-native-oct03",
+  "baseline_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-frequency-pfor-v9-oct03.idx",
+  "candidate_index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-frequency-pfor-v9-oct03.idx",
+  "reverse_note": "reverse labels swap: ratio to baseline is baseline/candidate",
+  "loadavg_end": "7.68 10.21 11.30 3/2548 867438"
+}
