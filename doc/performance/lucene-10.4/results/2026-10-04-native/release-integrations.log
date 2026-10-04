@@ -1,0 +1,179 @@
+warning: `package.homepage` is redundant with `package.repository`
+ --> columnar/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-columnar` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> tokenizer-api/Cargo.toml:7:12
+  |
+7 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+8 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-tokenizer-api` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> jitexpr/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `jitexpr` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> ownedbytes/Cargo.toml:9:12
+   |
+ 9 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `ownedbytes` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> sstable/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-sstable` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> Cargo.toml:9:12
+   |
+ 9 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> query-grammar/Cargo.toml:8:12
+  |
+8 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+9 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-query-grammar` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> bitpacker/Cargo.toml:12:12
+   |
+ 9 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+...
+12 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-bitpacker` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+  --> common/Cargo.toml:9:12
+   |
+ 9 | homepage = "https://github.com/quickwit-oss/tantivy"
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+10 | repository = "https://github.com/quickwit-oss/tantivy"
+   |              -----------------------------------------
+   |
+   = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-common` (manifest) generated 1 warning
+warning: `package.homepage` is redundant with `package.repository`
+ --> stacker/Cargo.toml:6:12
+  |
+6 | homepage = "https://github.com/quickwit-oss/tantivy"
+  |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+7 | repository = "https://github.com/quickwit-oss/tantivy"
+  |              -----------------------------------------
+  |
+  = note: `cargo::redundant_homepage` is set to `warn` by default
+help: consider removing `package.homepage`
+warning: `tantivy-stacker` (manifest) generated 1 warning
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling tantivy v0.27.0 (/home/pronsh/Coding/playground/search/tantivy-pr2937)
+warning: method `phrase_count` is never used
+   --> src/query/phrase_query/phrase_scorer.rs:294:12
+    |
+153 | impl<TPostings: Postings> PhraseScorer<TPostings> {
+    | ------------------------------------------------- method in this implementation
+...
+294 |     pub fn phrase_count(&self) -> u32 {
+    |            ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `tantivy` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 1m 04s
+     Running tests/native_basic_norms.rs (target/release/build/tantivy/5b74f555d253c784/out/native_basic_norms-5b74f555d253c784)
+
+running 4 tests
+test native_basic_norms_use_float_term_identity_instead_of_numeric_equality ... ok
+test native_basic_norms_count_distinct_encoded_terms ... ok
+test native_basic_norms_scores_match_lucene_docs_term_fields ... ok
+test native_basic_norms_survive_deletion_and_merge ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests/native_bm25.rs (target/release/build/tantivy/43a69f28b8db4a74/out/native_bm25-43a69f28b8db4a74)
+
+running 4 tests
+test historical_custom_provider_and_public_constructors_keep_score_bits ... ok
+test native_sloppy_fractional_frequency_matches_lucene_raw ... ok
+test native_term_boost_and_explanations_match_lucene_raw ... ok
+test native_reciprocal_score_resolves_legacy_selected_pair_tie ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/native_boolean_score_sums.rs (target/release/build/tantivy/0d4c3d6f89f3a7f7/out/native_boolean_score_sums-0d4c3d6f89f3a7f7)
+
+running 1 test
+test native_boolean_identical_documents_keep_ties_across_clause_orders ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/phrase_prefix_statistics.rs (target/release/build/tantivy/1be20f19655b4356/out/phrase_prefix_statistics-1be20f19655b4356)
+
+running 4 tests
+test phrase_prefix_explanation_uses_provider_average_and_classic_policy ... ok
+test phrase_prefix_native_scores_and_disabled_counts_keep_current_behavior ... ok
+test phrase_prefix_uses_historical_scalar_provider_for_scores ... ok
+test phrase_prefix_uses_coherent_snapshot_and_custom_term_frequencies ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/query_pruning_correctness.rs (target/release/build/tantivy/a96d4a0aa4357714/out/query_pruning_correctness-a96d4a0aa4357714)
+
+running 8 tests
+test one_segment_deleted_without_fieldnorms ... ok
+test one_segment_without_fieldnorms ... ok
+test one_segment ... ok
+test one_segment_deleted ... ok
+test three_segments_deleted ... ok
+test three_segments_deleted_without_fieldnorms ... ok
+test three_segments_without_fieldnorms ... ok
+test three_segments ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+

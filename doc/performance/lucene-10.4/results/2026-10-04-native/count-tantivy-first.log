@@ -1,0 +1,21 @@
+the                  Tantivy=36.8 Lucene=51.8 T/L=0.711
+of                   Tantivy=33.9 Lucene=48.4 T/L=0.701
+and                  Tantivy=39.4 Lucene=54.5 T/L=0.724
+united               Tantivy=39.2 Lucene=51.3 T/L=0.765
+states               Tantivy=40.6 Lucene=55.0 T/L=0.737
+american             Tantivy=39.3 Lucene=56.8 T/L=0.691
+york                 Tantivy=34.5 Lucene=46.7 T/L=0.737
+saxophone            Tantivy=40.7 Lucene=59.3 T/L=0.686
++the +of             Tantivy=860.8 Lucene=932.8 T/L=0.923
++united +states      Tantivy=522.2 Lucene=667.2 T/L=0.783
++new +york           Tantivy=533.5 Lucene=566.8 T/L=0.941
++the +american       Tantivy=752.7 Lucene=841.7 T/L=0.894
++the +saxophone      Tantivy=300.3 Lucene=464.3 T/L=0.647
+the of               Tantivy=855.2 Lucene=954.6 T/L=0.896
+united states        Tantivy=512.9 Lucene=697.5 T/L=0.735
+the american         Tantivy=762.5 Lucene=842.7 T/L=0.905
+"united states"      Tantivy=4537.0 Lucene=6684.4 T/L=0.679
+"new york"           Tantivy=4520.3 Lucene=5241.6 T/L=0.862
++griffith +observatory Tantivy=181.1 Lucene=233.7 T/L=0.775
+griffith observatory Tantivy=202.3 Lucene=289.8 T/L=0.698
+geomean T/L 0.7693525183008242

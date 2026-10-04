@@ -1,0 +1,20 @@
+{
+  "command": [
+    "artifacts/d74b893b1f0c327ea7b3b182803442c5e85490c7/build_index",
+    "../wiki-1m-native-equivalent-v11-oct03.idx"
+  ],
+  "started_at_utc": "2026-10-04T06:26:13.644611+00:00",
+  "input": {
+    "path": "/home/pronsh/Coding/playground/search/bench/wiki-1m.jsonl",
+    "bytes": 1831702900,
+    "sha256": "2b630549676f1c58a579017b6cd949e25115fe63989f9e75cadadc5c1a1a8238"
+  },
+  "exit_code": 0,
+  "wall_seconds": 97.03796141500061,
+  "user_seconds": 113.36161,
+  "system_seconds": 5.604588000000001,
+  "max_rss_kib": 1312080,
+  "minor_faults": 190817,
+  "major_faults": 0,
+  "scope": "single command process tree; Linux child resource accounting"
+}

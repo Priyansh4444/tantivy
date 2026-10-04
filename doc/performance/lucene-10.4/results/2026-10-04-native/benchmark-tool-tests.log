@@ -1,0 +1,20 @@
+test_cutoff_replacement_requires_ties_in_both_models (test_compare_wiki_correctness.ComparisonGateTests.test_cutoff_replacement_requires_ties_in_both_models) ... ok
+test_duplicate_nan_infinite_and_truncated_dumps_fail (test_compare_wiki_correctness.ComparisonGateTests.test_duplicate_nan_infinite_and_truncated_dumps_fail) ... ok
+test_equal_results_and_empty_results_pass (test_compare_wiki_correctness.ComparisonGateTests.test_equal_results_and_empty_results_pass) ... ok
+test_float_tie_reordering_passes (test_compare_wiki_correctness.ComparisonGateTests.test_float_tie_reordering_passes) ... ok
+test_non_tie_order_inversion_fails (test_compare_wiki_correctness.ComparisonGateTests.test_non_tie_order_inversion_fails) ... ok
+test_score_mismatch_and_false_internal_oracle_fail (test_compare_wiki_correctness.ComparisonGateTests.test_score_mismatch_and_false_internal_oracle_fail) ... ok
+test_multisegment_matcher_is_rejected (test_native_lucene.CompositeHeaderTests.test_multisegment_matcher_is_rejected) ... ok
+test_versions_and_nonleading_text_header (test_native_lucene.CompositeHeaderTests.test_versions_and_nonleading_text_header) ... ok
+test_wrong_footer_truncated_header_and_missing_text_fail (test_native_lucene.CompositeHeaderTests.test_wrong_footer_truncated_header_and_missing_text_fail) ... ok
+test_all_cli_entrypoints_reject_both_modes_before_io (test_native_lucene.NativeModeTests.test_all_cli_entrypoints_reject_both_modes_before_io) ... ok
+test_historical_defaults_and_explicit_matched_are_preserved (test_native_lucene.NativeModeTests.test_historical_defaults_and_explicit_matched_are_preserved) ... ok
+test_invalid_mode_combinations_and_scales_fail (test_native_lucene.NativeModeTests.test_invalid_mode_combinations_and_scales_fail) ... ok
+test_native_builder_checks_targets_and_leaves_count_unwrapped (test_native_lucene.NativeModeTests.test_native_builder_checks_targets_and_leaves_count_unwrapped) ... ok
+test_native_never_reads_matcher_header_or_names_matched_class (test_native_lucene.NativeModeTests.test_native_never_reads_matcher_header_or_names_matched_class) ... ok
+test_native_provenance_hashes_only_native_classes (test_native_lucene.NativeModeTests.test_native_provenance_hashes_only_native_classes) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.359s
+
+OK

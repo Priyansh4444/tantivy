@@ -1,0 +1,6 @@
+{
+  "payload_identical": true,
+  "metadata_headers_equal": true,
+  "old": "../wiki-1m-frequency-pfor-v9-oct03.idx",
+  "new": "../wiki-1m-native-v11-oct03.idx"
+}

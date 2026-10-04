@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "native_high_norm": 135,
+  "empty_norm": 0,
+  "accepted_lengths": [
+    39,
+    40,
+    219,
+    255
+  ],
+  "positions_checked": true,
+  "named_query_registration": true,
+  "rejected": [
+    "length256",
+    "uppercase",
+    "punctuation",
+    "unknown_key",
+    "negative_sort",
+    "missing_text",
+    "default_short"
+  ]
+}

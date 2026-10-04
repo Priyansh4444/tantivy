@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "identical_reencode": true,
+  "detected_components": {
+    "postings": "postings",
+    "frequency": "postings",
+    "positions": "postings",
+    "fieldnorm": "fieldnorms_sha256",
+    "fast": "fast_u64_sha256",
+    "stored": "stored_documents_sha256"
+  },
+  "unsupported_rejections": {
+    "unsupported_mixed_json": "unsupported mixed JSON field",
+    "unsupported_fast_string": "unsupported fast-field type"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "binary": "/home/pronsh/Coding/playground/search/bench/do_query-final-unroll4-native-oct03",
+  "binary_sha256": "4d137b62a472de03ff6fda611f56bb73280488eb014da347dbee8eb1fc72450d",
+  "index": "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-v11-oct03.idx",
+  "exit_code": 101,
+  "stdout": "",
+  "stderr": "\nthread 'main' (486357) panicked at src/bin/do_query.rs:16:37:\ncalled `Result::unwrap()` on an `Err` value: OpenReadError(IncompatibleIndex(Library version: 9, index version: 11. Change tantivy to a version compatible with index format 11 (e.g. 0.27.x) and rebuild your project.))\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+}

@@ -1,5 +1,10 @@
 # Wikipedia 1M comparison with Lucene 10.4
 
+The [October 4 native comparison](results/2026-10-04-native/README.md) matches
+native collection statistics and raw scores on the corrected equivalent corpus.
+It records both-order query wins, complete term/ID/sort/norm comparison, and
+the remaining full-API scope.
+
 The [October 3 follow-up](results/2026-10-03-followup/README.md) adds measured
 COUNT improvements and smaller frequency blocks to the
 [corrected baseline](results/2026-10-03/README.md). Both reports include matching

@@ -1,0 +1,16 @@
+{
+  "tantivy": {
+    "VmRSS": "15260 kB",
+    "VmHWM": "15260 kB",
+    "VmSize": "749260 kB",
+    "RssAnon": "620 kB",
+    "RssFile": "14640 kB"
+  },
+  "lucene": {
+    "VmRSS": "354576 kB",
+    "VmHWM": "396948 kB",
+    "VmSize": "11388568 kB",
+    "RssAnon": "323052 kB",
+    "RssFile": "31492 kB"
+  }
+}

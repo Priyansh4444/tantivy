@@ -1,0 +1,8 @@
+{
+  "analyzer": "wiki_ascii_lucene",
+  "corpus_canonical_lines_sha256": "2b630549676f1c58a579017b6cd949e25115fe63989f9e75cadadc5c1a1a8238",
+  "documents": 1000000,
+  "fixture_mode": false,
+  "segments": 1,
+  "tokens": 294827020
+}

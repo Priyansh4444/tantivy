@@ -1,0 +1,167 @@
+{
+  "method": "COUNT and TOP_10 over the same query suite, warmed serially per engine; snapshot includes mmap pages; default JVM heap; query cache disabled. This is not an indexing or universal peak-memory measurement.",
+  "warmup_seconds": 20.0,
+  "mode": "native",
+  "native_bm25": true,
+  "matched_bm25": false,
+  "matched_collection_statistics": false,
+  "token_total": null,
+  "lucene_score_scale": 1.0,
+  "lucene_bm25": {
+    "k1": 1.2,
+    "b": 0.75
+  },
+  "provenance": {
+    "lucene_mode": "native",
+    "native_bm25": true,
+    "matched_collection_statistics": false,
+    "lucene_score_scale": 1.0,
+    "platform": "Linux-7.2.5-4-omarchy-x86_64-with-glibc2.44",
+    "java_version": "openjdk version \"21.0.12.1\" 2026-08-18\nOpenJDK Runtime Environment (build 21.0.12.1+1)\nOpenJDK 64-Bit Server VM (build 21.0.12.1+1, mixed mode, sharing)",
+    "tantivy_binary": "/home/pronsh/Coding/playground/search/bench/native-perf-adapter-oct03/artifacts/7db890908f1cc8422905102da7740733fe3f22f6/do_query",
+    "tantivy_binary_sha256": "7396f5bba982180b8551e5cf3b6ed8fd08ae3cac5cd2c172e9cedfdf15811c3a",
+    "query_suite_sha256": "47feb065c35e50ef465beab072ae8549ffef9dd23e20e708c458139adcfccfc5",
+    "java_classes_sha256": {
+      "/home/pronsh/Coding/playground/search/bench/native-lucene-tools-oct03/lucene-native-classes-oct03/DoQueryNative.class": "c409635f239c45565f713da602cddb5e1274ec4cbcbbb6bc0d0e0926851f8bd8",
+      "/home/pronsh/Coding/playground/search/bench/native-lucene-tools-oct03/lucene-native-classes-oct03/DumpNativeLuceneResults.class": "53006625cf30ec5629b6f1e5becdf4ef9b2957ccd84083a7ee1c9ec31cca9b91"
+    },
+    "lucene_jars_sha256": {
+      "lucene-analysis-common-10.4.0.jar": "8e768c9b2a3870f1fc2655181516699e719a56b9aaf8664226a11ae7d90cb4e9",
+      "lucene-core-10.4.0.jar": "8f894d211a8123938ccb9ff6827d136747e0eb6b1782ada6ac9086aa911b52e2",
+      "lucene-facet-10.4.0.jar": "c4d602a389945a8347bc39f904e8bd2504d823333f5cf9da16cda364c6f9eae8",
+      "lucene-queries-10.4.0.jar": "c5cfbb892dfa78d272d6c0b46442159d75f92adfd7577c03bf5fe9e6067b475b",
+      "lucene-queryparser-10.4.0.jar": "4635f2a14e9c01574c4cf9ad60e018ab2b041b7889369107a991ef950648c847",
+      "lucene-sandbox-10.4.0.jar": "49f5aa75aa6eda166652be4f294e2efc720e59b9325ee6f60403166edca0e70c",
+      "minimal-json-0.9.5.jar": "69ff84463d1d7cc5cfdb8baf2b6e5f7af153d351bf0dbee3bbc8916247afac74"
+    },
+    "tool_sources_sha256": {
+      "BuildWikiFixture.java": "060e12663355c64e0f7f6a7471aafa8a09eb2bd9a15171440eec42e39b2ba827",
+      "DumpLuceneResults.java": "e0b3f9d731ea4d0833a7d50f2188cae276603fb9c65dd279f290329b60bc0444",
+      "DumpNativeLuceneResults.java": "94393e754646008960b9e3bce4d70706566141a498d9a59a43759a229fd7e0da",
+      "DumpWikiLogical.java": "9e260583d431077ad5bb50e888f8afbb1bd733ae0128a9e224d3a80b24c2519b",
+      "MatchedStatisticsSearcher.java": "3a921ac2993ff0913b6202a6e6d49a62a8db3fde9ad0cda50f2e7c851e92c9c7",
+      "build_index.rs": "052ef01c4707472adb829c11798174b6cfc58e07a006139362909fa160a04c89",
+      "compare_payload.py": "4edf300c30e4551b7defe39da34cf38543f8a3958c27a2d197c3a83eddac5f44",
+      "compare_process_memory.py": "806cdee70144bfefba53b50c4a979fc9a8b67d95169f3bedad88a629f98ff6a4",
+      "compare_wiki_correctness.py": "5478edbbfc39c4545cdb0bc2fdd5b672a71f0d67886b3cf2ef846c4e9245a5e2",
+      "compare_wiki_logical.py": "0dc9796c10a9d992b93bc05ac479ef32f10b5092dbe6b6b906e08acf5045b682",
+      "do_query.rs": "495c0beb376ae6c43409b013f1e1ced86b6b692b1e95b0696123003998c13c24",
+      "dump_docmap.rs": "b504282ef5d149ea6ae8d27ad2b95a8a053e474a3af8f7d4ee555985fdb8dbca",
+      "dump_termtotals.rs": "8df19739b229c6d12e839818156a976e1081e4335c16b8f47d805865686829d2",
+      "lucene_mode.py": "e4a79f447cc3b1620abf5a167aaa4dcde3f2bcfad4137dda10ddf83f7a489b05",
+      "payload_fixtures.rs": "850ac6950867d0aa0370bfec243fd8f68ea6971f2a354b612bac56de8b6fdfbc",
+      "payload_identity.rs": "2ac08388b9fa2a8478f8b4a41c21aca80cfade7c355cfc6b7b8919ddb72be418",
+      "prepare_matched_lucene.py": "5365e50c3f57f0c59a63f88f778faca8757de994f66e142fc46ff0fa9a3221dd",
+      "prepare_native_lucene.py": "977cf24aed5f86e8d1f53b94f128e3d559254d9a4eec73b46b9686a4ff68c9b4",
+      "provenance.py": "093b32206e7cc549bdfad31eb5d13e7e5670698ea6a26ebb50b48d70b489d3e7",
+      "reencode_index.rs": "82bfdd686553ef4b09e6fad2633876ffecf3caca8822af3454062ea62ec62c9b",
+      "suite_lucene_interleaved.py": "e7f9243cfbe53f34f248c92afa618c69ea9d90586b1a9d4c477669f084b05bb9",
+      "tantivy_statistics.py": "b2eeb7d870237894564e8cd5c0e5ad6c326e3a410fc9cd7aa3e12e9042431e75",
+      "test_compare_wiki_correctness.py": "fb4fa3e77219ada092078ae9fa932b30430366029e47fe0261b0affb6d53ac99",
+      "test_native_lucene.py": "6cb0dddc122d8c6252edff875f4ecd87cfbba80534e8d28617adb43388fdf1e5",
+      "validate_index.rs": "1b18fc61a59c4e5ac32fadbc3c42c1a7bff1a456d4b9477a4c797fe1791f4c57",
+      "verify_payload_sensitivity.py": "e01140e847ca372e54029b1c1e62beb39e6f0174782cdec46a2e11d572833343",
+      "verify_wiki_analyzer.py": "48e8c4d2100aabf030a1d3f50646e4be4f3bfa01c164c17f574afe51a21dd59a"
+    }
+  },
+  "tantivy_binary_sha256": "7396f5bba982180b8551e5cf3b6ed8fd08ae3cac5cd2c172e9cedfdf15811c3a",
+  "query_file_sha256": "47feb065c35e50ef465beab072ae8549ffef9dd23e20e708c458139adcfccfc5",
+  "loadavg_start": "8.74 8.59 6.97 4/2313 948465",
+  "engine_commands": {
+    "tantivy": [
+      "taskset",
+      "-c",
+      "4",
+      "/home/pronsh/Coding/playground/search/bench/native-perf-adapter-oct03/artifacts/7db890908f1cc8422905102da7740733fe3f22f6/do_query",
+      "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-equivalent-v11-oct03.idx"
+    ],
+    "lucene": [
+      "taskset",
+      "-c",
+      "4",
+      "java",
+      "-XX:+UseParallelGC",
+      "--add-modules",
+      "jdk.incubator.vector",
+      "--enable-native-access=ALL-UNNAMED",
+      "-cp",
+      "/home/pronsh/Coding/playground/search/bench/native-lucene-tools-oct03/lucene-native-classes-oct03:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+      "DoQueryNative",
+      "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx",
+      "1.0"
+    ]
+  },
+  "engines": {
+    "tantivy": {
+      "rounds": 814,
+      "status": {
+        "VmRSS": "15260 kB",
+        "VmHWM": "15260 kB",
+        "VmSize": "749260 kB",
+        "RssAnon": "620 kB",
+        "RssFile": "14640 kB"
+      },
+      "smaps_rollup": {
+        "5cec70002000-7ffdecb6f000 ---p 00000000 00": "00 0                          [rollup]",
+        "Rss": "15260 kB",
+        "Pss": "12522 kB",
+        "Pss_Dirty": "620 kB",
+        "Pss_Anon": "620 kB",
+        "Pss_File": "11902 kB",
+        "Pss_Shmem": "0 kB",
+        "Shared_Clean": "2764 kB",
+        "Shared_Dirty": "0 kB",
+        "Private_Clean": "11876 kB",
+        "Private_Dirty": "620 kB",
+        "Referenced": "15260 kB",
+        "Anonymous": "620 kB",
+        "KSM": "0 kB",
+        "LazyFree": "0 kB",
+        "AnonHugePages": "0 kB",
+        "ShmemPmdMapped": "0 kB",
+        "FilePmdMapped": "0 kB",
+        "Shared_Hugetlb": "0 kB",
+        "Private_Hugetlb": "0 kB",
+        "Swap": "0 kB",
+        "SwapPss": "0 kB",
+        "Locked": "0 kB"
+      }
+    },
+    "lucene": {
+      "rounds": 298,
+      "status": {
+        "VmRSS": "354576 kB",
+        "VmHWM": "396948 kB",
+        "VmSize": "11388568 kB",
+        "RssAnon": "323052 kB",
+        "RssFile": "31492 kB"
+      },
+      "smaps_rollup": {
+        "614200000-7fffd12c1000 ---p 00000000 00": "00 0                             [rollup]",
+        "Rss": "354576 kB",
+        "Pss": "349920 kB",
+        "Pss_Dirty": "323084 kB",
+        "Pss_Anon": "323052 kB",
+        "Pss_File": "26836 kB",
+        "Pss_Shmem": "32 kB",
+        "Shared_Clean": "4784 kB",
+        "Shared_Dirty": "0 kB",
+        "Private_Clean": "26708 kB",
+        "Private_Dirty": "323084 kB",
+        "Referenced": "354576 kB",
+        "Anonymous": "323052 kB",
+        "KSM": "0 kB",
+        "LazyFree": "0 kB",
+        "AnonHugePages": "251904 kB",
+        "ShmemPmdMapped": "0 kB",
+        "FilePmdMapped": "0 kB",
+        "Shared_Hugetlb": "0 kB",
+        "Private_Hugetlb": "0 kB",
+        "Swap": "0 kB",
+        "SwapPss": "0 kB",
+        "Locked": "0 kB"
+      }
+    }
+  },
+  "loadavg_end": "8.11 8.48 7.00 8/2303 952601"
+}

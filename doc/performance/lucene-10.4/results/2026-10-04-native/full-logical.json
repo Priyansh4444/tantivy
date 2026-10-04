@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "results": {
+    "tantivy": {
+      "terms": {
+        "sha256": "dc15193a1ec1d93b778bf9cb0caedd1e71129180af0a1ea0e04b0f742c6c4d20",
+        "terms": 1642896
+      },
+      "documents": {
+        "sha256": "31e2b88a36a6ed3ebdf5b2b8df48c6a1a0fa48fe601ba5f3a465e56bf454ed3d",
+        "documents": 1000000
+      },
+      "statistics": {
+        "derived_total_tokens": 294827020,
+        "documents": 1000000,
+        "field_doc_count": 917578,
+        "serialized_total_tokens": 294827020,
+        "terms": 1642896
+      }
+    },
+    "lucene": {
+      "terms": {
+        "sha256": "dc15193a1ec1d93b778bf9cb0caedd1e71129180af0a1ea0e04b0f742c6c4d20",
+        "terms": 1642896
+      },
+      "documents": {
+        "sha256": "31e2b88a36a6ed3ebdf5b2b8df48c6a1a0fa48fe601ba5f3a465e56bf454ed3d",
+        "documents": 1000000
+      },
+      "statistics": {
+        "documents": 1000000,
+        "field_doc_count": 917578,
+        "terms": 1642896,
+        "derived_total_tokens": 294827020,
+        "serialized_total_tokens": 294827020
+      }
+    }
+  },
+  "java_source_sha256": "9e260583d431077ad5bb50e888f8afbb1bd733ae0128a9e224d3a80b24c2519b"
+}
