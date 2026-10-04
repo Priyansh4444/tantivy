@@ -106,6 +106,7 @@ pub(crate) fn serialize_postings(
 #[derive(Default, Debug)]
 pub(crate) struct IndexingPosition {
     pub num_tokens: u32,
+    pub num_overlaps: u32,
     pub end_position: u32,
 }
 
@@ -145,6 +146,8 @@ pub(crate) trait PostingsWriter: Send + Sync {
     ) {
         let end_of_path_idx = term_buffer.len_bytes();
         let mut num_tokens = 0;
+        // Positions are local to this value. Its first token is never an overlap.
+        let mut previous_position = None;
         let mut end_position = indexing_position.end_position;
         token_stream.process(&mut |token: &Token| {
             // We skip all tokens with a len greater than u16.
@@ -163,6 +166,10 @@ pub(crate) trait PostingsWriter: Send + Sync {
             end_position = end_position.max(start_position + token.position_length as u32);
             self.subscribe(doc_id, start_position, term_buffer, ctx);
             num_tokens += 1;
+            if previous_position == Some(token.position) {
+                indexing_position.num_overlaps += 1;
+            }
+            previous_position = Some(token.position);
         });
 
         indexing_position.end_position = end_position + POSITION_GAP;

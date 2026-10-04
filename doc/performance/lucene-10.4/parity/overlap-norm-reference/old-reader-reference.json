@@ -1,0 +1,50 @@
+{
+  "old_reader_production_commit": "7db890908f1cc8422905102da7740733fe3f22f6",
+  "old_reader_format": 11,
+  "old_reader_sha256": "db2dea63b39a825530c6025b35d9812b7a90df0f4ab3dc8c5bf4d0cc12cf4309",
+  "rows": [
+    {
+      "name": "legacy_enabled",
+      "segments": 0,
+      "fieldnorms": true,
+      "old_reader_exit": 0,
+      "old_reader_stdout": "OPEN format=11 segments=0\n",
+      "old_reader_stderr": ""
+    },
+    {
+      "name": "legacy_disabled",
+      "segments": 0,
+      "fieldnorms": false,
+      "old_reader_exit": 0,
+      "old_reader_stdout": "OPEN format=11 segments=0\n",
+      "old_reader_stderr": ""
+    },
+    {
+      "name": "discount_enabled",
+      "segments": 0,
+      "fieldnorms": {
+        "enabled": true,
+        "policy": "discount_overlaps"
+      },
+      "old_reader_exit": 2,
+      "old_reader_stdout": "",
+      "old_reader_stderr": "REJECT format=11 Data corrupted: 'Data corruption (in file `\"meta.json\"`): Meta file cannot be deserialized. Error(\"invalid type: map, expected a boolean\", line: 23, column: 5). Content: \"{\\n  \\\"index_settings\\\": {\\n    \\\"docstore_compression\\\": \\\"lz4\\\",\\n    \\\"docstore_blocksize\\\": 16384\\n  },\\n  \\\"segments\\\": [],\\n  \\\"schema\\\": [\\n    {\\n      \\\"name\\\": \\\"text\\\",\\n      \\\"type\\\": \\\"text\\\",\\n      \\\"options\\\": {\\n        \\\"indexing\\\": {\\n          \\\"record\\\": \\\"basic\\\",\\n          \\\"fieldnorms\\\": {\\n            \\\"enabled\\\": true,\\n            \\\"policy\\\": \\\"discount_overlaps\\\"\\n          },\\n          \\\"tokenizer\\\": \\\"default\\\"\\n        },\\n        \\\"stored\\\": false,\\n        \\\"fast\\\": false\\n      }\\n    }\\n  ],\\n  \\\"opstamp\\\": 0\\n}\\n\".'\n"
+    },
+    {
+      "name": "discount_disabled",
+      "segments": 0,
+      "fieldnorms": {
+        "enabled": false,
+        "policy": "discount_overlaps"
+      },
+      "old_reader_exit": 2,
+      "old_reader_stdout": "",
+      "old_reader_stderr": "REJECT format=11 Data corrupted: 'Data corruption (in file `\"meta.json\"`): Meta file cannot be deserialized. Error(\"invalid type: map, expected a boolean\", line: 23, column: 5). Content: \"{\\n  \\\"index_settings\\\": {\\n    \\\"docstore_compression\\\": \\\"lz4\\\",\\n    \\\"docstore_blocksize\\\": 16384\\n  },\\n  \\\"segments\\\": [],\\n  \\\"schema\\\": [\\n    {\\n      \\\"name\\\": \\\"text\\\",\\n      \\\"type\\\": \\\"text\\\",\\n      \\\"options\\\": {\\n        \\\"indexing\\\": {\\n          \\\"record\\\": \\\"basic\\\",\\n          \\\"fieldnorms\\\": {\\n            \\\"enabled\\\": false,\\n            \\\"policy\\\": \\\"discount_overlaps\\\"\\n          },\\n          \\\"tokenizer\\\": \\\"default\\\"\\n        },\\n        \\\"stored\\\": false,\\n        \\\"fast\\\": false\\n      }\\n    }\\n  ],\\n  \\\"opstamp\\\": 0\\n}\\n\".'\n"
+    }
+  ],
+  "old_reader_source_sha256": "9bdf6d66ba404af90b0e22bf165393e6889cc57cc83261d99dd7079787283c80",
+  "new_empty_index_source_sha256": "93043b008df0103df76427c1c880f62c10f03a8b9eb22f67e7d31b4f92aa68e5",
+  "old_reader_build_command": "CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=target/overlap-policy-oct04 cargo build --locked --offline --example overlap_old_reader --message-format=json",
+  "new_empty_index_run_command": "CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=target/overlap-policy-oct04 cargo run --locked --offline --example overlap_empty_indexes -- /tmp/native-overlap-empty-indexes-oct04",
+  "old_reader_run_command": "/tmp/native-overlap-old11-reader-oct04 /tmp/native-overlap-empty-indexes-oct04/<name>"
+}

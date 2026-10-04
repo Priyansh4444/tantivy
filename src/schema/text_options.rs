@@ -178,6 +178,77 @@ impl TextOptions {
     }
 }
 
+/// Index-time policy for the length encoded in text field norms.
+///
+/// Basic postings always use the unique term count, regardless of this policy.
+/// Changing an existing index's policy requires reindexing its documents.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FieldNormPolicy {
+    /// Every indexed token contributes to the field length.
+    CountAllTokens,
+    /// Tokens at the same position as the previous token do not increase length.
+    DiscountOverlaps,
+}
+
+// Keep enablement separate from the latent policy so toggling norms preserves it.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+struct FieldNormOptions {
+    enabled: bool,
+    policy: FieldNormPolicy,
+}
+
+// A new key would be ignored by old schema readers. A tagged value in the
+// existing Boolean slot makes old writers reject this policy even on empty indexes.
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+enum StoredFieldNorms {
+    Legacy(bool),
+    Discounted(DiscountedFieldNorms),
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct DiscountedFieldNorms {
+    enabled: bool,
+    policy: DiscountedPolicy,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+enum DiscountedPolicy {
+    DiscountOverlaps,
+}
+
+impl Serialize for FieldNormOptions {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let stored = match self.policy {
+            FieldNormPolicy::CountAllTokens => StoredFieldNorms::Legacy(self.enabled),
+            FieldNormPolicy::DiscountOverlaps => {
+                StoredFieldNorms::Discounted(DiscountedFieldNorms {
+                    enabled: self.enabled,
+                    policy: DiscountedPolicy::DiscountOverlaps,
+                })
+            }
+        };
+        stored.serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for FieldNormOptions {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        Ok(match StoredFieldNorms::deserialize(deserializer)? {
+            StoredFieldNorms::Legacy(enabled) => FieldNormOptions {
+                enabled,
+                policy: FieldNormPolicy::CountAllTokens,
+            },
+            StoredFieldNorms::Discounted(options) => FieldNormOptions {
+                enabled: options.enabled,
+                policy: FieldNormPolicy::DiscountOverlaps,
+            },
+        })
+    }
+}
+
 /// Configuration defining indexing for a text field.
 ///
 /// It defines
@@ -187,12 +258,14 @@ impl TextOptions {
 /// - The name of the `Tokenizer` that should be used to process the field.
 /// - Flag indicating, if fieldnorms should be stored (See [fieldnorm](crate::fieldnorm)). Defaults
 ///   to `true`.
+/// - The index-time field length policy. Newly constructed options discount overlapping tokens;
+///   legacy Boolean schemas preserve counting every token.
 #[derive(Clone, PartialEq, Debug, Eq, Serialize, Deserialize)]
 pub struct TextFieldIndexing {
     #[serde(default)]
     record: IndexRecordOption,
-    #[serde(default = "default_fieldnorms")]
-    fieldnorms: bool,
+    #[serde(default = "legacy_fieldnorms")]
+    fieldnorms: FieldNormOptions,
     #[serde(default = "default_tokenizer")]
     tokenizer: Cow<'static, str>,
 }
@@ -201,8 +274,11 @@ fn default_tokenizer() -> Cow<'static, str> {
     Cow::Borrowed(DEFAULT_TOKENIZER_NAME)
 }
 
-pub(crate) fn default_fieldnorms() -> bool {
-    true
+fn legacy_fieldnorms() -> FieldNormOptions {
+    FieldNormOptions {
+        enabled: true,
+        policy: FieldNormPolicy::CountAllTokens,
+    }
 }
 
 impl Default for TextFieldIndexing {
@@ -210,7 +286,10 @@ impl Default for TextFieldIndexing {
         TextFieldIndexing {
             tokenizer: default_tokenizer(),
             record: IndexRecordOption::default(),
-            fieldnorms: default_fieldnorms(),
+            fieldnorms: FieldNormOptions {
+                enabled: true,
+                policy: FieldNormPolicy::DiscountOverlaps,
+            },
         }
     }
 }
@@ -228,16 +307,29 @@ impl TextFieldIndexing {
         self.tokenizer.as_ref()
     }
 
-    /// Sets fieldnorms
+    /// Enables or disables field norms, preserving the configured length policy.
     #[must_use]
     pub fn set_fieldnorms(mut self, fieldnorms: bool) -> TextFieldIndexing {
-        self.fieldnorms = fieldnorms;
+        self.fieldnorms.enabled = fieldnorms;
         self
     }
 
     /// Returns true if and only if [fieldnorms](crate::fieldnorm) are stored.
     pub fn fieldnorms(&self) -> bool {
-        self.fieldnorms
+        self.fieldnorms.enabled
+    }
+
+    /// Sets the index-time text length policy. The policy is retained when norms
+    /// are disabled. Basic postings always encode the unique term count.
+    #[must_use]
+    pub fn set_fieldnorm_policy(mut self, policy: FieldNormPolicy) -> Self {
+        self.fieldnorms.policy = policy;
+        self
+    }
+
+    /// Returns the configured policy, including when norms are disabled.
+    pub fn fieldnorm_policy(&self) -> FieldNormPolicy {
+        self.fieldnorms.policy
     }
 
     /// Sets which information should be indexed with the tokens.
@@ -261,7 +353,10 @@ impl TextFieldIndexing {
 pub const STRING: TextOptions = TextOptions {
     indexing: Some(TextFieldIndexing {
         tokenizer: Cow::Borrowed(RAW_TOKENIZER_NAME),
-        fieldnorms: true,
+        fieldnorms: FieldNormOptions {
+            enabled: true,
+            policy: FieldNormPolicy::DiscountOverlaps,
+        },
         record: IndexRecordOption::Basic,
     }),
     stored: false,
@@ -273,7 +368,10 @@ pub const STRING: TextOptions = TextOptions {
 pub const TEXT: TextOptions = TextOptions {
     indexing: Some(TextFieldIndexing {
         tokenizer: Cow::Borrowed(DEFAULT_TOKENIZER_NAME),
-        fieldnorms: true,
+        fieldnorms: FieldNormOptions {
+            enabled: true,
+            policy: FieldNormPolicy::DiscountOverlaps,
+        },
         record: IndexRecordOption::WithFreqsAndPositions,
     }),
     stored: false,

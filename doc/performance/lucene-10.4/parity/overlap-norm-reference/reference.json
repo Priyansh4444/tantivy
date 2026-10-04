@@ -1,6 +1,6 @@
 {
   "source_commit": "9983b7ce7fdd04f4d357688fb85c14277c15ea8d",
-  "source_sha256": "771f61b706e10dc240e6361602baa8a37c4120b66bdbc25263f6d8600c50c76f",
+  "source_sha256": "17df4326eb755dcca9d7bdfa3999499127f2aa5147344febd204c42383b106d0",
   "command": [
     "java",
     "--add-modules",
@@ -114,6 +114,29 @@
       ]
     },
     {
+      "name": "same_term_basic",
+      "discount": true,
+      "basic": true,
+      "doc_count": 2,
+      "sum_total_term_freq": 4,
+      "norms": [
+        2,
+        2
+      ],
+      "alpha": [
+        {
+          "doc": 0,
+          "score": 0.082873434,
+          "bits": 1034533260
+        },
+        {
+          "doc": 1,
+          "score": 0.082873434,
+          "bits": 1034533260
+        }
+      ]
+    },
+    {
       "name": "multi_value",
       "discount": true,
       "basic": false,
@@ -181,6 +204,40 @@
           "bits": 1035524425
         }
       ]
+    },
+    {
+      "name": "nonoverlap",
+      "discount": true,
+      "basic": false,
+      "doc_count": 2,
+      "sum_total_term_freq": 4,
+      "norms": [
+        2,
+        2
+      ],
+      "alpha": [
+        {
+          "doc": 0,
+          "score": 0.082873434,
+          "bits": 1034533260
+        },
+        {
+          "doc": 1,
+          "score": 0.082873434,
+          "bits": 1034533260
+        }
+      ]
+    },
+    {
+      "name": "ngrams",
+      "discount": true,
+      "basic": false,
+      "doc_count": 1,
+      "sum_total_term_freq": 5,
+      "norms": [
+        1
+      ],
+      "alpha": []
     }
   ],
   "scope": "Native BM25Similarity default/explicit discount flag, no statistics override, no timings."

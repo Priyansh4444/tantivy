@@ -40,7 +40,7 @@ public class OverlapNormReference {
     type.setTokenized(true);
     type.setIndexOptions(basic ? IndexOptions.DOCS : IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
     type.freeze();
-    BM25Similarity similarity = new BM25Similarity(discount);
+    BM25Similarity similarity = discount ? new BM25Similarity() : new BM25Similarity(false);
     try (var dir = new ByteBuffersDirectory()) {
       var config = new IndexWriterConfig().setSimilarity(similarity).setMergePolicy(NoMergePolicy.INSTANCE);
       try (var writer = new IndexWriter(dir, config)) {
@@ -83,11 +83,16 @@ public class OverlapNormReference {
     run("basic", true, true, standard);
     run("same_term", true, false, new Tok[][][] {
       {{new Tok("alpha",0),new Tok("alpha",0),new Tok("beta",1)}},standard[1]});
+    run("same_term_basic", true, true, new Tok[][][] {
+      {{new Tok("alpha",0),new Tok("alpha",0),new Tok("beta",1)}},standard[1]});
     run("multi_value", true, false, new Tok[][][] {
       {{new Tok("alpha",0),new Tok("synonym",0)},{new Tok("beta",0)}},standard[1]});
     run("position_length", true, false, new Tok[][][] {
       {{new Tok("alpha",0,3),new Tok("synonym",0),new Tok("beta",1)}},standard[1]});
     run("start_gap", true, false, new Tok[][][] {
       {{new Tok("alpha",5),new Tok("synonym",5),new Tok("beta",8)}},standard[1]});
+    run("nonoverlap", true, false, new Tok[][][] {standard[1],standard[1]});
+    run("ngrams", true, false, new Tok[][][] {
+      {{new Tok("ab",0),new Tok("abc",0),new Tok("bc",0),new Tok("bcd",0),new Tok("cd",0)}}});
   }
 }

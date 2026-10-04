@@ -247,7 +247,7 @@ impl InvertedIndexPluginWriter {
                         );
                     }
                 }
-                FieldType::Str(_) => {
+                FieldType::Str(text_options) => {
                     let mut indexing_position = IndexingPosition::default();
                     for value in values {
                         let value = value.as_value();
@@ -275,8 +275,19 @@ impl InvertedIndexPluginWriter {
                         && field_entry.field_type().index_record_option()
                             != Some(IndexRecordOption::Basic)
                     {
-                        self.fieldnorms_writer
-                            .record(doc_id, field, indexing_position.num_tokens);
+                        let policy = text_options
+                            .get_indexing_options()
+                            .expect("indexed text field has indexing options")
+                            .fieldnorm_policy();
+                        let length = match policy {
+                            crate::schema::FieldNormPolicy::CountAllTokens => {
+                                indexing_position.num_tokens
+                            }
+                            crate::schema::FieldNormPolicy::DiscountOverlaps => {
+                                indexing_position.num_tokens - indexing_position.num_overlaps
+                            }
+                        };
+                        self.fieldnorms_writer.record(doc_id, field, length);
                     }
                 }
                 FieldType::U64(_) => {

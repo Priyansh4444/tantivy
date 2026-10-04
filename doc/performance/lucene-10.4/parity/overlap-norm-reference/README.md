@@ -18,3 +18,21 @@ Similarity.java lines 95–125 and 153–162, BM25Similarity.java lines 36–108
 IndexingChain.java lines 1218–1288 and 1325–1345. The initial public Rust
 regression checks the default norm/score mismatch before changing production
 code and preserves the explicit legacy Boolean-schema and Basic control.
+
+`OldReader.rs` was built against unchanged production commit
+`7db890908f1cc8422905102da7740733fe3f22f6` before the fix. Copy it temporarily to
+`examples/overlap_old_reader.rs` in that checkout, then build using
+`CARGO_BUILD_JOBS=4 CARGO_TARGET_DIR=target/overlap-policy-oct04 cargo build
+--locked --offline --example overlap_old_reader --message-format=json`. Save the
+reported executable outside the target tree before rebuilding new production.
+
+`EmptyIndexes.rs` was then built as a temporary example against the fix and run
+using the same jobs/target with `cargo run --locked --offline --example
+overlap_empty_indexes -- /tmp/native-overlap-empty-indexes-oct04`. It creates
+four zero-segment indexes using the new production serializer and reopens each
+with the new reader. Running the saved old reader on each directory opens both
+legacy Boolean schemas and rejects both Discount schemas (enabled/disabled).
+`old-reader-reference.json` records the exact persisted values, reader exit
+codes/diagnostics, old production identity, and executable hash. Remove the
+temporary example files after reproducing. No synthetic metadata substitution
+or segment-footer check is used to establish the empty-index gate.

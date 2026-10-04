@@ -163,7 +163,10 @@ mod tests {
   "options": {
     "indexing": {
       "record": "position",
-      "fieldnorms": true,
+      "fieldnorms": {
+        "enabled": true,
+        "policy": "discount_overlaps"
+      },
       "tokenizer": "default"
     },
     "stored": false,

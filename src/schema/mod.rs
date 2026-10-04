@@ -151,7 +151,7 @@ pub use self::named_field_document::NamedFieldDocument;
 pub use self::numeric_options::NumericOptions;
 pub use self::schema::{Schema, SchemaBuilder};
 pub use self::term::{Term, ValueBytes};
-pub use self::text_options::{TextFieldIndexing, TextOptions, STRING, TEXT};
+pub use self::text_options::{FieldNormPolicy, TextFieldIndexing, TextOptions, STRING, TEXT};
 
 /// Validator for a potential `field_name`.
 /// Returns true if the name can be use for a field name.

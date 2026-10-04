@@ -490,7 +490,10 @@ mod tests {
     "options": {
       "indexing": {
         "record": "position",
-        "fieldnorms": true,
+        "fieldnorms": {
+          "enabled": true,
+          "policy": "discount_overlaps"
+        },
         "tokenizer": "default"
       },
       "stored": false,
@@ -503,7 +506,10 @@ mod tests {
     "options": {
       "indexing": {
         "record": "basic",
-        "fieldnorms": false,
+        "fieldnorms": {
+          "enabled": false,
+          "policy": "discount_overlaps"
+        },
         "tokenizer": "raw"
       },
       "stored": false,
@@ -893,7 +899,10 @@ mod tests {
     "options": {
       "indexing": {
         "record": "basic",
-        "fieldnorms": true,
+        "fieldnorms": {
+          "enabled": true,
+          "policy": "discount_overlaps"
+        },
         "tokenizer": "raw"
       },
       "stored": true,

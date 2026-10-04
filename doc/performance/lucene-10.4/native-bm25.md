@@ -8,6 +8,36 @@ both statistics. Custom providers that implement only the historical required
 methods, and public single-term weight constructors, retain their previous
 statistics rounding, rational score formula, and `k1+1` numerator.
 
+## Index-time text norms
+
+New `TextFieldIndexing` options and `TEXT` use
+`FieldNormPolicy::DiscountOverlaps`: consecutive tokens at the same start
+position contribute one unit to the norm length. Each value's first token
+contributes independently; start gaps and position lengths do not add norm
+units. Frequencies and collection token totals still count every indexed token.
+Basic postings keep unique-term norms regardless of this policy.
+
+Use `set_fieldnorm_policy(FieldNormPolicy::CountAllTokens)` for the historical
+length policy. `set_fieldnorms(false)` disables norm storage and retains the
+configured policy, including through schema serialization/reopen. Custom BM25
+providers keep their existing arithmetic and read the index's actual norms.
+
+Legacy schemas with Boolean or absent `fieldnorms` preserve CountAllTokens on
+reopen and append. CountAllTokens serializes as the original Boolean. Discount
+schemas encode the existing `fieldnorms` slot as
+`{"enabled":true,"policy":"discount_overlaps"}` (or enabled false). Older
+Boolean schema readers reject this object before opening a writer, including
+when the index has no segments. This schema gate needs no footer bump: norm
+bytes and format 11 bound selection are unchanged. Merges preserve/remap norm
+bytes and rebuild bounds using those bytes; adopting another policy requires
+replaying the source documents into a new index.
+
+`tests/native_overlap_norms.rs` checks the pinned native Java raw norm/score
+reference, schema compatibility, empty/missing fields, value boundaries, Basic
+and frequency controls, stored norm bytes through sort/delete/merge, and native
+pruning against exhaustive scores. The reference and actual old format-11
+empty-index reader evidence live in `parity/overlap-norm-reference`.
+
 ## Arithmetic contract
 
 Native IDF uses f64 arithmetic and rounds to f32 once. A phrase sums individually
