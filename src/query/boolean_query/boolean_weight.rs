@@ -685,9 +685,10 @@ impl<TScoreCombiner: ScoreCombiner + Sync> Weight for BooleanWeight<TScoreCombin
         match scorer {
             // Block-WAND scores by summing the matching terms, so it may only
             // drive a combiner that sums. Anything else (dis_max) still needs
-            // every matching term and falls back to the plain union.
+            // every matching term and falls back to the plain union. Custom
+            // float accumulators also retain their own rounding through it.
             SpecializedScorer::TermUnion(term_scorers) => {
-                if TScoreCombiner::SUPPORTS_BLOCK_WAND {
+                if TScoreCombiner::SUPPORTS_BLOCK_WAND && TScoreCombiner::SUMS_IN_F64 {
                     if term_scorers.len() == 2 {
                         super::two_term_or_maxscore(term_scorers, threshold, callback);
                     } else {

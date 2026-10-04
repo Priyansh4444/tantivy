@@ -1,4 +1,5 @@
 use crate::postings::compression::COMPRESSION_BLOCK_SIZE;
+use crate::query::score_combiner::ScoreSumUpperBound;
 use crate::query::term_query::TermScorer;
 use crate::query::Scorer;
 use crate::{DocId, DocSet, Score, TERMINATED};
@@ -57,6 +58,7 @@ pub(crate) fn block_wand_intersection(
     callback: &mut dyn FnMut(DocId, Score) -> Score,
 ) {
     assert!(scorers.len() >= 2);
+    let upper_bound = ScoreSumUpperBound::new(scorers.len());
 
     // Sort by cost (ascending). scorers[0] becomes the "leader" (rarest term).
     scorers.sort_by_key(TermScorer::size_hint);
@@ -65,10 +67,11 @@ pub(crate) fn block_wand_intersection(
 
     // Precompute global max scores for early termination checks.
     let leader_max_score: Score = leader.max_score();
-    let secondaries_global_max_sum: Score = secondaries.iter().map(TermScorer::max_score).sum();
+    let secondaries_global_max_sum: f64 =
+        secondaries.iter().map(|s| f64::from(s.max_score())).sum();
 
     // Early exit: no document can possibly beat the threshold.
-    if leader_max_score + secondaries_global_max_sum <= threshold {
+    if upper_bound.score(f64::from(leader_max_score) + secondaries_global_max_sum) <= threshold {
         return;
     }
 
@@ -83,8 +86,8 @@ pub(crate) fn block_wand_intersection(
 
     let mut secondary_block_max_scores: Box<[f32]> =
         vec![0.0f32; secondaries.len()].into_boxed_slice();
-    let mut secondary_suffix_block_max: Box<[f32]> =
-        vec![0.0f32; secondaries.len()].into_boxed_slice();
+    let mut secondary_suffix_block_max: Box<[f64]> =
+        vec![0.0f64; secondaries.len()].into_boxed_slice();
 
     while doc < TERMINATED {
         // --- Phase 1: Block-level pruning ---
@@ -100,7 +103,7 @@ pub(crate) fn block_wand_intersection(
         // smallest window where all block_max values hold.
         let mut window_end: DocId = leader.last_doc_in_block();
 
-        let mut secondary_block_max_sum: Score = 0.0;
+        let mut secondary_block_max_sum = 0.0f64;
         let num_secondaries = secondaries.len();
         for (idx, secondary) in secondaries.iter_mut().enumerate() {
             secondary.block_cursor().seek_block(doc);
@@ -110,10 +113,10 @@ pub(crate) fn block_wand_intersection(
             window_end = window_end.min(secondary.last_doc_in_block());
             let bms = secondary.block_max_score();
             secondary_block_max_scores[idx] = bms;
-            secondary_block_max_sum += bms;
+            secondary_block_max_sum += f64::from(bms);
         }
 
-        if leader_block_max + secondary_block_max_sum <= threshold {
+        if upper_bound.score(f64::from(leader_block_max) + secondary_block_max_sum) <= threshold {
             // The entire window cannot beat the threshold. Skip past it.
             doc = window_end + 1;
             continue;
@@ -144,7 +147,6 @@ pub(crate) fn block_wand_intersection(
         // The trick: always write to the buffer at `num_candidates`, then
         // conditionally advance the count. The compiler can turn this into
         // a cmov instead of a branch, avoiding misprediction costs.
-        let score_threshold = threshold - secondary_block_max_sum;
         let mut candidate_doc_ids = [0u32; COMPRESSION_BLOCK_SIZE];
         let mut candidate_scores = [0.0f32; COMPRESSION_BLOCK_SIZE];
         let mut num_candidates = 0usize;
@@ -156,7 +158,11 @@ pub(crate) fn block_wand_intersection(
             let leader_score = bm25_weight.score(fieldnorm_id, term_freq);
             candidate_doc_ids[num_candidates] = candidate_doc;
             candidate_scores[num_candidates] = leader_score;
-            num_candidates += (leader_score > score_threshold) as usize;
+            // Compare the rounded forward bound. Subtracting the suffix from
+            // threshold can round upward and discard a winning final score.
+            num_candidates += (upper_bound
+                .score(f64::from(leader_score.max(0.0)) + secondary_block_max_sum)
+                > threshold) as usize;
         }
 
         // Precompute suffix sums: suffix[i] = sum of block_max for secondaries[i+1..].
@@ -167,18 +173,23 @@ pub(crate) fn block_wand_intersection(
             continue;
         }
 
-        let mut running = 0.0f32;
+        let mut running = 0.0f64;
         for idx in (0..num_secondaries).rev() {
             secondary_suffix_block_max[idx] = running;
-            running += secondary_block_max_scores[idx];
+            running += f64::from(secondary_block_max_scores[idx]);
         }
 
         // Pass 2: Check intersection membership only for survivors.
-        // score_threshold may be stale (threshold can increase from callbacks),
-        // but that's conservative — we may check a few extra candidates, never miss one.
+        // Earlier filtering used a possibly lower threshold. This is conservative:
+        // we may check extra candidates after callbacks increase it.
         'next_candidate: for candidate_idx in 0..num_candidates {
             let candidate_doc = candidate_doc_ids[candidate_idx];
-            let mut total_score: Score = candidate_scores[candidate_idx];
+            let mut total_score = f64::from(candidate_scores[candidate_idx]);
+            // Keep bound leaves nonnegative even for negative boosted scores.
+            // Pointwise monotonic addition makes this counterfactual positive
+            // sum bound the signed actual sum; the positive-sum error proof
+            // then handles different prefix/suffix grouping and visit order.
+            let mut positive_score = f64::from(candidate_scores[candidate_idx].max(0.0));
 
             for (secondary_idx, secondary) in secondaries.iter_mut().enumerate() {
                 // If a previous candidate already advanced this secondary past
@@ -190,20 +201,27 @@ pub(crate) fn block_wand_intersection(
                 if seek_result != candidate_doc {
                     continue 'next_candidate;
                 }
-                total_score += secondary.score();
+                let score = secondary.score();
+                total_score += f64::from(score);
+                positive_score += f64::from(score.max(0.0));
 
                 // Prune: even if all remaining secondaries score at their block max,
                 // can we still beat the threshold?
-                if total_score + secondary_suffix_block_max[secondary_idx] <= threshold {
+                if upper_bound.score(positive_score + secondary_suffix_block_max[secondary_idx])
+                    <= threshold
+                {
                     continue 'next_candidate;
                 }
             }
 
             // All secondaries matched.
+            let total_score = total_score as Score;
             if total_score > threshold {
                 threshold = callback(candidate_doc, total_score);
 
-                if leader_max_score + secondaries_global_max_sum <= threshold {
+                if upper_bound.score(f64::from(leader_max_score) + secondaries_global_max_sum)
+                    <= threshold
+                {
                     return;
                 }
             }
@@ -363,14 +381,13 @@ mod tests {
             }
 
             if all_match {
-                // Accumulate in the same left-to-right order as the WAND implementation
-                // (leader first, then each secondary in turn).  Float addition is not
-                // associative, so `leader + secondaries.sum()` gives a different bit
-                // pattern and can cause spurious nearly_equals failures.
-                let mut score: Score = leader.score();
+                // Exhaustive reference uses the default double-accumulation
+                // contract, retaining each child's returned float score.
+                let mut score = f64::from(leader.score());
                 for secondary in secondaries.iter_mut() {
-                    score += secondary.score();
+                    score += f64::from(secondary.score());
                 }
+                let score = score as Score;
 
                 if score > limit {
                     heap.push(Float(score));

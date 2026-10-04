@@ -378,9 +378,11 @@ where
 {
     #[inline]
     fn score(&mut self) -> Score {
-        self.left.score()
-            + self.right.score()
-            + self.others.iter_mut().map(Scorer::score).sum::<Score>()
+        let mut sum = f64::from(self.left.score()) + f64::from(self.right.score());
+        for scorer in &mut self.others {
+            sum += f64::from(scorer.score());
+        }
+        sum as Score
     }
 }
 

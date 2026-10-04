@@ -1,6 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
 use super::block_wand_intersection;
+use crate::query::score_combiner::ScoreSumUpperBound;
 use crate::query::term_query::TermScorer;
 use crate::query::Scorer;
 use crate::{DocId, DocSet, Score, TERMINATED};
@@ -84,14 +85,15 @@ pub(crate) fn two_term_or_maxscore(
 fn find_pivot_doc(
     term_scorers: &[TermScorerWithMaxScore],
     threshold: Score,
+    upper_bound: &ScoreSumUpperBound,
 ) -> Option<(usize, usize, DocId)> {
     let mut max_score = 0.0;
     let mut before_pivot_len = 0;
     let mut pivot_doc = TERMINATED;
     while before_pivot_len < term_scorers.len() {
         let term_scorer = &term_scorers[before_pivot_len];
-        max_score += term_scorer.max_score;
-        if max_score > threshold {
+        max_score += f64::from(term_scorer.max_score);
+        if upper_bound.score(max_score) > threshold {
             pivot_doc = term_scorer.doc();
             break;
         }
@@ -219,6 +221,7 @@ pub fn block_wand(
     callback: &mut dyn FnMut(u32, Score) -> Score,
 ) {
     scorers.retain(|scorer| scorer.doc() < TERMINATED);
+    let upper_bound = ScoreSumUpperBound::new(scorers.len());
     if scorers.len() == 1 {
         let scorer = scorers.pop().unwrap();
         return block_wand_single_scorer(scorer, threshold, callback);
@@ -230,17 +233,17 @@ pub fn block_wand(
     // At this point we need to ensure that the scorers are sorted!
     scorers.sort_by_key(|scorer| scorer.doc());
     while let Some((before_pivot_len, pivot_len, pivot_doc)) =
-        find_pivot_doc(&scorers[..], threshold)
+        find_pivot_doc(&scorers[..], threshold, &upper_bound)
     {
         debug_assert!(scorers.iter().map(|scorer| scorer.doc()).is_sorted());
         debug_assert_ne!(pivot_doc, TERMINATED);
         debug_assert!(before_pivot_len < pivot_len);
 
-        let block_max_score_upperbound: Score = scorers[..pivot_len]
+        let block_max_score_sum: f64 = scorers[..pivot_len]
             .iter_mut()
             .map(|scorer| {
                 scorer.seek_block(pivot_doc);
-                scorer.block_max_score()
+                f64::from(scorer.block_max_score())
             })
             .sum();
 
@@ -248,7 +251,7 @@ pub fn block_wand(
         // the segment posting lists.
         //
         // `block_segment_postings.load_block()` need to be called separately.
-        if block_max_score_upperbound <= threshold {
+        if upper_bound.score(block_max_score_sum) <= threshold {
             // Block max condition was not reached
             // We could get away by simply advancing the scorers to DocId + 1 but it would
             // be inefficient. The optimization requires proper explanation and was
@@ -272,8 +275,8 @@ pub fn block_wand(
         // At this point, all scorers are positioned on the doc.
         let score = scorers[..pivot_len]
             .iter_mut()
-            .map(|scorer| scorer.score())
-            .sum();
+            .map(|scorer| f64::from(scorer.score()))
+            .sum::<f64>() as Score;
 
         if score > threshold {
             threshold = callback(pivot_doc, score);
