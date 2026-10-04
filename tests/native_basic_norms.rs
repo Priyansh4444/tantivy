@@ -172,6 +172,10 @@ fn native_basic_norms_count_distinct_encoded_terms() -> tantivy::Result<()> {
     );
     let stats = searcher.field_statistics(fixture.without_norms)?;
     assert_eq!((stats.doc_count(), stats.sum_total_term_freq()), (3, 5));
+    assert!(searcher
+        .segment_reader(0)
+        .get_fieldnorms_reader(fixture.without_norms)
+        .is_err());
     Ok(())
 }
 
