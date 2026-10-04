@@ -14,6 +14,11 @@ The Tantivy index must have the frozen schema's `text` field and stored string
 `id` field. Its single `.idx` file contains the text field's eight-byte token total in
 composite entry `(text, idx=0)`; field metadata can precede that entry.
 
+For an equivalent native corpus, use the
+[configured ASCII replay and full logical comparison](configured-wiki.md).
+It corrects the historical 55-token analyzer difference and preserves the old
+indexes as compatibility fixtures.
+
 The historical reports above use a **matched scoring comparison**, with BM25 `k1=1.2`, `b=0.75`, the same
 document population and average field length, and the same score scale. It is
 different from the search-benchmark-game Lucene adapter's BM25 `0.9/0.4` and from
