@@ -2,6 +2,7 @@ use std::io::{self, BufRead};
 use tantivy::collector::TopDocs;
 use tantivy::query::{EnableScoring, QueryParser};
 use tantivy::schema::Value;
+use tantivy::tokenizer::{LowerCaser, RemoveLongFilter, SimpleTokenizer, TextAnalyzer};
 use tantivy::{DocAddress, Index, Score, TantivyDocument, TERMINATED};
 
 fn main() -> tantivy::Result<()> {
@@ -9,6 +10,13 @@ fn main() -> tantivy::Result<()> {
     let schema = index.schema();
     let text = schema.get_field("text")?;
     let id = schema.get_field("id")?;
+    index.tokenizers().register(
+        "wiki_ascii_lucene",
+        TextAnalyzer::builder(SimpleTokenizer::default())
+            .filter(RemoveLongFilter::limit(256))
+            .filter(LowerCaser)
+            .build(),
+    );
     let parser = QueryParser::for_index(&index, vec![text]);
     let reader = index.reader()?;
     let searcher = reader.searcher();

@@ -3,7 +3,7 @@ extern crate tantivy;
 
 use tantivy::collector::{Collector, Count, SegmentCollector, TopDocs};
 use tantivy::query::{QueryParser, Weight};
-use tantivy::tokenizer::TokenizerManager;
+use tantivy::tokenizer::{LowerCaser, RemoveLongFilter, SimpleTokenizer, TextAnalyzer};
 use tantivy::{DocId, Index, Order, Score, SegmentReader, TERMINATED};
 
 use std::collections::BinaryHeap;
@@ -163,10 +163,18 @@ impl Collector for UnoptimizedCount {
 fn main_inner(index_dir: &Path) -> tantivy::Result<()> {
     let index = Index::open_in_dir(index_dir).expect("failed to open index");
     let text_field = index.schema().get_field("text").expect("no all field?!");
+    let tokenizers = index.tokenizers().clone();
+    tokenizers.register(
+        "wiki_ascii_lucene",
+        TextAnalyzer::builder(SimpleTokenizer::default())
+            .filter(RemoveLongFilter::limit(256))
+            .filter(LowerCaser)
+            .build(),
+    );
     let query_parser = QueryParser::new(
         index.schema(),
         vec![text_field],
-        TokenizerManager::default(),
+        tokenizers,
     );
     let reader = index.reader()?;
     let searcher = reader.searcher();
