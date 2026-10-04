@@ -6,7 +6,7 @@ use common::{BinarySerializable, CountingWriter, VInt};
 use super::TermInfo;
 use crate::directory::{CompositeWrite, WritePtr};
 use crate::fieldnorm::FieldNormReader;
-use crate::index::field_statistics::{legacy_average, FieldStatistics};
+use crate::index::field_statistics::{legacy_average, BlockMaxSelection, FieldStatistics};
 use crate::index::Segment;
 use crate::positions::PositionSerializer;
 use crate::postings::compression::{
@@ -105,9 +105,9 @@ impl InvertedIndexSerializer {
         statistics: FieldStatistics,
         fieldnorm_reader: Option<FieldNormReader>,
     ) -> io::Result<FieldSerializer<'_>> {
-        statistics
-            .doc_count
-            .serialize(self.postings_write.for_field_with_idx(field, 1))?;
+        let metadata = self.postings_write.for_field_with_idx(field, 1);
+        statistics.doc_count.serialize(metadata)?;
+        metadata.write_all(&[BlockMaxSelection::NATIVE_TAG])?;
         let field_entry = self.schema.get_field_entry(field);
         let index_record_option = field_entry
             .field_type()
@@ -121,6 +121,7 @@ impl InvertedIndexSerializer {
             self.positions_write.for_field(field),
             fieldnorm_reader,
             statistics.average(),
+            BlockMaxSelection::NativeSaturationInput,
         )
     }
 
@@ -167,6 +168,7 @@ impl<'a, W: Write> FieldSerializer<'a, W> {
             positions_write,
             fieldnorm_reader,
             average,
+            BlockMaxSelection::LegacyTfFactor,
         )
     }
 
@@ -178,11 +180,16 @@ impl<'a, W: Write> FieldSerializer<'a, W> {
         positions_write: &'a mut CountingWriter<W>,
         fieldnorm_reader: Option<FieldNormReader>,
         average_fieldnorm: Score,
+        selection: BlockMaxSelection,
     ) -> io::Result<FieldSerializer<'a, W>> {
         total_num_tokens.serialize(postings_write)?;
         let term_dictionary_builder = TermDictionaryBuilder::create(term_dictionary_write)?;
-        let postings_serializer =
-            PostingsSerializer::new(average_fieldnorm, index_record_option, fieldnorm_reader);
+        let postings_serializer = PostingsSerializer::new_with_selection(
+            average_fieldnorm,
+            index_record_option,
+            fieldnorm_reader,
+            selection,
+        );
         let positions_serializer_opt = if index_record_option.has_positions() {
             Some(PositionSerializer::new(positions_write))
         } else {
@@ -366,6 +373,7 @@ pub struct PostingsSerializer {
     fieldnorm_reader: Option<FieldNormReader>,
 
     bm25_weight: Option<Bm25Weight>,
+    selection: BlockMaxSelection,
     avg_fieldnorm: Score, /* Average number of term in the field for that segment.
                            * this value is used to compute the block wand information. */
     term_has_freq: bool,
@@ -380,6 +388,20 @@ impl PostingsSerializer {
         mode: IndexRecordOption,
         fieldnorm_reader: Option<FieldNormReader>,
     ) -> PostingsSerializer {
+        Self::new_with_selection(
+            avg_fieldnorm,
+            mode,
+            fieldnorm_reader,
+            BlockMaxSelection::LegacyTfFactor,
+        )
+    }
+
+    fn new_with_selection(
+        avg_fieldnorm: Score,
+        mode: IndexRecordOption,
+        fieldnorm_reader: Option<FieldNormReader>,
+        selection: BlockMaxSelection,
+    ) -> PostingsSerializer {
         PostingsSerializer {
             block_encoder: BlockEncoder::new(),
             block: Box::new(Block::new()),
@@ -392,6 +414,7 @@ impl PostingsSerializer {
 
             fieldnorm_reader,
             bm25_weight: None,
+            selection,
             avg_fieldnorm,
             term_has_freq: false,
         }
@@ -418,11 +441,16 @@ impl PostingsSerializer {
             return;
         }
 
-        self.bm25_weight = Some(Bm25Weight::for_one_term_without_explain(
-            term_doc_freq as u64,
-            num_docs_in_segment,
-            self.avg_fieldnorm,
-        ));
+        self.bm25_weight = Some(match self.selection {
+            BlockMaxSelection::LegacyTfFactor => Bm25Weight::for_one_term_without_explain(
+                term_doc_freq as u64,
+                num_docs_in_segment,
+                self.avg_fieldnorm,
+            ),
+            BlockMaxSelection::NativeSaturationInput => {
+                Bm25Weight::for_native_block_bounds(self.avg_fieldnorm)
+            }
+        });
     }
 
     fn write_block(&mut self) {
@@ -510,10 +538,16 @@ impl PostingsSerializer {
                         .max_by(
                             |(left_fieldnorm_id, left_term_freq),
                              (right_fieldnorm_id, right_term_freq)| {
-                                let left_score =
-                                    bm25_weight.tf_factor(*left_fieldnorm_id, *left_term_freq);
-                                let right_score =
-                                    bm25_weight.tf_factor(*right_fieldnorm_id, *right_term_freq);
+                                let input = |fieldnorm_id, term_freq| match self.selection {
+                                    BlockMaxSelection::LegacyTfFactor => {
+                                        bm25_weight.tf_factor(fieldnorm_id, term_freq)
+                                    }
+                                    BlockMaxSelection::NativeSaturationInput => {
+                                        bm25_weight.native_saturation_input(fieldnorm_id, term_freq)
+                                    }
+                                };
+                                let left_score = input(*left_fieldnorm_id, *left_term_freq);
+                                let right_score = input(*right_fieldnorm_id, *right_term_freq);
                                 left_score
                                     .partial_cmp(&right_score)
                                     .unwrap_or(Ordering::Equal)
@@ -581,5 +615,197 @@ impl PostingsSerializer {
     fn clear(&mut self) {
         self.block.clear();
         self.last_doc_id_encoded = 0;
+    }
+}
+
+#[cfg(test)]
+mod native_bound_tests {
+    use super::*;
+    use crate::directory::FileSlice;
+    use crate::postings::BlockSegmentPostings;
+
+    fn serialized_block(
+        average: Score,
+        selection: BlockMaxSelection,
+        norms: &[u32],
+        frequencies: &[u32],
+    ) -> BlockSegmentPostings {
+        let mut writer = PostingsSerializer::new_with_selection(
+            average,
+            IndexRecordOption::WithFreqs,
+            Some(FieldNormReader::for_test(norms)),
+            selection,
+        );
+        let count = frequencies.len() as u32;
+        writer.new_term(count, true);
+        for (doc, &frequency) in frequencies.iter().enumerate() {
+            writer.write_doc(doc as u32, frequency);
+        }
+        let mut bytes = Vec::new();
+        writer.close_term(count, &mut bytes).unwrap();
+        BlockSegmentPostings::open(
+            count,
+            FileSlice::from(bytes),
+            IndexRecordOption::WithFreqs,
+            IndexRecordOption::WithFreqs,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn native_selection_avoids_both_rounding_migration_witnesses() {
+        let average = 100.0;
+        let native = Bm25Weight::for_native_block_bounds(average);
+        // Weight 1 exactly, without classic's numerator multiplier.
+        let legacy = Bm25Weight::new_without_explain(1.0 / 2.2, average);
+        for (a_norm, a_tf, b_norm, b_tf) in [(59u8, 1, 87u8, 7), (52, 1, 103, 37)] {
+            let norms: Vec<_> = (0..128)
+                .map(|i| FieldNormReader::id_to_fieldnorm(if i % 2 == 0 { a_norm } else { b_norm }))
+                .collect();
+            let frequencies: Vec<_> = (0..128)
+                .map(|i| if i % 2 == 0 { a_tf } else { b_tf })
+                .collect();
+            let mut old = serialized_block(
+                average,
+                BlockMaxSelection::LegacyTfFactor,
+                &norms,
+                &frequencies,
+            );
+            let mut new = serialized_block(
+                average,
+                BlockMaxSelection::NativeSaturationInput,
+                &norms,
+                &frequencies,
+            );
+            if a_norm == 59 {
+                assert_eq!(native.score(a_norm, a_tf).to_bits(), 0x3eddd64c);
+                assert_eq!(native.score(b_norm, b_tf).to_bits(), 0x3eddd64a);
+                assert_eq!(
+                    legacy.tf_factor(a_norm, a_tf),
+                    legacy.tf_factor(b_norm, b_tf)
+                );
+                assert!(
+                    old.block_max_score_with_stored_max(
+                        &FieldNormReader::for_test(&norms),
+                        &native,
+                        true
+                    ) < native.score(a_norm, a_tf)
+                );
+                assert_eq!(
+                    new.block_max_score_with_stored_max(
+                        &FieldNormReader::for_test(&norms),
+                        &native,
+                        true
+                    ),
+                    native.score(a_norm, a_tf)
+                );
+            } else {
+                assert!(
+                    native.native_saturation_input(b_norm, b_tf)
+                        > native.native_saturation_input(a_norm, a_tf)
+                );
+                assert!(legacy.score(a_norm, a_tf) > legacy.score(b_norm, b_tf));
+                assert!(
+                    new.block_max_score_with_stored_max(
+                        &FieldNormReader::for_test(&norms),
+                        &legacy,
+                        true
+                    ) < legacy.score(a_norm, a_tf)
+                );
+            }
+            assert!(!native.can_use_stored_block_max_with_selection(
+                average,
+                BlockMaxSelection::LegacyTfFactor
+            ));
+            assert!(!legacy.can_use_stored_block_max_with_selection(
+                average,
+                BlockMaxSelection::NativeSaturationInput
+            ));
+            assert!(native.can_use_stored_block_max_with_selection(
+                average,
+                BlockMaxSelection::NativeSaturationInput
+            ));
+            assert!(legacy.can_use_stored_block_max_with_selection(
+                average,
+                BlockMaxSelection::LegacyTfFactor
+            ));
+        }
+    }
+
+    #[test]
+    fn native_serialized_bounds_cover_all_norms_weights_frequencies_and_tails() {
+        let frequencies_to_test = [1, 7, 254, 255, 256, 16_777_217, u32::MAX];
+        // Two complete blocks cover every fieldnorm ID, followed by a decoded tail.
+        let norms: Vec<_> = (0..265)
+            .map(|i| FieldNormReader::id_to_fieldnorm((i % 256) as u8))
+            .collect();
+        let reader = FieldNormReader::for_test(&norms);
+        for average in [0.5, 1.0, 100.0, 10_000.0, 1e9, Score::MAX] {
+            for frequency in frequencies_to_test {
+                let frequencies: Vec<_> = (0..norms.len())
+                    .map(|i| if i % 3 == 0 { frequency } else { 1 })
+                    .collect();
+                for query_average in [average, average * 0.5] {
+                    for boost in [0.0, Score::from_bits(1), 1.0, 3.25, Score::MAX, -2.0] {
+                        let weight =
+                            Bm25Weight::for_native_block_bounds(query_average).boost_by(boost);
+                        let use_stored = weight.can_use_stored_block_max_with_selection(
+                            average,
+                            BlockMaxSelection::NativeSaturationInput,
+                        );
+                        assert_eq!(use_stored, query_average == average && boost >= 0.0);
+                        let mut blocks = serialized_block(
+                            average,
+                            BlockMaxSelection::NativeSaturationInput,
+                            &norms,
+                            &frequencies,
+                        );
+                        for start in [0, 128, 256] {
+                            if start != 0 {
+                                blocks.advance_skip_only();
+                            }
+                            // Complete blocks have not yet been loaded after the first one.
+                            let bound = blocks
+                                .block_max_score_with_stored_max(&reader, &weight, use_stored);
+                            for doc in start..(start + 128).min(norms.len()) {
+                                let actual =
+                                    weight.score(reader.fieldnorm_id(doc as u32), frequencies[doc]);
+                                assert!(
+                                    bound >= actual,
+                                    "avg={average} query_avg={query_average} boost={boost} \
+                                     tf={frequency} doc={doc}: {bound} < {actual}"
+                                );
+                            }
+                            blocks.load_block();
+                            // Loading does not invalidate the selected pair or its ceiling.
+                            let loaded_bound = blocks
+                                .block_max_score_with_stored_max(&reader, &weight, use_stored);
+                            for doc in start..(start + 128).min(norms.len()) {
+                                assert!(
+                                    loaded_bound
+                                        >= weight.score(
+                                            reader.fieldnorm_id(doc as u32),
+                                            frequencies[doc]
+                                        )
+                                );
+                            }
+                            // The public API accepts arbitrary weights; it must discard caches
+                            // and avoid assuming any selection provenance.
+                            let alternate = weight.boost_by(0.5);
+                            let public_bound = blocks.block_max_score(&reader, &alternate);
+                            for doc in start..(start + 128).min(norms.len()) {
+                                assert!(
+                                    public_bound
+                                        >= alternate.score(
+                                            reader.fieldnorm_id(doc as u32),
+                                            frequencies[doc]
+                                        )
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

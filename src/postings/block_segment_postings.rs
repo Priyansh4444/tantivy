@@ -186,8 +186,9 @@ impl BlockSegmentPostings {
                 return skip_reader_max_score;
             }
         }
-        // When stored metadata cannot be trusted, a loaded block still allows
-        // an exact maximum using the query statistics.
+        // A loaded tail, or a trusted complete block with absent metadata,
+        // allows an exact maximum using the query statistics. Complete blocks
+        // with untrusted provenance already returned the global bound above.
         if self.block_is_loaded() {
             let docs = self.doc_decoder.output_array().iter().cloned();
             let bm25_scores = docs.enumerate().map(|(idx, doc)| {

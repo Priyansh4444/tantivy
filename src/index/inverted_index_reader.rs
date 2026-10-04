@@ -10,7 +10,7 @@ use itertools::Itertools;
 use tantivy_fst::automaton::{AlwaysMatch, Automaton};
 
 use crate::directory::FileSlice;
-use crate::index::field_statistics::{FieldStatistics, StatisticsSource};
+use crate::index::field_statistics::{BlockMaxSelection, FieldStatistics, StatisticsSource};
 use crate::positions::PositionReader;
 use crate::postings::{BlockSegmentPostings, SegmentPostings, TermInfo};
 use crate::schema::{IndexRecordOption, Term, Type};
@@ -264,6 +264,10 @@ impl InvertedIndexReader {
 
     pub(crate) fn stored_selection_average_fieldnorm(&self) -> Score {
         self.statistics.selection_average()
+    }
+
+    pub(crate) fn stored_block_max_selection(&self) -> BlockMaxSelection {
+        self.statistics.selection()
     }
 
     /// Returns the segment postings associated with the term, and with the given option,

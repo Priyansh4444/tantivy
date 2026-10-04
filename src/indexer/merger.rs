@@ -1605,14 +1605,9 @@ mod tests {
         // the difference compared to before is intrinsic to the bm25 formula. no worries there.
         for doc in segment_reader.doc_ids_alive() {
             assert_eq!(term_scorer.doc(), doc);
-            // Version 10 pairs use legacy rational-factor selection. Native
-            // scoring uses a conservative global bound for complete old blocks.
-            let expected_bound = if doc < 128 {
-                (1.0f64 + 0.5 / 143.5).ln() as f32
-            } else {
-                0.0015810292
-            };
-            assert_nearly_equals!(term_scorer.block_max_score(), expected_bound);
+            // Format 11 selects native saturation inputs, restoring a tight
+            // bound for complete blocks as well as decoded tails.
+            assert_nearly_equals!(term_scorer.block_max_score(), 0.0015810292);
             assert_nearly_equals!(term_scorer.score(), 0.0015810292);
             term_scorer.advance();
         }

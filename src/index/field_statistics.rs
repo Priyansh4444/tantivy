@@ -58,8 +58,20 @@ impl FieldStatistics {
     }
 }
 
+/// The comparator that selected a serialized (fieldnorm, frequency) bound.
+/// Statistics alone do not certify compatibility between scoring expressions.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub(crate) enum BlockMaxSelection {
+    LegacyTfFactor,
+    NativeSaturationInput,
+}
+
+impl BlockMaxSelection {
+    pub(crate) const NATIVE_TAG: u8 = 1;
+}
+
 pub(crate) enum StatisticsSource {
-    Native(FieldStatistics),
+    Native(FieldStatistics, BlockMaxSelection),
     Legacy {
         header_tokens: u64,
         max_doc: u32,
@@ -72,15 +84,24 @@ impl StatisticsSource {
     pub(crate) fn open(header_tokens: u64, max_doc: u32, count: Option<&[u8]>) -> io::Result<Self> {
         match count {
             Some(bytes) => {
-                let bytes: [u8; 4] = bytes
-                    .try_into()
-                    .map_err(|_| invalid("Field population metadata must contain four bytes"))?;
+                let selection = match bytes.len() {
+                    4 => BlockMaxSelection::LegacyTfFactor,
+                    5 if bytes[4] == BlockMaxSelection::NATIVE_TAG => {
+                        BlockMaxSelection::NativeSaturationInput
+                    }
+                    _ => {
+                        return Err(invalid(
+                            "Invalid field population or bound-selection metadata",
+                        ))
+                    }
+                };
+                let bytes: [u8; 4] = bytes[..4].try_into().unwrap();
                 let statistics = FieldStatistics {
                     doc_count: u32::from_le_bytes(bytes),
                     sum_total_term_freq: header_tokens,
                 }
                 .validate(max_doc)?;
-                Ok(Self::Native(statistics))
+                Ok(Self::Native(statistics, selection))
             }
             None => Ok(Self::Legacy {
                 header_tokens,
@@ -92,7 +113,7 @@ impl StatisticsSource {
 
     pub(crate) fn header_tokens(&self) -> u64 {
         match self {
-            Self::Native(stats) => stats.sum_total_term_freq,
+            Self::Native(stats, _) => stats.sum_total_term_freq,
             Self::Legacy { header_tokens, .. } => *header_tokens,
             Self::Empty => 0,
         }
@@ -100,7 +121,7 @@ impl StatisticsSource {
 
     pub(crate) fn selection_average(&self) -> Score {
         match self {
-            Self::Native(stats) => stats.average(),
+            Self::Native(stats, _) => stats.average(),
             Self::Legacy {
                 header_tokens,
                 max_doc,
@@ -110,9 +131,16 @@ impl StatisticsSource {
         }
     }
 
+    pub(crate) fn selection(&self) -> BlockMaxSelection {
+        match self {
+            Self::Native(_, selection) => *selection,
+            Self::Legacy { .. } | Self::Empty => BlockMaxSelection::LegacyTfFactor,
+        }
+    }
+
     pub(crate) fn exact(&self, reader: &InvertedIndexReader) -> io::Result<FieldStatistics> {
         match self {
-            Self::Native(stats) => Ok(*stats),
+            Self::Native(stats, _) => Ok(*stats),
             Self::Legacy { max_doc, exact, .. } => exact
                 .get_or_try_init(|| derive_physical(reader, *max_doc))
                 .copied(),
@@ -278,6 +306,53 @@ mod tests {
     }
 
     #[test]
+    fn native_bound_metadata_round_trip_and_symmetric_reader_policy() -> crate::Result<()> {
+        use crate::query::{Bm25Weight, EnableScoring, TermQuery};
+        let mut schema = Schema::builder();
+        let text = schema.add_text_field("text", TEXT);
+        let index = Index::create_in_ram(schema.build());
+        let mut writer = index.writer_for_tests()?;
+        for _ in 0..128 {
+            writer.add_document(doc!(text => "a"))?;
+        }
+        writer.commit()?;
+        let searcher = index.reader()?.searcher();
+        let segment = searcher.segment_reader(0);
+        let inverted = segment.inverted_index(text)?;
+        assert_eq!(
+            inverted.stored_block_max_selection(),
+            BlockMaxSelection::NativeSaturationInput
+        );
+        let stored = index.segment(index.searchable_segment_metas()?.remove(0));
+        let composite = CompositeFile::open(&stored.open_read(SegmentComponent::Postings)?)?;
+        assert_eq!(
+            composite
+                .open_read_with_idx(text, 1)
+                .unwrap()
+                .read_bytes()?
+                .as_slice(),
+            &[128, 0, 0, 0, 1]
+        );
+        let term = crate::Term::from_field_text(text, "a");
+        let native = Bm25Weight::for_terms(&searcher, &[term.clone()])?;
+        let legacy = Bm25Weight::for_one_term(128, 128, 1.0);
+        assert!(native
+            .can_use_stored_block_max_with_selection(1.0, inverted.stored_block_max_selection()));
+        assert!(!legacy
+            .can_use_stored_block_max_with_selection(1.0, inverted.stored_block_max_selection()));
+        // Actual native Searcher -> TermWeight -> reader provenance -> TermScorer route.
+        let query = TermQuery::new(term, IndexRecordOption::WithFreqs);
+        let mut scorer = query
+            .specialized_weight(EnableScoring::enabled_from_searcher(&searcher))?
+            .term_scorer_for_test(segment, 1.0)?
+            .unwrap();
+        let bound = scorer.block_max_score();
+        assert_eq!(bound, native.score(1, 1));
+        assert!(bound < native.max_score());
+        Ok(())
+    }
+
+    #[test]
     fn field_statistics_metadata_validation_and_rounding() {
         for bytes in [&[][..], &[0, 0, 0][..], &[0; 5][..]] {
             assert!(StatisticsSource::open(7, 4, Some(bytes)).is_err());
@@ -289,6 +364,17 @@ mod tests {
         assert_eq!(empty.selection_average(), 0.0);
         let native = StatisticsSource::open(7, 4, Some(&2u32.to_le_bytes())).unwrap();
         assert_eq!(native.selection_average(), 3.5);
+        assert_eq!(native.selection(), BlockMaxSelection::LegacyTfFactor);
+        let tagged = StatisticsSource::open(7, 4, Some(&[2, 0, 0, 0, 1])).unwrap();
+        assert_eq!(tagged.selection_average(), 3.5);
+        assert_eq!(tagged.selection(), BlockMaxSelection::NativeSaturationInput);
+        for bytes in [
+            &[2, 0, 0, 0, 0][..],
+            &[2, 0, 0, 0, 2][..],
+            &[2, 0, 0, 0, 1, 0][..],
+        ] {
+            assert!(StatisticsSource::open(7, 4, Some(bytes)).is_err());
+        }
         // Explicitly exercise inputs where the two historical rounding policies differ.
         let (tokens, count) = (16_777_216u64..16_778_000)
             .flat_map(|tokens| (3..30u32).map(move |count| (tokens, count)))
@@ -621,7 +707,10 @@ mod pruning_tests {
             vec![legacy.clone()],
             vec![native, legacy],
         ] {
-            for custom in [false, true] {
+            // Mode 0 uses the actual Searcher's native policy. Modes 1/2 retain
+            // historical custom providers with exact/overridden statistics.
+            for mode in 0..3 {
+                let custom = mode == 2;
                 let docs = if custom {
                     readers.iter().map(|r| u64::from(r.max_doc())).sum()
                 } else {
@@ -637,9 +726,12 @@ mod pruning_tests {
                     docs,
                     tokens,
                 };
-                let weight = query.specialized_weight(
-                    EnableScoring::enabled_from_statistics_provider(&statistics, &searcher),
-                )?;
+                let scoring = if mode == 0 {
+                    EnableScoring::enabled_from_searcher(&searcher)
+                } else {
+                    EnableScoring::enabled_from_statistics_provider(&statistics, &searcher)
+                };
+                let weight = query.specialized_weight(scoring)?;
                 let mut exhaustive = Vec::new();
                 for (segment, reader) in readers.iter().enumerate() {
                     weight.for_each(reader, &mut |doc, score| {
@@ -673,7 +765,7 @@ mod pruning_tests {
                     assert_eq!(
                         top,
                         exhaustive[..k],
-                        "segments={} custom={custom} k={k}",
+                        "segments={} mode={mode} k={k}",
                         readers.len()
                     );
                 }

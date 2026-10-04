@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::fieldnorm::FieldNormReader;
+use crate::index::field_statistics::BlockMaxSelection;
 use crate::query::Explanation;
 use crate::schema::Field;
 use crate::{Score, Searcher, Term};
@@ -304,6 +305,17 @@ impl Bm25Weight {
         }
     }
 
+    // Serialization selects an input independent of term IDF and query boost.
+    pub(crate) fn for_native_block_bounds(average_fieldnorm: Score) -> Self {
+        Self {
+            weight: 1.0,
+            idf_explain: None,
+            cache: compute_tf_cache(average_fieldnorm, Bm25Scoring::NativeLucene),
+            average_fieldnorm,
+            scoring: Bm25Scoring::NativeLucene,
+        }
+    }
+
     /// Compute the BM25 score of a single document.
     #[inline]
     pub fn score(&self, fieldnorm_id: u8, term_freq: u32) -> Score {
@@ -371,11 +383,31 @@ impl Bm25Weight {
         self.weight.max(0.0)
     }
 
+    #[cfg(test)]
     pub(crate) fn can_use_stored_block_max(&self, segment_average_fieldnorm: Score) -> bool {
-        // Existing pairs were selected by the legacy rational tf_factor. Its
-        // rounded ties can resolve differently under native reciprocal scoring.
-        self.scoring == Bm25Scoring::LegacyClassic
-            && self.weight.is_finite()
+        self.can_use_stored_block_max_with_selection(
+            segment_average_fieldnorm,
+            BlockMaxSelection::LegacyTfFactor,
+        )
+    }
+
+    pub(crate) fn can_use_stored_block_max_with_selection(
+        &self,
+        segment_average_fieldnorm: Score,
+        selection: BlockMaxSelection,
+    ) -> bool {
+        // Reject both migration directions: each comparator can have rounded
+        // ties that resolve differently under the other scoring expression.
+        matches!(
+            (self.scoring, selection),
+            (
+                Bm25Scoring::LegacyClassic,
+                BlockMaxSelection::LegacyTfFactor
+            ) | (
+                Bm25Scoring::NativeLucene,
+                BlockMaxSelection::NativeSaturationInput
+            )
+        ) && self.weight.is_finite()
             && self.weight >= 0.0
             && self.average_fieldnorm.is_finite()
             && self.average_fieldnorm > 0.0
@@ -388,6 +420,22 @@ impl Bm25Weight {
         let term_freq = term_freq as Score;
         let norm = self.cache[fieldnorm_id as usize];
         term_freq / (term_freq + norm)
+    }
+
+    pub(crate) fn supports_frequency_ceiling(&self) -> bool {
+        self.scoring == Bm25Scoring::NativeLucene
+            && self.weight.is_finite()
+            && self.weight >= 0.0
+            && self.average_fieldnorm.is_finite()
+            && self.average_fieldnorm > 0.0
+    }
+
+    #[inline]
+    pub(crate) fn native_saturation_input(&self, fieldnorm_id: u8, term_freq: u32) -> Score {
+        debug_assert_eq!(self.scoring, Bm25Scoring::NativeLucene);
+        // For fixed finite nonnegative weight, fl(w - w / fl(1 + x)) is
+        // nondecreasing in x. Select x directly, before rounded score ties.
+        term_freq as Score * self.cache[fieldnorm_id as usize]
     }
 
     /// Produce an [Explanation] of a BM25 score.

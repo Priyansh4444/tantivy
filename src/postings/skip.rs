@@ -223,12 +223,16 @@ impl SkipReader {
                 block_wand_fieldnorm_id,
                 block_wand_term_freq,
                 ..
-            } if block_wand_term_freq != 0 && block_wand_term_freq != u32::MAX => {
+            } if block_wand_term_freq != 0
+                && (block_wand_term_freq != u32::MAX
+                    || bm25_weight.supports_frequency_ceiling()) =>
+            {
                 Some(bm25_weight.score(block_wand_fieldnorm_id, block_wand_term_freq))
             }
             // Zero means absent metadata. Saturated frequencies decode to
-            // u32::MAX, but f32 division need not increase monotonically when
-            // its rounded denominator changes. Use an exact or global bound.
+            // u32::MAX. Native subtraction scoring is monotone in frequency,
+            // so this ceiling is safe. The legacy rounded ratio need not be
+            // monotone; retain its exact or global fallback.
             BlockInfo::BitPacked { .. } | BlockInfo::Dense { .. } => None,
             BlockInfo::VInt { .. } => None,
         }

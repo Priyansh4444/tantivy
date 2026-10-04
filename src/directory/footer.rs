@@ -182,16 +182,16 @@ mod tests {
     use crate::directory::{FileSlice, OwnedBytes};
 
     #[test]
-    fn field_statistics_version_boundary_rejects_native_bounds_in_v9_reader() {
+    fn native_selection_version_boundary_rejects_bounds_in_v10_reader() {
         let mut footer = Footer::new(0);
-        assert_eq!(footer.version.index_format_version, 10);
+        assert_eq!(footer.version.index_format_version, 11);
         assert!(footer.is_compatible().is_ok());
-        assert!(footer.is_compatible_with_range(4..=9).is_err());
-        for version in 4..=9 {
+        assert!(footer.is_compatible_with_range(4..=10).is_err());
+        for version in 4..=10 {
             footer.version.index_format_version = version;
             assert!(footer.is_compatible().is_ok());
         }
-        footer.version.index_format_version = 11;
+        footer.version.index_format_version = 12;
         assert!(footer.is_compatible().is_err());
     }
 

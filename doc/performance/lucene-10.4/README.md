@@ -11,9 +11,10 @@ These tools compare COUNT and TOP_10 for the fixed 20 queries in
 documents in both indexes, one segment per index, and no query cache. Existing
 indexes are required; these tools do not download the corpus or build indexes.
 The Tantivy index must have the frozen schema's `text` field and stored string
-`id` field. Its single `.idx` file starts with that field's eight-byte token total.
+`id` field. Its single `.idx` file contains the text field's eight-byte token total in
+composite entry `(text, idx=0)`; field metadata can precede that entry.
 
-This is a **matched scoring comparison**, with BM25 `k1=1.2`, `b=0.75`, the same
+The historical reports above use a **matched scoring comparison**, with BM25 `k1=1.2`, `b=0.75`, the same
 document population and average field length, and the same score scale. It is
 different from the search-benchmark-game Lucene adapter's BM25 `0.9/0.4` and from
 Lucene's ordinary treatment of documents without indexed text. Consequently,
@@ -187,15 +188,15 @@ measurements, not indexing throughput or a universal peak-memory claim.
 
 ## Why the statistics and boost are matched
 
-Tantivy computes BM25 population from all indexed document slots. Lucene normally
-uses documents containing indexed terms in the field. In the frozen corpus this
+The historical Tantivy baseline computed BM25 population from all indexed
+document slots. Lucene normally uses documents containing indexed terms in the field. In the frozen corpus this
 is one million documents versus 917,578. `MatchedStatisticsSearcher` supplies
 Lucene with the all-document population and Tantivy's persisted token total.
 The frozen totals are 294,826,965 Tantivy tokens and 294,827,020 Lucene tokens;
 the override uses the former for the shared average length. Actual postings,
 term frequencies and norms stay in each engine's index.
 
-Lucene's BM25 omits Tantivy's constant `k1+1` score multiplier. A positive 2.2
+Lucene's BM25 omits the historical Tantivy baseline's constant `k1+1` score multiplier. A positive 2.2
 boost on TOP_* requests matches that scale. Lucene forwards this factor to the
 underlying weight; it adds no per-document scoring wrapper. COUNT remains an
 unwrapped query because scores are unused. `DumpLuceneResults` uses the boost
@@ -208,6 +209,14 @@ See the official Lucene 10.4 sources for
 [boost propagation](https://github.com/apache/lucene/blob/releases/lucene/10.4.0/lucene/core/src/java/org/apache/lucene/search/BoostQuery.java),
 and [score-bound evaluation](https://github.com/apache/lucene/blob/releases/lucene/10.4.0/lucene/core/src/java/org/apache/lucene/search/MaxScoreCache.java).
 
+
+Current Tantivy `Searcher` scoring uses exact physical field populations and
+Lucene's native IDF, reciprocal normalization, and raw score convention. Public
+`Bm25Weight::for_one_term` constructors and custom providers using the default
+field-statistics method retain the historical arithmetic and scale. Native
+comparisons therefore use score scale 1; historical matched overrides describe
+the earlier baseline. See [native scoring and bound compatibility](native-bm25.md)
+for the format 11 migration and its verification.
 
 Native Lucene BM25 comparisons use `prepare_native_lucene.py --lucene-dir PATH
 --output-dir /tmp/lucene-native-classes` followed by `--native-bm25
@@ -223,7 +232,7 @@ retain their historical matched default; the timing suite retains its original
 game-adapter default (k1=.9/b=.4). Explicit `--matched-bm25` preserves the earlier
 statistics overrides and score scale 2.2. The matched path now locates the text
 field's idx=0 entry through the actual composite directory and outer footer,
-including when version 10 metadata precedes the postings. Its header is a stored
+including when version 10 or 11 metadata precedes the postings. Its header is a stored
 value, not independent proof of exact legacy merged-index statistics.
 
 For diagnosis before Rust's native score change, native mode alone accepts

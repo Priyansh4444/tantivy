@@ -203,8 +203,9 @@ impl TermWeight {
         let similarity_weight = self.similarity_weight.boost_by(boost);
         Ok(TermOrEmptyOrAllScorer::TermScorer(Box::new(
             TermScorer::new(segment_postings, fieldnorm_reader, similarity_weight)
-                .with_segment_average_fieldnorm(
+                .with_stored_block_max_selection(
                     inverted_index.stored_selection_average_fieldnorm(),
+                    inverted_index.stored_block_max_selection(),
                 ),
         )))
     }

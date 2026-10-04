@@ -2,6 +2,7 @@ use common::TinySet;
 
 use crate::docset::DocSet;
 use crate::fieldnorm::FieldNormReader;
+use crate::index::field_statistics::BlockMaxSelection;
 use crate::postings::{BlockSegmentPostings, FreqReadingOption, Postings, SegmentPostings};
 use crate::query::bm25::Bm25Weight;
 use crate::query::{Explanation, Scorer};
@@ -38,12 +39,23 @@ impl TermScorer {
         }
     }
 
-    /// The stored pair maximizes the frequency factor using segment statistics.
-    /// It remains a valid bound only when scoring uses those same statistics.
+    /// Test fixtures written by the public serializer use legacy selection.
+    #[cfg(test)]
     pub(crate) fn with_segment_average_fieldnorm(mut self, average_fieldnorm: Score) -> Self {
         self.use_stored_block_max = self
             .similarity_weight
             .can_use_stored_block_max(average_fieldnorm);
+        self
+    }
+
+    pub(crate) fn with_stored_block_max_selection(
+        mut self,
+        average_fieldnorm: Score,
+        selection: BlockMaxSelection,
+    ) -> Self {
+        self.use_stored_block_max = self
+            .similarity_weight
+            .can_use_stored_block_max_with_selection(average_fieldnorm, selection);
         self
     }
 
@@ -83,8 +95,8 @@ impl TermScorer {
 
     /// Returns a conservative upper bound on the score for the current block.
     ///
-    /// Stored maxima are used only when the segment and query average fieldnorms
-    /// match. Otherwise the term's global bound preserves correctness across
+    /// Stored maxima are used only when the selection policy and average fieldnorm
+    /// match the query. Otherwise the term's global bound preserves correctness across
     /// segments with different length distributions or custom scoring statistics.
     pub fn block_max_score(&mut self) -> Score {
         self.postings.block_cursor.block_max_score_with_stored_max(
