@@ -1,4 +1,4 @@
-use tantivy::query::{Query, TermQuery};
+use tantivy::query::{Bm25Parameters, Query, TermQuery};
 use tantivy::schema::{IndexRecordOption, Schema, TEXT};
 use tantivy::{doc, DocAddress, Index, Searcher, Term};
 
@@ -6,11 +6,7 @@ const JAVA_REFERENCE: &str =
     include_str!("../doc/performance/lucene-10.4/parity/bm25-parameters-reference/reference.csv");
 
 fn configured_searcher(searcher: Searcher, k1: f32, b: f32) -> tantivy::Result<Searcher> {
-    // Red baseline: production has no query-parameter API and always uses DEFAULT.
-    // The fix replaces this route with its public validated builder; Java oracle
-    // values and fixture inputs remain unchanged.
-    let _ = (k1, b);
-    Ok(searcher)
+    Ok(searcher.with_bm25_parameters(Bm25Parameters::new(k1, b)?))
 }
 
 #[test]

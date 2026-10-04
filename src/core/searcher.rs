@@ -5,9 +5,9 @@ use std::{fmt, io};
 use crate::collector::Collector;
 use crate::core::Executor;
 use crate::index::{SegmentId, SegmentReader};
-use crate::query::{Bm25StatisticsProvider, EnableScoring, Query};
+use crate::query::{Bm25Parameters, Bm25StatisticsProvider, EnableScoring, Query};
 use crate::schema::document::DocumentDeserialize;
-use crate::schema::{Schema, Term};
+use crate::schema::{Field, Schema, Term};
 use crate::space_usage::SearcherSpaceUsage;
 use crate::store::{CacheStats, StoreReader};
 use crate::{DocAddress, Index, Opstamp, TrackedObject};
@@ -68,9 +68,63 @@ impl SearcherGeneration {
 #[derive(Clone)]
 pub struct Searcher {
     inner: Arc<SearcherInner>,
+    bm25_configuration: Option<Arc<Bm25Configuration>>,
+}
+
+#[derive(Clone, Default)]
+struct Bm25Configuration {
+    default: Bm25Parameters,
+    fields: BTreeMap<Field, Bm25Parameters>,
 }
 
 impl Searcher {
+    /// Configure query-time BM25 parameters on this handle, preserving field overrides.
+    /// Existing clones retain their configuration; fresh reader handles use DEFAULT.
+    /// Explicit statistics providers remain authoritative. Stored norms are unchanged.
+    /// Reader generation is shared; parameter configuration is local to this handle.
+    #[must_use]
+    pub fn with_bm25_parameters(mut self, parameters: Bm25Parameters) -> Self {
+        let configuration = self
+            .bm25_configuration
+            .get_or_insert_with(|| Arc::new(Bm25Configuration::default()));
+        Arc::make_mut(configuration).default = parameters;
+        self
+    }
+
+    /// Override one field's query-time parameters. The field ordinal must exist in
+    /// this schema; a Field value does not carry its originating schema identity.
+    pub fn with_field_bm25_parameters(
+        mut self,
+        field: Field,
+        parameters: Bm25Parameters,
+    ) -> crate::Result<Self> {
+        if field.field_id() as usize >= self.schema().num_fields() {
+            return Err(crate::TantivyError::InvalidArgument(format!(
+                "unknown field ordinal {}",
+                field.field_id()
+            )));
+        }
+        let configuration = self
+            .bm25_configuration
+            .get_or_insert_with(|| Arc::new(Bm25Configuration::default()));
+        Arc::make_mut(configuration)
+            .fields
+            .insert(field, parameters);
+        Ok(self)
+    }
+
+    pub(crate) fn bm25_parameters_for_field(&self, field: Field) -> Bm25Parameters {
+        self.bm25_configuration
+            .as_ref()
+            .map_or(Bm25Parameters::DEFAULT, |configuration| {
+                configuration
+                    .fields
+                    .get(&field)
+                    .copied()
+                    .unwrap_or(configuration.default)
+            })
+    }
+
     /// Returns the `Index` associated with the `Searcher`
     pub fn index(&self) -> &Index {
         &self.inner.index
@@ -248,7 +302,10 @@ impl Searcher {
 
 impl From<Arc<SearcherInner>> for Searcher {
     fn from(inner: Arc<SearcherInner>) -> Self {
-        Searcher { inner }
+        Searcher {
+            inner,
+            bm25_configuration: None,
+        }
     }
 }
 

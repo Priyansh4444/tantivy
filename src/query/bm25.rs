@@ -2,9 +2,13 @@ use std::sync::Arc;
 
 use crate::fieldnorm::FieldNormReader;
 use crate::index::field_statistics::BlockMaxSelection;
-use crate::query::Explanation;
+use crate::query::{Bm25Parameters, Explanation};
 use crate::schema::Field;
 use crate::{Score, Searcher, Term};
+
+#[cfg(test)]
+#[path = "bm25_parameter_tests.rs"]
+mod parameter_tests;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Bm25Scoring {
@@ -23,6 +27,7 @@ pub struct Bm25FieldStatistics {
     sum_total_term_freq: u64,
     average_fieldnorm: Score,
     scoring: Bm25Scoring,
+    parameters: Bm25Parameters,
 }
 
 impl Bm25FieldStatistics {
@@ -34,6 +39,7 @@ impl Bm25FieldStatistics {
             sum_total_term_freq,
             average_fieldnorm: sum_total_term_freq as Score / doc_count as Score,
             scoring: Bm25Scoring::LegacyClassic,
+            parameters: Bm25Parameters::DEFAULT,
         }
     }
     /// Number of documents represented by this field's statistics.
@@ -45,6 +51,19 @@ impl Bm25FieldStatistics {
         self.sum_total_term_freq
     }
 
+    /// Query parameters carried by this coherent statistics snapshot.
+    pub fn parameters(&self) -> Bm25Parameters {
+        self.parameters
+    }
+
+    /// Explicitly customize parameters while retaining this snapshot's arithmetic
+    /// policy and average rounding. A classic custom snapshot stays classic.
+    #[must_use]
+    pub fn with_parameters(mut self, parameters: Bm25Parameters) -> Self {
+        self.parameters = parameters;
+        self
+    }
+
     fn native(doc_count: u64, sum_total_term_freq: u64) -> Self {
         Self {
             doc_count,
@@ -54,12 +73,10 @@ impl Bm25FieldStatistics {
                 doc_count,
             ),
             scoring: Bm25Scoring::NativeLucene,
+            parameters: Bm25Parameters::DEFAULT,
         }
     }
 }
-
-const K1: Score = 1.2;
-const B: Score = 0.75;
 
 /// An interface to compute the statistics needed in BM25 scoring.
 ///
@@ -95,7 +112,8 @@ impl Bm25StatisticsProvider for Searcher {
             docs += u64::from(statistics.doc_count);
             tokens += statistics.sum_total_term_freq;
         }
-        Ok(Bm25FieldStatistics::native(docs, tokens))
+        Ok(Bm25FieldStatistics::native(docs, tokens)
+            .with_parameters(self.bm25_parameters_for_field(field)))
     }
 
     fn total_num_tokens(&self, field: Field) -> crate::Result<u64> {
@@ -144,21 +162,56 @@ fn native_idf_explanation(doc_freq: u64, doc_count: u64) -> Explanation {
     explanation
 }
 
-fn cached_tf_component(fieldnorm: u32, average_fieldnorm: Score) -> Score {
-    K1 * (1.0 - B + B * fieldnorm as Score / average_fieldnorm)
+fn cached_tf_component(
+    fieldnorm: u32,
+    average_fieldnorm: Score,
+    parameters: Bm25Parameters,
+) -> Score {
+    parameters.k1()
+        * (1.0 - parameters.b() + parameters.b() * fieldnorm as Score / average_fieldnorm)
 }
 
-fn compute_tf_cache(average_fieldnorm: Score, scoring: Bm25Scoring) -> Arc<[Score; 256]> {
+fn compute_tf_cache(
+    average_fieldnorm: Score,
+    scoring: Bm25Scoring,
+    parameters: Bm25Parameters,
+) -> (Arc<[Score; 256]>, bool) {
+    if parameters.is_default_profile() {
+        // DEFAULT's inner normalization is at least .25 for positive finite
+        // average: no NaN/negative cache entries are possible. Keep its original
+        // cache loop free of per-entry classification and constant parameters.
+        compute_tf_cache_impl::<false>(average_fieldnorm, scoring, Bm25Parameters::DEFAULT)
+    } else {
+        compute_tf_cache_impl::<true>(average_fieldnorm, scoring, parameters)
+    }
+}
+
+fn compute_tf_cache_impl<const CLASSIFY: bool>(
+    average_fieldnorm: Score,
+    scoring: Bm25Scoring,
+    parameters: Bm25Parameters,
+) -> (Arc<[Score; 256]>, bool) {
     let mut cache: [Score; 256] = [0.0; 256];
+    let mut safe_normalization = average_fieldnorm.is_finite() && average_fieldnorm > 0.0;
     for (fieldnorm_id, cache_mut) in cache.iter_mut().enumerate() {
         let fieldnorm = FieldNormReader::id_to_fieldnorm(fieldnorm_id as u8);
-        let norm = cached_tf_component(fieldnorm, average_fieldnorm);
+        let norm = cached_tf_component(fieldnorm, average_fieldnorm, parameters);
         *cache_mut = match scoring {
             Bm25Scoring::LegacyClassic => norm,
             Bm25Scoring::NativeLucene => 1.0 / norm,
         };
+        // Positive frequencies with a nonnegative component/inverse saturate at
+        // weight. Validated -0 k1 yields -infinity inverses and constant weight;
+        // it needs this separate proof, not a nonnegative-cache assumption.
+        if CLASSIFY {
+            safe_normalization &= !cache_mut.is_nan()
+                && (*cache_mut >= 0.0
+                    || (scoring == Bm25Scoring::NativeLucene
+                        && parameters.k1().to_bits() == (-0.0f32).to_bits()
+                        && *cache_mut == Score::NEG_INFINITY));
+        }
     }
-    Arc::new(cache)
+    (Arc::new(cache), safe_normalization)
 }
 
 /// A struct used for computing BM25 scores.
@@ -169,6 +222,8 @@ pub struct Bm25Weight {
     cache: Arc<[Score; 256]>,
     average_fieldnorm: Score,
     scoring: Bm25Scoring,
+    parameters: Bm25Parameters,
+    safe_normalization: bool,
 }
 
 impl Bm25Weight {
@@ -183,6 +238,8 @@ impl Bm25Weight {
             cache: self.cache.clone(),
             average_fieldnorm: self.average_fieldnorm,
             scoring: self.scoring,
+            parameters: self.parameters,
+            safe_normalization: self.safe_normalization,
         }
     }
 
@@ -207,6 +264,7 @@ impl Bm25Weight {
         let collection = statistics.field_statistics(field)?;
         let total_num_docs = collection.doc_count;
         let average_fieldnorm = collection.average_fieldnorm;
+        let parameters = collection.parameters;
 
         if collection.scoring == Bm25Scoring::NativeLucene {
             let explanation = if terms.len() == 1 {
@@ -226,15 +284,20 @@ impl Bm25Weight {
                 }
                 explanation
             };
-            return Ok(Bm25Weight::new_native(explanation, average_fieldnorm));
+            return Ok(Bm25Weight::new_native_with_parameters(
+                explanation,
+                average_fieldnorm,
+                parameters,
+            ));
         }
 
         if terms.len() == 1 {
             let term_doc_freq = statistics.doc_freq(&terms[0])?;
-            Ok(Bm25Weight::for_one_term(
+            Ok(Bm25Weight::for_one_term_with_parameters(
                 term_doc_freq,
                 total_num_docs,
                 average_fieldnorm,
+                parameters,
             ))
         } else {
             let mut idf_sum: Score = 0.0;
@@ -243,7 +306,11 @@ impl Bm25Weight {
                 idf_sum += idf(term_doc_freq, total_num_docs);
             }
             let idf_explain = Explanation::new("idf", idf_sum);
-            Ok(Bm25Weight::new(idf_explain, average_fieldnorm))
+            Ok(Bm25Weight::new_with_parameters(
+                idf_explain,
+                average_fieldnorm,
+                parameters,
+            ))
         }
     }
 
@@ -253,6 +320,20 @@ impl Bm25Weight {
         total_num_docs: u64,
         avg_fieldnorm: Score,
     ) -> Bm25Weight {
+        Self::for_one_term_with_parameters(
+            term_doc_freq,
+            total_num_docs,
+            avg_fieldnorm,
+            Bm25Parameters::DEFAULT,
+        )
+    }
+
+    fn for_one_term_with_parameters(
+        term_doc_freq: u64,
+        total_num_docs: u64,
+        avg_fieldnorm: Score,
+        parameters: Bm25Parameters,
+    ) -> Self {
         let idf = idf(term_doc_freq, total_num_docs);
         let mut idf_explain =
             Explanation::new("idf, computed as log(1 + (N - n + 0.5) / (n + 0.5))", idf);
@@ -261,7 +342,7 @@ impl Bm25Weight {
             term_doc_freq as Score,
         );
         idf_explain.add_const("N, total number of docs", total_num_docs as Score);
-        Bm25Weight::new(idf_explain, avg_fieldnorm)
+        Bm25Weight::new_with_parameters(idf_explain, avg_fieldnorm, parameters)
     }
     /// Construct a [Bm25Weight] for a single term.
     /// This method does not carry the [Explanation] for the idf.
@@ -275,45 +356,83 @@ impl Bm25Weight {
     }
 
     pub(crate) fn new(idf_explain: Explanation, average_fieldnorm: Score) -> Bm25Weight {
-        let weight = idf_explain.value() * (1.0 + K1);
-        Bm25Weight {
-            idf_explain: Some(idf_explain),
-            weight,
-            cache: compute_tf_cache(average_fieldnorm, Bm25Scoring::LegacyClassic),
-            average_fieldnorm,
-            scoring: Bm25Scoring::LegacyClassic,
-        }
-    }
-    pub(crate) fn new_without_explain(idf: f32, average_fieldnorm: Score) -> Bm25Weight {
-        let weight = idf * (1.0 + K1);
-        Bm25Weight {
-            idf_explain: None,
-            weight,
-            cache: compute_tf_cache(average_fieldnorm, Bm25Scoring::LegacyClassic),
-            average_fieldnorm,
-            scoring: Bm25Scoring::LegacyClassic,
-        }
+        Self::new_with_parameters(idf_explain, average_fieldnorm, Bm25Parameters::DEFAULT)
     }
 
-    fn new_native(idf_explain: Explanation, average_fieldnorm: Score) -> Bm25Weight {
-        Bm25Weight {
-            weight: idf_explain.value(),
-            idf_explain: Some(idf_explain),
-            cache: compute_tf_cache(average_fieldnorm, Bm25Scoring::NativeLucene),
+    fn new_with_parameters(
+        idf_explain: Explanation,
+        average_fieldnorm: Score,
+        parameters: Bm25Parameters,
+    ) -> Self {
+        Self::build(
+            idf_explain.value(),
+            Some(idf_explain),
             average_fieldnorm,
-            scoring: Bm25Scoring::NativeLucene,
+            Bm25Scoring::LegacyClassic,
+            parameters,
+        )
+    }
+    pub(crate) fn new_without_explain(idf: f32, average_fieldnorm: Score) -> Bm25Weight {
+        Self::build(
+            idf,
+            None,
+            average_fieldnorm,
+            Bm25Scoring::LegacyClassic,
+            Bm25Parameters::DEFAULT,
+        )
+    }
+
+    #[cfg(test)]
+    fn new_native(idf_explain: Explanation, average_fieldnorm: Score) -> Bm25Weight {
+        Self::new_native_with_parameters(idf_explain, average_fieldnorm, Bm25Parameters::DEFAULT)
+    }
+
+    fn new_native_with_parameters(
+        idf_explain: Explanation,
+        average_fieldnorm: Score,
+        parameters: Bm25Parameters,
+    ) -> Self {
+        Self::build(
+            idf_explain.value(),
+            Some(idf_explain),
+            average_fieldnorm,
+            Bm25Scoring::NativeLucene,
+            parameters,
+        )
+    }
+
+    fn build(
+        idf: Score,
+        idf_explain: Option<Explanation>,
+        average_fieldnorm: Score,
+        scoring: Bm25Scoring,
+        parameters: Bm25Parameters,
+    ) -> Self {
+        let weight = match scoring {
+            Bm25Scoring::LegacyClassic => idf * (1.0 + parameters.k1()),
+            Bm25Scoring::NativeLucene => idf,
+        };
+        let (cache, safe_normalization) = compute_tf_cache(average_fieldnorm, scoring, parameters);
+        Self {
+            idf_explain,
+            weight,
+            cache,
+            average_fieldnorm,
+            scoring,
+            parameters,
+            safe_normalization,
         }
     }
 
     // Serialization selects an input independent of term IDF and query boost.
     pub(crate) fn for_native_block_bounds(average_fieldnorm: Score) -> Self {
-        Self {
-            weight: 1.0,
-            idf_explain: None,
-            cache: compute_tf_cache(average_fieldnorm, Bm25Scoring::NativeLucene),
+        Self::build(
+            1.0,
+            None,
             average_fieldnorm,
-            scoring: Bm25Scoring::NativeLucene,
-        }
+            Bm25Scoring::NativeLucene,
+            Bm25Parameters::DEFAULT,
+        )
     }
 
     /// Compute the BM25 score of a single document.
@@ -373,7 +492,7 @@ impl Bm25Weight {
     pub fn max_score(&self) -> Score {
         // Public constructors may receive invalid custom statistics. Such
         // normalization can exceed saturation, so no finite bound is safe.
-        if !self.average_fieldnorm.is_finite() || self.average_fieldnorm <= 0.0 {
+        if !self.has_safe_score_bounds() {
             return Score::INFINITY;
         }
         // With a nonnegative norm, tf / (tf + norm) is at most one.
@@ -381,6 +500,12 @@ impl Bm25Weight {
         // lengths and token overlaps can make frequency exceed that length.
         // Negative boosts have nonpositive scores and therefore upper bound zero.
         self.weight.max(0.0)
+    }
+
+    // This domain certifies finite positive matching frequencies. Literal zero
+    // frequency/exceptional custom-statistics NaNs are not ordered scores.
+    pub(crate) fn has_safe_score_bounds(&self) -> bool {
+        self.safe_normalization && self.weight.is_finite()
     }
 
     #[cfg(test)]
@@ -407,7 +532,8 @@ impl Bm25Weight {
                 Bm25Scoring::NativeLucene,
                 BlockMaxSelection::NativeSaturationInput
             )
-        ) && self.weight.is_finite()
+        ) && self.parameters.is_default_profile()
+            && self.has_safe_score_bounds()
             && self.weight >= 0.0
             && self.average_fieldnorm.is_finite()
             && self.average_fieldnorm > 0.0
@@ -424,7 +550,8 @@ impl Bm25Weight {
 
     pub(crate) fn supports_frequency_ceiling(&self) -> bool {
         self.scoring == Bm25Scoring::NativeLucene
-            && self.weight.is_finite()
+            && self.parameters.is_default_profile()
+            && self.has_safe_score_bounds()
             && self.weight >= 0.0
             && self.average_fieldnorm.is_finite()
             && self.average_fieldnorm > 0.0
@@ -460,8 +587,8 @@ impl Bm25Weight {
         );
 
         tf_explanation.add_const("freq, occurrences of term within document", term_freq);
-        tf_explanation.add_const("k1, term saturation parameter", K1);
-        tf_explanation.add_const("b, length normalization parameter", B);
+        tf_explanation.add_const("k1, term saturation parameter", self.parameters.k1());
+        tf_explanation.add_const("b, length normalization parameter", self.parameters.b());
         tf_explanation.add_const(
             "dl, length of field",
             FieldNormReader::id_to_fieldnorm(fieldnorm_id) as Score,
@@ -470,7 +597,7 @@ impl Bm25Weight {
 
         let mut explanation = Explanation::new("TermQuery, product of...", score);
         if self.scoring == Bm25Scoring::LegacyClassic {
-            explanation.add_detail(Explanation::new("(K1+1)", K1 + 1.0));
+            explanation.add_detail(Explanation::new("(K1+1)", self.parameters.k1() + 1.0));
         }
         if let Some(idf_explain) = &self.idf_explain {
             explanation.add_detail(idf_explain.clone());

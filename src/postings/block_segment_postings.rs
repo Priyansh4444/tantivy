@@ -10,8 +10,15 @@ use crate::query::Bm25Weight;
 use crate::schema::IndexRecordOption;
 use crate::{DocId, Score, TERMINATED};
 
-fn max_score<I: Iterator<Item = Score>>(mut it: I) -> Option<Score> {
-    it.next().map(|first| it.fold(first, Score::max))
+fn max_score<I: Iterator<Item = Score>>(it: I) -> Option<Score> {
+    it.map(|score| {
+        if score.is_nan() {
+            Score::INFINITY
+        } else {
+            score
+        }
+    })
+    .reduce(Score::max)
 }
 
 /// `BlockSegmentPostings` is a cursor iterating over blocks
@@ -172,6 +179,11 @@ impl BlockSegmentPostings {
         bm25_weight: &Bm25Weight,
         use_stored_max: bool,
     ) -> Score {
+        // Neither a cached pair nor f32::max over a loaded tail can certify
+        // exceptional normalization/weight domains. In particular max discards NaN.
+        if !bm25_weight.has_safe_score_bounds() {
+            return bm25_weight.max_score();
+        }
         if !use_stored_max && self.skip_reader.last_doc_in_block() != TERMINATED {
             return bm25_weight.max_score();
         }

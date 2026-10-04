@@ -60,6 +60,7 @@ impl FieldStatistics {
 
 /// The comparator that selected a serialized (fieldnorm, frequency) bound.
 /// Statistics alone do not certify compatibility between scoring expressions.
+/// Both existing profiles certify only exact DEFAULT k1/b float bits.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) enum BlockMaxSelection {
     LegacyTfFactor,
