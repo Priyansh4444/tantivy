@@ -180,6 +180,12 @@ impl Bm25Weight {
         self.weight * self.tf_factor(fieldnorm_id, term_freq)
     }
 
+    /// Score a fractional phrase frequency without rounding its distance weights.
+    #[inline]
+    pub(crate) fn score_with_frequency(&self, fieldnorm_id: u8, frequency: Score) -> Score {
+        self.weight * (frequency / (frequency + self.cache[fieldnorm_id as usize]))
+    }
+
     /// Whether this term frequency could produce a score above `threshold`.
     ///
     /// Most documents can be rejected without the division in `score`. The
@@ -243,12 +249,15 @@ impl Bm25Weight {
 
     /// Produce an [Explanation] of a BM25 score.
     pub fn explain(&self, fieldnorm_id: u8, term_freq: u32) -> Explanation {
+        self.explain_with_frequency(fieldnorm_id, term_freq as Score)
+    }
+
+    pub(crate) fn explain_with_frequency(&self, fieldnorm_id: u8, term_freq: Score) -> Explanation {
         // The explain format is directly copied from Lucene's.
         // (So, Kudos to Lucene)
-        let score = self.score(fieldnorm_id, term_freq);
+        let score = self.score_with_frequency(fieldnorm_id, term_freq);
 
         let norm = self.cache[fieldnorm_id as usize];
-        let term_freq = term_freq as Score;
         let right_factor = term_freq / (term_freq + norm);
 
         let mut tf_explanation = Explanation::new(

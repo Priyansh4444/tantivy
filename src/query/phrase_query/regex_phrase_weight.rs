@@ -288,10 +288,12 @@ impl Weight for RegexPhraseWeight {
         }
         let fieldnorm_reader = self.fieldnorm_reader(reader)?;
         let fieldnorm_id = fieldnorm_reader.fieldnorm_id(doc);
-        let phrase_count = scorer.phrase_count();
+        let phrase_frequency = scorer.phrase_frequency();
         let mut explanation = Explanation::new("Phrase Scorer", scorer.score());
         if let Some(similarity_weight) = self.similarity_weight_opt.as_ref() {
-            explanation.add_detail(similarity_weight.explain(fieldnorm_id, phrase_count));
+            explanation.add_detail(
+                similarity_weight.explain_with_frequency(fieldnorm_id, phrase_frequency),
+            );
         }
         Ok(explanation)
     }
@@ -442,7 +444,9 @@ mod tests {
             .phrase_scorer(searcher.segment_reader(0u32), 1.0)?
             .unwrap();
         assert_eq!(phrase_scorer.doc(), 0);
-        assert_eq!(phrase_scorer.phrase_count(), 2);
+        // Frontier windows have distances 1, 2, 2.
+        assert_eq!(phrase_scorer.phrase_count(), 3);
+        assert!((phrase_scorer.phrase_frequency() - (0.5 + 1.0 / 3.0 + 1.0 / 3.0)).abs() < 1e-6);
         assert_eq!(phrase_scorer.advance(), TERMINATED);
 
         Ok(())

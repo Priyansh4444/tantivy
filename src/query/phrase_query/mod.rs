@@ -3,6 +3,7 @@ mod phrase_scorer;
 mod phrase_weight;
 pub mod regex_phrase_query;
 mod regex_phrase_weight;
+mod sloppy_phrase_matcher;
 
 pub use self::phrase_query::PhraseQuery;
 pub(crate) use self::phrase_scorer::intersection_count;
@@ -229,8 +230,9 @@ pub(crate) mod tests {
         let index = create_index(&["a b e c", "a e e e c", "a e e e e c"])?;
         let scores = test_query(3, &index, vec!["a", "c"]);
         assert_eq!(scores.len(), 2);
-        assert_nearly_equals!(scores[0], 0.29086056);
-        assert_nearly_equals!(scores[1], 0.26706287);
+        // Frozen Lucene 10.4 native scores times the current BM25 factor 2.2.
+        assert_nearly_equals!(scores[0], 0.14471380);
+        assert_nearly_equals!(scores[1], 0.10129970);
         Ok(())
     }
 
@@ -266,10 +268,10 @@ pub(crate) mod tests {
             "a e b c",
         ])?;
         let scores = test_query(3, &index, vec!["a", "b", "c"]);
-        // The first and last matches.
-        assert_nearly_equals!(scores[0], 0.23091172);
-        assert_nearly_equals!(scores[1], 0.27310878);
-        assert_nearly_equals!(scores[3], 0.25024384);
+        // Frozen distance-weighted scores, in document order.
+        assert_nearly_equals!(scores[0], 0.11232231);
+        assert_nearly_equals!(scores[1], 0.14501993);
+        assert_nearly_equals!(scores[3], 0.12659387);
         Ok(())
     }
 

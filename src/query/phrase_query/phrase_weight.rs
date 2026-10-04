@@ -78,7 +78,31 @@ impl PhraseWeight {
             };
             term_postings_list.push((offset, postings));
         }
-        Ok(Some(PhraseScorer::new_danger(
+        // Same-offset duplicates may share an occurrence, as in Lucene.
+        let mut repeat_groups = Vec::new();
+        if self.slop > 0 {
+            for (ordinal, (offset, term)) in self.phrase_terms.iter().enumerate() {
+                if self.phrase_terms[..ordinal]
+                    .iter()
+                    .any(|(_, previous)| previous == term)
+                {
+                    continue;
+                }
+                let group: Vec<_> = self
+                    .phrase_terms
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(index, (candidate_offset, candidate))| {
+                        (candidate == term && (index == ordinal || candidate_offset != offset))
+                            .then_some(index)
+                    })
+                    .collect();
+                if group.len() > 1 {
+                    repeat_groups.push(group);
+                }
+            }
+        }
+        Ok(Some(PhraseScorer::new_danger_with_repeat_groups(
             term_postings_list,
             similarity_weight_opt,
             fieldnorm_reader,
@@ -86,6 +110,7 @@ impl PhraseWeight {
             0,
             false,
             target,
+            repeat_groups,
         )))
     }
 
@@ -146,10 +171,12 @@ impl Weight for PhraseWeight {
         }
         let fieldnorm_reader = self.fieldnorm_reader(reader)?;
         let fieldnorm_id = fieldnorm_reader.fieldnorm_id(doc);
-        let phrase_count = scorer.phrase_count();
+        let phrase_frequency = scorer.phrase_frequency();
         let mut explanation = Explanation::new("Phrase Scorer", scorer.score());
         if let Some(similarity_weight) = self.similarity_weight_opt.as_ref() {
-            explanation.add_detail(similarity_weight.explain(fieldnorm_id, phrase_count));
+            explanation.add_detail(
+                similarity_weight.explain_with_frequency(fieldnorm_id, phrase_frequency),
+            );
         }
         Ok(explanation)
     }
@@ -163,6 +190,50 @@ mod tests {
     use crate::query::{EnableScoring, PhraseQuery, Weight};
     use crate::schema::{Schema, TEXT};
     use crate::{DocSet, Index, Score, Term};
+
+    #[test]
+    fn test_lucene_sloppy_repeated_scorer_danger() -> crate::Result<()> {
+        let index = create_index(&["alpha", "alpha alpha", "alpha x x alpha", "alpha alpha"])?;
+        let field = index.schema().get_field("text").unwrap();
+        let searcher = index.reader()?.searcher();
+        let term = Term::from_field_text(field, "alpha");
+        let mut query = PhraseQuery::new(vec![term.clone(), term]);
+        query.set_slop(1);
+        for scoring in [
+            EnableScoring::disabled_from_searcher(&searcher),
+            EnableScoring::enabled_from_searcher(&searcher),
+        ] {
+            let weight = query.phrase_weight(scoring)?;
+            let reader = searcher.segment_reader(0);
+            let (result, mut scorer) = weight.scorer_danger(reader, 0, 1.0)?;
+            assert_eq!(result, SeekDangerResult::SeekLowerBound(1));
+            assert_eq!(scorer.seek_danger(1), SeekDangerResult::Found);
+            assert_eq!(scorer.seek_danger(2), SeekDangerResult::SeekLowerBound(3));
+            assert_eq!(scorer.seek_danger(3), SeekDangerResult::Found);
+            assert_eq!(scorer.doc(), 3);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_lucene_sloppy_same_offset_repeat() -> crate::Result<()> {
+        use crate::collector::Count;
+        let index = create_index(&["alpha", "alpha alpha"])?;
+        let field = index.schema().get_field("text").unwrap();
+        let searcher = index.reader()?.searcher();
+        let term = Term::from_field_text(field, "alpha");
+        let mut query = PhraseQuery::new_with_offset(vec![(0, term.clone()), (0, term)]);
+        query.set_slop(1);
+        assert_eq!(searcher.search(&query, &Count)?, 2);
+        let weight = query.phrase_weight(EnableScoring::enabled_from_searcher(&searcher))?;
+        let mut scorer = weight
+            .phrase_scorer(searcher.segment_reader(0), 1.0)?
+            .unwrap();
+        assert_eq!(scorer.phrase_frequency(), 1.0);
+        assert_eq!(scorer.advance(), 1);
+        assert_eq!(scorer.phrase_frequency(), 2.0);
+        Ok(())
+    }
 
     #[test]
     fn test_lucene_sloppy_repeat_requires_distinct_positions() -> crate::Result<()> {
@@ -235,6 +306,10 @@ mod tests {
         // max_score supplies the current BM25 numerator convention unchanged.
         let numerator = crate::query::Bm25Weight::for_terms(&searcher, &terms)?.max_score();
         let expected = numerator * 0.5 / (0.5 + 1.2 * (0.25 + 0.75 * 3.0 / 2.5));
+        assert_eq!(
+            weight.explain(searcher.segment_reader(0), 1)?.value(),
+            scorer.score()
+        );
         assert!(
             (scorer.score() - expected).abs() < 1e-6,
             "{} != {expected}",
