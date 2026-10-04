@@ -47,14 +47,14 @@ Build the existing game engine's Java classes and dependencies:
 
 ```bash
 gradle -p "$PERF_LUCENE" classes copyDependencies
-python "$PERF_TOOLS/prepare_matched_lucene.py" \
+python "$PERF_TOOLS/prepare_native_lucene.py" \
   --lucene-dir "$PERF_LUCENE" --output-dir "$PERF_CLASSES"
 ```
 
-`prepare_matched_lucene.py` generates `DoQueryMatched.java` in the specified
-output directory and compiles it with the two Java helpers here. The default
-output is this tools directory's ignored `classes/` folder. The expected game
-source substitutions are checked before compilation.
+`prepare_native_lucene.py` generates `DoQueryNative.java` in the specified
+output directory and compiles it with the native result dumper. The expected game
+source substitutions are checked before compilation. Current binaries use
+native scoring, so pass `--native-bm25` explicitly on each comparison below.
 
 ## Build the Rust protocol adapter and validator
 
@@ -89,19 +89,20 @@ RUSTFLAGS='-C target-cpu=native' cargo build \
   --bin do_query --bin validate_index --bin reencode_index
 ```
 
-This fork writes [format-9 frequency blocks](../../frequency-pfor.md) and still
-reads supported older indexes. To measure the storage savings using the frozen
+This fork writes format 11 metadata and retains the
+[format-9 frequency block encoding](../../frequency-pfor.md). It still reads
+supported older indexes. To measure storage using the frozen
 existing index, rewrite its segments without retokenizing into a **new, absent**
 output directory:
 
 ```bash
-PERF_REENCODED="/absolute/path/to/wiki-1m-frequency-pfor-v9.idx"
+PERF_REENCODED="/absolute/path/to/wiki-1m-native-v11.idx"
 "$PERF_ADAPTER/target/release/reencode_index" "$PERF_INDEX" "$PERF_REENCODED"
 PERF_INDEX="$PERF_REENCODED"
 ```
 
-Readers limited to format 8 reject newly written format-9 segment files. Keep
-the source index if older deployments still need it.
+Readers limited to format 10 or older reject newly written format-11 segment
+files. Keep the source index if older deployments still need it.
 
 Record the Rust toolchain, fork commit, JVM and CPU used for the run. The result
 JSON also records hashes of the binary, query suite, Java classes, dependency
@@ -114,7 +115,7 @@ must refer to the source actually used to build the Rust binary.
 python "$PERF_TOOLS/compare_wiki_correctness.py" \
   --tantivy-validator "$PERF_ADAPTER/target/release/validate_index" \
   --tantivy-index "$PERF_INDEX" --lucene-dir "$PERF_LUCENE" \
-  --lucene-classes "$PERF_CLASSES" --commit "$(git rev-parse HEAD)" \
+  --lucene-classes "$PERF_CLASSES" --native-bm25 --commit "$(git rev-parse HEAD)" \
   --output "$PERF_RESULTS/correctness.json"
 ```
 
@@ -147,13 +148,13 @@ PERF_COMMAND=COUNT
 python "$PERF_TOOLS/suite_lucene_interleaved.py" \
   --tantivy-binary "$PERF_ADAPTER/target/release/do_query" \
   --tantivy-index "$PERF_INDEX" --lucene-dir "$PERF_LUCENE" \
-  --lucene-classes "$PERF_CLASSES" --matched-bm25 --cpu-core 4 \
+  --lucene-classes "$PERF_CLASSES" --native-bm25 --cpu-core 4 \
   --command "$PERF_COMMAND" --warmup-seconds 40 --iterations 128 \
   --output "$PERF_RESULTS/$PERF_COMMAND-tantivy-first.json"
 python "$PERF_TOOLS/suite_lucene_interleaved.py" \
   --tantivy-binary "$PERF_ADAPTER/target/release/do_query" \
   --tantivy-index "$PERF_INDEX" --lucene-dir "$PERF_LUCENE" \
-  --lucene-classes "$PERF_CLASSES" --matched-bm25 --cpu-core 4 \
+  --lucene-classes "$PERF_CLASSES" --native-bm25 --cpu-core 4 \
   --command "$PERF_COMMAND" --warmup-seconds 40 --iterations 128 --lucene-first \
   --output "$PERF_RESULTS/$PERF_COMMAND-lucene-first.json"
 ```
@@ -177,7 +178,7 @@ Run this separately from latency measurements and builds:
 python "$PERF_TOOLS/compare_process_memory.py" \
   --tantivy-binary "$PERF_ADAPTER/target/release/do_query" \
   --tantivy-index "$PERF_INDEX" --lucene-dir "$PERF_LUCENE" \
-  --lucene-classes "$PERF_CLASSES" --cpu-core 4 --warmup-seconds 20 \
+  --lucene-classes "$PERF_CLASSES" --native-bm25 --cpu-core 4 --warmup-seconds 20 \
   --output "$PERF_RESULTS/process-memory.json"
 ```
 
