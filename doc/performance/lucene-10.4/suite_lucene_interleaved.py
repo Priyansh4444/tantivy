@@ -9,6 +9,7 @@ import subprocess
 import time
 from pathlib import Path
 from provenance import capture
+from lucene_mode import add_arguments, configuration, report
 
 BENCH = Path(__file__).resolve().parent
 QUERIES = [json.loads(line)['query'] for line in
@@ -45,23 +46,16 @@ def main():
     ap.add_argument('--iterations', type=int, default=128)
     ap.add_argument('--lucene-first', action='store_true')
     ap.add_argument('--command', choices=['COUNT', 'TOP_10'], required=True)
-    ap.add_argument('--matched-bm25', action='store_true')
+    add_arguments(ap)
     args = ap.parse_args()
-    postings_files = list(args.tantivy_index.glob('*.idx'))
-    assert len(postings_files) == 1, 'Statistics matcher requires the frozen one-segment text index'
-    with postings_files[0].open('rb') as postings:
-        token_total = int.from_bytes(postings.read(8), 'little')
+    scoring = configuration(args, ap)
     lucene = args.lucene_dir.resolve()
-    cp = f'{lucene / "build/classes/java/main"}:{lucene / "build/dependencies"}/*'
-    if args.matched_bm25:
-        cp = f'{args.lucene_classes.resolve()}:{cp}'
-    lucene_class = 'DoQueryMatched' if args.matched_bm25 else 'DoQuery'
     pin = [] if args.cpu_core is None else ['taskset', '-c', str(args.cpu_core)]
     commands = {
         'tantivy': pin + [str(args.tantivy_binary),str(args.tantivy_index)],
         'lucene': pin + ['java','-XX:+UseParallelGC',
                    '--add-modules','jdk.incubator.vector','--enable-native-access=ALL-UNNAMED',
-                   '-cp',cp,lucene_class,str(lucene/'idx')] + ([str(token_total)] if args.matched_bm25 else []),
+                   '-cp',scoring['classpath'],scoring['query_class'],str(lucene/'idx')] + scoring['extra_args'],
     }
     names = ['lucene','tantivy'] if args.lucene_first else ['tantivy','lucene']
     procs = {name: start(commands[name]) for name in names}
@@ -104,12 +98,12 @@ def main():
     args.output.write_text(json.dumps({'queries':QUERIES,'counts':counts,'command':args.command,'medians_us':medians,
         'samples_us':samples,'geomean_ratio':overall,'iterations':args.iterations,
         'warmup_seconds':args.warmup_seconds,'lucene_first':args.lucene_first,
-        'matched_bm25':args.matched_bm25,
-        'matched_collection_statistics': args.matched_bm25, 'token_total': token_total,
+        **report(scoring),
         'tantivy_index':str(args.tantivy_index),
         'lucene_dir':str(lucene), 'lucene_classes':str(args.lucene_classes.resolve()),
         'cpu_core':args.cpu_core, 'engine_commands':commands,
-        'provenance':capture(args.tantivy_binary, lucene, args.lucene_classes, args.matched_bm25)},indent=2)+'\n')
+        'provenance':capture(args.tantivy_binary, lucene, args.lucene_classes, scoring['matched_bm25'],
+                             native=scoring['native_bm25'], score_scale=scoring['lucene_score_scale'])},indent=2)+'\n')
 
 if __name__ == '__main__':
     main()

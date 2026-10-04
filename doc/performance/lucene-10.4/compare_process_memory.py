@@ -6,6 +6,8 @@ import json
 import subprocess
 import time
 from pathlib import Path
+from lucene_mode import add_arguments, configuration, report
+from provenance import capture
 
 
 def fields(path):
@@ -23,26 +25,26 @@ def main():
     parser.add_argument('--cpu-core', default='4')
     parser.add_argument('--warmup-seconds', type=float, default=20)
     parser.add_argument('--output', type=Path, required=True)
+    add_arguments(parser, matched_default=True)
     args = parser.parse_args()
-    posting_files = list(args.tantivy_index.glob('*.idx'))
-    if len(posting_files) != 1:
-        raise ValueError('Requires the frozen one-segment text index')
-    with posting_files[0].open('rb') as postings:
-        token_total = int.from_bytes(postings.read(8), 'little')
+    scoring = configuration(args, parser)
     queries = [json.loads(line)['query'] for line in args.query_file.read_text().splitlines()]
     prefix = [] if args.cpu_core == 'none' else ['taskset', '-c', args.cpu_core]
-    classpath = f'{args.lucene_classes}:{args.lucene_dir}/build/classes/java/main:{args.lucene_dir}/build/dependencies/*'
     commands = {
         'tantivy': prefix + [str(args.tantivy_binary), str(args.tantivy_index)],
         'lucene': prefix + ['java', '-XX:+UseParallelGC', '--add-modules', 'jdk.incubator.vector',
-                           '--enable-native-access=ALL-UNNAMED', '-cp', classpath,
-                           'DoQueryMatched', str(args.lucene_dir / 'idx'), str(token_total)],
+                           '--enable-native-access=ALL-UNNAMED', '-cp', scoring['classpath'],
+                           scoring['query_class'], str(args.lucene_dir.resolve() / 'idx')] + scoring['extra_args'],
     }
     result = {
         'method': 'COUNT and TOP_10 over the same query suite, warmed serially per engine; '
                   'snapshot includes mmap pages; default JVM heap; query cache disabled. '
                   'This is not an indexing or universal peak-memory measurement.',
         'warmup_seconds': args.warmup_seconds,
+        **report(scoring),
+        'provenance': capture(args.tantivy_binary, args.lucene_dir, args.lucene_classes,
+                              scoring['matched_bm25'], native=scoring['native_bm25'],
+                              score_scale=scoring['lucene_score_scale']),
         'tantivy_binary_sha256': hashlib.sha256(args.tantivy_binary.read_bytes()).hexdigest(),
         'query_file_sha256': hashlib.sha256(args.query_file.read_bytes()).hexdigest(),
         'loadavg_start': Path('/proc/loadavg').read_text().strip(),

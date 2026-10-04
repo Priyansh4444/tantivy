@@ -207,3 +207,31 @@ See the official Lucene 10.4 sources for
 [BM25 scoring](https://github.com/apache/lucene/blob/releases/lucene/10.4.0/lucene/core/src/java/org/apache/lucene/search/similarities/BM25Similarity.java),
 [boost propagation](https://github.com/apache/lucene/blob/releases/lucene/10.4.0/lucene/core/src/java/org/apache/lucene/search/BoostQuery.java),
 and [score-bound evaluation](https://github.com/apache/lucene/blob/releases/lucene/10.4.0/lucene/core/src/java/org/apache/lucene/search/MaxScoreCache.java).
+
+
+Native Lucene BM25 comparisons use `prepare_native_lucene.py --lucene-dir PATH
+--output-dir /tmp/lucene-native-classes` followed by `--native-bm25
+--lucene-classes /tmp/lucene-native-classes` on the timing, correctness, or memory
+tool. This path uses Lucene's unmodified `IndexSearcher` collection statistics,
+BM25 defaults k1=1.2 and b=.75, score scale 1, and a disabled query cache. The
+protocol COUNT query is unwrapped. It does not read Tantivy's token header or
+instantiate `MatchedStatisticsSearcher`. `DumpNativeLuceneResults` writes the
+actual text maxDoc, docCount, and sumTotalTermFreq to stderr.
+
+`--native-bm25` and `--matched-bm25` are mutually exclusive. Correctness and memory
+retain their historical matched default; the timing suite retains its original
+game-adapter default (k1=.9/b=.4). Explicit `--matched-bm25` preserves the earlier
+statistics overrides and score scale 2.2. The matched path now locates the text
+field's idx=0 entry through the actual composite directory and outer footer,
+including when version 10 metadata precedes the postings. Its header is a stored
+value, not independent proof of exact legacy merged-index statistics.
+
+For diagnosis before Rust's native score change, native mode alone accepts
+`--lucene-score-scale 2.2`. This explicitly scales TOP scores while retaining
+Lucene's native collection statistics; reports record the scale and must not be
+presented as default native score parity. Default native runs use scale 1.
+Native provenance hashes `DoQueryNative` and `DumpNativeLuceneResults` classes;
+matched provenance hashes the matched classes. Existing warmup durations,
+iteration counts, alternating order, CPU selection, and COUNT/TOP markers remain
+unchanged. Verify with `python -m unittest discover -s doc/performance/lucene-10.4
+-p 'test_*.py'`; these fixture gates launch no search engines.

@@ -6,6 +6,7 @@ import math
 import subprocess
 from pathlib import Path
 from provenance import capture
+from lucene_mode import add_arguments, configuration, report
 
 BENCH = Path(__file__).resolve().parent
 
@@ -89,9 +90,11 @@ def compare_results(query, t, l):
         'top10_order_matches_within_score_ties': True,
         'common_top100_ids': len(common), 'max_relative_score_difference': max_relative_difference}
 
-def run(command, queries):
+def run(command, queries, diagnostics=None):
     result = subprocess.run(command, input=''.join(query + '\n' for query in queries),
                             capture_output=True, text=True, timeout=180)
+    if diagnostics is not None:
+        diagnostics['stderr'] = result.stderr.strip()
     if result.returncode:
         raise RuntimeError(f'{command[0]} failed: {result.stderr[-4000:]}')
     rows = [json.loads(line) for line in result.stdout.splitlines()]
@@ -107,19 +110,16 @@ def main():
     parser.add_argument('--lucene-classes', type=Path, default=BENCH/'classes')
     parser.add_argument('--commit', required=True)
     parser.add_argument('--output', type=Path, required=True)
+    add_arguments(parser, matched_default=True)
     args = parser.parse_args()
+    scoring = configuration(args, parser)
     lucene_dir = args.lucene_dir.resolve()
-    postings_files = list(args.tantivy_index.glob('*.idx'))
-    if len(postings_files) != 1:
-        raise ValueError('Statistics matcher requires the frozen one-segment text index')
-    with postings_files[0].open('rb') as postings:
-        token_total = int.from_bytes(postings.read(8), 'little')
     queries = [json.loads(line)['query'] for line in (BENCH/'queries-wiki.jsonl').read_text().splitlines()]
     tantivy = run([str(args.tantivy_validator), str(args.tantivy_index)], queries)
-    cp = f'{args.lucene_classes.resolve()}:{lucene_dir / "build/classes/java/main"}:{lucene_dir / "build/dependencies"}/*'
+    lucene_diagnostics = {}
     lucene = run(['java', '--add-modules', 'jdk.incubator.vector',
-                  '--enable-native-access=ALL-UNNAMED', '-cp', cp,
-                  'DumpLuceneResults', str(lucene_dir/'idx'), str(token_total)], queries)
+                  '--enable-native-access=ALL-UNNAMED', '-cp', scoring['classpath'],
+                  scoring['dump_class'], str(lucene_dir/'idx')] + scoring['extra_args'], queries, lucene_diagnostics)
     comparisons = []
     for query, t, l in zip(queries, tantivy, lucene):
         comparison = compare_results(query, t, l)
@@ -129,11 +129,12 @@ def main():
               f'common-top100={comparison["common_top100_ids"]} '
               f'max-score-diff={comparison["max_relative_score_difference"]}')
     args.output.write_text(json.dumps({'commit': args.commit,
-        'matched_collection_statistics': True, 'token_total': token_total,
+        **report(scoring),
         'tantivy_index': str(args.tantivy_index),
         'lucene_dir': str(lucene_dir), 'lucene_classes': str(args.lucene_classes.resolve()), 'comparisons': comparisons,
-        'tantivy': tantivy, 'lucene': lucene,
-        'provenance':capture(args.tantivy_validator, lucene_dir, args.lucene_classes)}, indent=2)+'\n')
+        'tantivy': tantivy, 'lucene': lucene, 'lucene_diagnostics': lucene_diagnostics,
+        'provenance':capture(args.tantivy_validator, lucene_dir, args.lucene_classes, scoring['matched_bm25'],
+                             native=scoring['native_bm25'], score_scale=scoring['lucene_score_scale'])}, indent=2)+'\n')
 
 if __name__ == '__main__':
     main()
