@@ -1,8 +1,9 @@
 //! Raw norms/scores from pinned Lucene 10.4 OverlapNormReference.java.
 use tantivy::collector::{Count, TopDocs};
 use tantivy::merge_policy::NoMergePolicy;
+use tantivy::postings::Postings;
 use tantivy::query::{
-    Bm25StatisticsProvider, Bm25Weight, BoostQuery, EnableScoring, Query, TermQuery,
+    Bm25Parameters, Bm25StatisticsProvider, Bm25Weight, BoostQuery, EnableScoring, Query, TermQuery,
 };
 use tantivy::schema::{
     Field, FieldNormPolicy, IndexRecordOption, NumericOptions, Schema, TextFieldIndexing,
@@ -300,6 +301,134 @@ fn nonoverlap_norms_statistics_and_raw_scores_are_policy_invariant() -> tantivy:
         );
         for (score, _) in searcher.search(&query, &TopDocs::with_limit(2).order_by_score())? {
             assert_eq!(score.to_bits(), 1034533260);
+        }
+    }
+    Ok(())
+}
+
+#[test]
+fn overlap_index_policy_and_native_query_parameters_match_java_independently() -> tantivy::Result<()>
+{
+    #[derive(serde::Deserialize)]
+    struct Hit {
+        doc: u32,
+        bits: u32,
+    }
+    #[derive(serde::Deserialize)]
+    struct Case {
+        profile: String,
+        index_discount: bool,
+        query_discount: bool,
+        k1_bits: u32,
+        b_bits: u32,
+        doc_count: u64,
+        sum_total_term_freq: u64,
+        alpha_doc_freq: u64,
+        alpha_total_term_freq: u64,
+        count: usize,
+        norms: [u8; 2],
+        alpha: [Hit; 2],
+    }
+    #[derive(serde::Deserialize)]
+    struct Reference {
+        lucene_version: String,
+        cases: Vec<Case>,
+    }
+    let reference: Reference = serde_json::from_str(include_str!(
+        "../doc/performance/lucene-10.4/parity/overlap-norm-reference/parameters-reference.json"
+    ))?;
+    assert_eq!(reference.lucene_version, "10.4.0");
+    assert_eq!(reference.cases.len(), 8);
+    let profiles = [
+        ("DEFAULT", Bm25Parameters::DEFAULT),
+        ("supplied", Bm25Parameters::new(0.9, 0.4)?),
+        ("zero_saturation", Bm25Parameters::new(0.0, 0.75)?),
+        ("full_length", Bm25Parameters::new(2.5, 1.0)?),
+    ];
+    for policy in [
+        FieldNormPolicy::DiscountOverlaps,
+        FieldNormPolicy::CountAllTokens,
+    ] {
+        let discount = policy == FieldNormPolicy::DiscountOverlaps;
+        let (index, field) = fixture(indexing().set_fieldnorm_policy(policy), standard())?;
+        let reader = index.reader()?;
+        let term = Term::from_field_text(field, "alpha");
+        let query = TermQuery::new(term.clone(), IndexRecordOption::WithFreqs);
+        for (name, parameters) in profiles {
+            let cases = reference
+                .cases
+                .iter()
+                .filter(|case| case.profile == name && case.index_discount == discount)
+                .collect::<Vec<_>>();
+            assert_eq!(cases.len(), 1);
+            let expected = cases[0];
+            // Java deliberately queries with the opposite overlap flag. Rust
+            // keeps index policy in its schema and configures only k1/b here.
+            assert_ne!(expected.query_discount, expected.index_discount);
+            assert_eq!(
+                (parameters.k1().to_bits(), parameters.b().to_bits()),
+                (expected.k1_bits, expected.b_bits)
+            );
+            let searcher = reader.searcher().with_bm25_parameters(parameters);
+            let stats = searcher.field_statistics(field)?;
+            assert_eq!(
+                (stats.doc_count(), stats.sum_total_term_freq()),
+                (expected.doc_count, expected.sum_total_term_freq)
+            );
+            assert_eq!((stats.doc_count(), stats.sum_total_term_freq()), (2, 5));
+            assert_eq!(
+                (
+                    stats.parameters().k1().to_bits(),
+                    stats.parameters().b().to_bits()
+                ),
+                (expected.k1_bits, expected.b_bits)
+            );
+            assert_eq!(searcher.num_docs(), 2);
+            assert_eq!(searcher.doc_freq(&term)?, expected.alpha_doc_freq);
+            assert_eq!(expected.alpha_doc_freq, 2);
+            let segment = searcher.segment_reader(0);
+            let norms = segment.get_fieldnorms_reader(field)?;
+            let actual_norms = [norms.fieldnorm_id(0), norms.fieldnorm_id(1)];
+            assert_eq!(actual_norms, expected.norms);
+            assert_eq!(actual_norms, if discount { [2, 2] } else { [3, 2] });
+            let inverted = segment.inverted_index(field)?;
+            let mut postings = inverted
+                .read_postings(&term, IndexRecordOption::WithFreqs)?
+                .unwrap();
+            let mut term_total = 0u64;
+            while postings.doc() != TERMINATED {
+                term_total += u64::from(postings.term_freq());
+                postings.advance();
+            }
+            assert_eq!(term_total, expected.alpha_total_term_freq);
+            assert_eq!(term_total, 2);
+            assert_eq!(searcher.search(&query, &Count)?, expected.count);
+            assert_eq!(expected.count, 2);
+            let top = searcher.search(&query, &TopDocs::with_limit(2).order_by_score())?;
+            assert_eq!(top.len(), expected.alpha.len());
+            for ((score, address), hit) in top.into_iter().zip(&expected.alpha) {
+                assert_eq!(address, DocAddress::new(0, hit.doc), "{policy:?} {name}");
+                assert_eq!(
+                    score.to_bits(),
+                    hit.bits,
+                    "{policy:?} {name} doc{}",
+                    hit.doc
+                );
+                assert_eq!(
+                    query.explain(&searcher, address)?.value().to_bits(),
+                    hit.bits
+                );
+            }
+            let after_norms = segment.get_fieldnorms_reader(field)?;
+            assert_eq!(
+                [after_norms.fieldnorm_id(0), after_norms.fieldnorm_id(1)],
+                expected.norms
+            );
+            let after_stats = searcher.field_statistics(field)?;
+            assert_eq!(
+                (after_stats.doc_count(), after_stats.sum_total_term_freq()),
+                (2, 5)
+            );
         }
     }
     Ok(())

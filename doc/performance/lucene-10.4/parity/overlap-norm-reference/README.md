@@ -36,3 +36,20 @@ legacy Boolean schemas and rejects both Discount schemas (enabled/disabled).
 codes/diagnostics, old production identity, and executable hash. Remove the
 temporary example files after reproducing. No synthetic metadata substitution
 or segment-footer check is used to establish the empty-index gate.
+
+`OverlapParametersReference.java` adds a native cross-feature matrix. It builds
+one tiny index for each overlap policy, reuses each reader for DEFAULT,
+(.9,.4), (0,.75), and (2.5,1) query parameters, and deliberately supplies the
+**opposite** query-time discountOverlaps flag. All eight cases retain their
+original norm bytes and full field/term totals. Native raw score bits, tie
+order, COUNT and explanation equality are checked without a statistics override.
+
+Compile that helper together with OverlapNormReference.java; the exact javac
+and Java commands, hashes of both sources and Lucene jars, pinned Lucene source
+identity, and literal eight-case output are in `parameters-reference.json`.
+The public `overlap_index_policy_and_native_query_parameters_match_java_independently`
+test in tests/native_overlap_norms.rs consumes those bits, configures native
+Searcher handles through Bm25Parameters, and checks physical frequencies and
+norm bytes before and after scoring. Index-time policy is preserved even at
+zero k1, where the CountAll fixture's score difference disappears and tie order
+changes. The earlier default norm/score reference remains unchanged.
