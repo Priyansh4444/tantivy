@@ -382,7 +382,7 @@ impl<TPostings: Postings> PhraseScorer<TPostings> {
 }
 
 impl PhraseScorer<SegmentPostings> {
-    /// The phrase frequency is at most the frequency of any constituent term.
+    /// The exact phrase frequency is at most the frequency of any constituent term.
     /// Compute a block bound using the query's BM25 weight, as the stored block
     /// impact was chosen using segment-local statistics at indexing time.
     fn first_term_block_can_compete(&mut self, threshold: Score) -> (DocId, bool) {

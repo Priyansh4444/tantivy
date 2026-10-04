@@ -380,6 +380,49 @@ mod tests {
     }
 
     #[test]
+    fn test_sloppy_pruning_frequency_exceeds_constituent_frequency() -> crate::Result<()> {
+        use crate::query::Scorer;
+        // Four-clause frontier frequency is 9, although alpha and beta each
+        // occur only 8 times. Fill multiple compressed posting blocks.
+        let text = "alpha beta ".repeat(8);
+        let index = create_index(&vec![text.as_str(); 384])?;
+        let field = index.schema().get_field("text").unwrap();
+        let searcher = index.reader()?.searcher();
+        let reader = searcher.segment_reader(0);
+        let mut query = PhraseQuery::new(
+            ["alpha", "beta", "alpha", "beta"]
+                .into_iter()
+                .map(|word| Term::from_field_text(field, word))
+                .collect(),
+        );
+        query.set_slop(4);
+        let weight = query.phrase_weight(EnableScoring::enabled_from_searcher(&searcher))?;
+        let mut scorer = weight.phrase_scorer(reader, 1.0)?.unwrap();
+        assert_eq!(scorer.phrase_frequency(), 9.0);
+        let fieldnorm_id = weight.fieldnorm_reader(reader)?.fieldnorm_id(0);
+        let unsafe_term_bound = weight
+            .similarity_weight_opt
+            .as_ref()
+            .unwrap()
+            .score(fieldnorm_id, 8);
+        let threshold = (unsafe_term_bound + scorer.score()) / 2.0;
+        assert!(unsafe_term_bound < threshold && threshold < scorer.score());
+        let mut hits = Vec::new();
+        weight.for_each_pruning(threshold, reader, &mut |doc, score| {
+            assert!(score > threshold);
+            hits.push(doc);
+            threshold
+        })?;
+        assert_eq!(hits, (0..384).collect::<Vec<_>>());
+        let (result, mut danger) = weight.scorer_danger(reader, 140, 1.0)?;
+        assert_eq!(result, SeekDangerResult::Found);
+        assert!(danger.score() > threshold);
+        assert_eq!(danger.seek_danger(260), SeekDangerResult::Found);
+        assert!(danger.score() > threshold);
+        Ok(())
+    }
+
+    #[test]
     fn test_phrase_pruning_matches_exhaustive_scoring() -> crate::Result<()> {
         let index = create_index(&[
             "a b a b a b",
