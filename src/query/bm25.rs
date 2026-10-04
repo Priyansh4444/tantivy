@@ -5,24 +5,34 @@ use crate::query::Explanation;
 use crate::schema::Field;
 use crate::{Score, Searcher, Term};
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum Bm25Scoring {
+    LegacyClassic,
+    NativeLucene,
+}
+
 /// A coherent collection-statistics snapshot used for BM25.
 ///
 /// `new` preserves the historical custom-provider average rounding. Native index
-/// statistics use double-precision division before converting their average to f32.
+/// statistics use double-precision division before converting their average to f32
+/// and Lucene's native IDF, reciprocal normalization, and score convention.
 #[derive(Clone, Copy, Debug)]
 pub struct Bm25FieldStatistics {
     doc_count: u64,
     sum_total_term_freq: u64,
     average_fieldnorm: Score,
+    scoring: Bm25Scoring,
 }
 
 impl Bm25FieldStatistics {
-    /// Construct custom statistics without changing historical average rounding.
+    /// Construct custom statistics without changing historical average rounding
+    /// or the classic BM25 score convention (including its k1+1 numerator).
     pub fn new(doc_count: u64, sum_total_term_freq: u64) -> Self {
         Self {
             doc_count,
             sum_total_term_freq,
             average_fieldnorm: sum_total_term_freq as Score / doc_count as Score,
+            scoring: Bm25Scoring::LegacyClassic,
         }
     }
     /// Number of documents represented by this field's statistics.
@@ -42,6 +52,7 @@ impl Bm25FieldStatistics {
                 sum_total_term_freq,
                 doc_count,
             ),
+            scoring: Bm25Scoring::NativeLucene,
         }
     }
 }
@@ -116,15 +127,35 @@ pub(crate) fn idf(doc_freq: u64, doc_count: u64) -> Score {
     (1.0 + x).ln()
 }
 
+fn native_idf(doc_freq: u64, doc_count: u64) -> Score {
+    assert!(doc_count >= doc_freq, "{doc_count} >= {doc_freq}");
+    let x = ((doc_count - doc_freq) as f64 + 0.5) / (doc_freq as f64 + 0.5);
+    (1.0 + x).ln() as Score
+}
+
+fn native_idf_explanation(doc_freq: u64, doc_count: u64) -> Explanation {
+    let mut explanation = Explanation::new(
+        "idf, computed as log(1 + (N - n + 0.5) / (n + 0.5))",
+        native_idf(doc_freq, doc_count),
+    );
+    explanation.add_const("n, number of docs containing this term", doc_freq as Score);
+    explanation.add_const("N, number of docs with this field", doc_count as Score);
+    explanation
+}
+
 fn cached_tf_component(fieldnorm: u32, average_fieldnorm: Score) -> Score {
     K1 * (1.0 - B + B * fieldnorm as Score / average_fieldnorm)
 }
 
-fn compute_tf_cache(average_fieldnorm: Score) -> Arc<[Score; 256]> {
+fn compute_tf_cache(average_fieldnorm: Score, scoring: Bm25Scoring) -> Arc<[Score; 256]> {
     let mut cache: [Score; 256] = [0.0; 256];
     for (fieldnorm_id, cache_mut) in cache.iter_mut().enumerate() {
         let fieldnorm = FieldNormReader::id_to_fieldnorm(fieldnorm_id as u8);
-        *cache_mut = cached_tf_component(fieldnorm, average_fieldnorm);
+        let norm = cached_tf_component(fieldnorm, average_fieldnorm);
+        *cache_mut = match scoring {
+            Bm25Scoring::LegacyClassic => norm,
+            Bm25Scoring::NativeLucene => 1.0 / norm,
+        };
     }
     Arc::new(cache)
 }
@@ -136,6 +167,7 @@ pub struct Bm25Weight {
     weight: Score,
     cache: Arc<[Score; 256]>,
     average_fieldnorm: Score,
+    scoring: Bm25Scoring,
 }
 
 impl Bm25Weight {
@@ -149,10 +181,14 @@ impl Bm25Weight {
             weight: self.weight * boost,
             cache: self.cache.clone(),
             average_fieldnorm: self.average_fieldnorm,
+            scoring: self.scoring,
         }
     }
 
     /// Construct a [Bm25Weight] for a phrase of terms.
+    ///
+    /// Searcher's native field snapshot selects Lucene's raw score convention.
+    /// Historical custom providers retain their classic k1+1 numerator.
     pub fn for_terms(
         statistics: &dyn Bm25StatisticsProvider,
         terms: &[Term],
@@ -170,6 +206,27 @@ impl Bm25Weight {
         let collection = statistics.field_statistics(field)?;
         let total_num_docs = collection.doc_count;
         let average_fieldnorm = collection.average_fieldnorm;
+
+        if collection.scoring == Bm25Scoring::NativeLucene {
+            let explanation = if terms.len() == 1 {
+                native_idf_explanation(statistics.doc_freq(&terms[0])?, total_num_docs)
+            } else {
+                // Lucene rounds each individual IDF to f32, sums in f64, then rounds once.
+                let mut sum = 0.0f64;
+                let mut details = Vec::with_capacity(terms.len());
+                for term in terms {
+                    let detail = native_idf_explanation(statistics.doc_freq(term)?, total_num_docs);
+                    sum += f64::from(detail.value());
+                    details.push(detail);
+                }
+                let mut explanation = Explanation::new("idf, sum of:", sum as Score);
+                for detail in details {
+                    explanation.add_detail(detail);
+                }
+                explanation
+            };
+            return Ok(Bm25Weight::new_native(explanation, average_fieldnorm));
+        }
 
         if terms.len() == 1 {
             let term_doc_freq = statistics.doc_freq(&terms[0])?;
@@ -221,8 +278,9 @@ impl Bm25Weight {
         Bm25Weight {
             idf_explain: Some(idf_explain),
             weight,
-            cache: compute_tf_cache(average_fieldnorm),
+            cache: compute_tf_cache(average_fieldnorm, Bm25Scoring::LegacyClassic),
             average_fieldnorm,
+            scoring: Bm25Scoring::LegacyClassic,
         }
     }
     pub(crate) fn new_without_explain(idf: f32, average_fieldnorm: Score) -> Bm25Weight {
@@ -230,21 +288,36 @@ impl Bm25Weight {
         Bm25Weight {
             idf_explain: None,
             weight,
-            cache: compute_tf_cache(average_fieldnorm),
+            cache: compute_tf_cache(average_fieldnorm, Bm25Scoring::LegacyClassic),
             average_fieldnorm,
+            scoring: Bm25Scoring::LegacyClassic,
+        }
+    }
+
+    fn new_native(idf_explain: Explanation, average_fieldnorm: Score) -> Bm25Weight {
+        Bm25Weight {
+            weight: idf_explain.value(),
+            idf_explain: Some(idf_explain),
+            cache: compute_tf_cache(average_fieldnorm, Bm25Scoring::NativeLucene),
+            average_fieldnorm,
+            scoring: Bm25Scoring::NativeLucene,
         }
     }
 
     /// Compute the BM25 score of a single document.
     #[inline]
     pub fn score(&self, fieldnorm_id: u8, term_freq: u32) -> Score {
-        self.weight * self.tf_factor(fieldnorm_id, term_freq)
+        self.score_with_frequency(fieldnorm_id, term_freq as Score)
     }
 
     /// Score a fractional phrase frequency without rounding its distance weights.
     #[inline]
     pub(crate) fn score_with_frequency(&self, fieldnorm_id: u8, frequency: Score) -> Score {
-        self.weight * (frequency / (frequency + self.cache[fieldnorm_id as usize]))
+        let norm = self.cache[fieldnorm_id as usize];
+        match self.scoring {
+            Bm25Scoring::LegacyClassic => self.weight * (frequency / (frequency + norm)),
+            Bm25Scoring::NativeLucene => self.weight - self.weight / (1.0 + frequency * norm),
+        }
     }
 
     /// Whether this term frequency could produce a score above `threshold`.
@@ -260,6 +333,11 @@ impl Bm25Weight {
         term_freq: u32,
         threshold: Score,
     ) -> bool {
+        if self.scoring == Bm25Scoring::NativeLucene {
+            // The legacy algebraic predicate does not account for cancellation
+            // in Lucene's subtraction formula. Use its actual rounded score.
+            return self.score(fieldnorm_id, term_freq) > threshold;
+        }
         let norm = self.cache[fieldnorm_id as usize];
         if self.weight.is_finite()
             && self.weight > 0.0
@@ -294,7 +372,10 @@ impl Bm25Weight {
     }
 
     pub(crate) fn can_use_stored_block_max(&self, segment_average_fieldnorm: Score) -> bool {
-        self.weight.is_finite()
+        // Existing pairs were selected by the legacy rational tf_factor. Its
+        // rounded ties can resolve differently under native reciprocal scoring.
+        self.scoring == Bm25Scoring::LegacyClassic
+            && self.weight.is_finite()
             && self.weight >= 0.0
             && self.average_fieldnorm.is_finite()
             && self.average_fieldnorm > 0.0
@@ -303,6 +384,7 @@ impl Bm25Weight {
 
     #[inline]
     pub(crate) fn tf_factor(&self, fieldnorm_id: u8, term_freq: u32) -> Score {
+        debug_assert_eq!(self.scoring, Bm25Scoring::LegacyClassic);
         let term_freq = term_freq as Score;
         let norm = self.cache[fieldnorm_id as usize];
         term_freq / (term_freq + norm)
@@ -319,7 +401,10 @@ impl Bm25Weight {
         let score = self.score_with_frequency(fieldnorm_id, term_freq);
 
         let norm = self.cache[fieldnorm_id as usize];
-        let right_factor = term_freq / (term_freq + norm);
+        let right_factor = match self.scoring {
+            Bm25Scoring::LegacyClassic => term_freq / (term_freq + norm),
+            Bm25Scoring::NativeLucene => 1.0 - 1.0 / (1.0 + term_freq * norm),
+        };
 
         let mut tf_explanation = Explanation::new(
             "freq / (freq + k1 * (1 - b + b * dl / avgdl))",
@@ -336,7 +421,9 @@ impl Bm25Weight {
         tf_explanation.add_const("avgdl, average length of field", self.average_fieldnorm);
 
         let mut explanation = Explanation::new("TermQuery, product of...", score);
-        explanation.add_detail(Explanation::new("(K1+1)", K1 + 1.0));
+        if self.scoring == Bm25Scoring::LegacyClassic {
+            explanation.add_detail(Explanation::new("(K1+1)", K1 + 1.0));
+        }
         if let Some(idf_explain) = &self.idf_explain {
             explanation.add_detail(idf_explain.clone());
         }
@@ -349,6 +436,52 @@ impl Bm25Weight {
 mod tests {
     use super::{idf, Bm25Weight};
     use crate::{assert_nearly_equals, Score};
+
+    #[test]
+    fn native_policy_keeps_old_pairs_untrusted_and_global_bound_conservative() {
+        use crate::query::Explanation;
+        for average in [0.5, 1.0, 100.0, 10_000.0, 1_000_000_000.0] {
+            let native = Bm25Weight::new_native(Explanation::new("idf", 1.0), average);
+            for boost in [0.0, 1.0, 3.25, -2.0] {
+                let weight = native.boost_by(boost);
+                assert!(!weight.can_use_stored_block_max(average));
+                for norm in 0..=255 {
+                    for frequency in [0, 1, 7, 128, 16_777_217, u32::MAX] {
+                        assert!(weight.max_score() >= weight.score(norm, frequency));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn native_threshold_predicate_matches_actual_score_at_float_neighbors() {
+        use crate::query::Explanation;
+        for average in [0.5, 100.0, 1_000_000_000.0] {
+            let native = Bm25Weight::new_native(Explanation::new("idf", 1.0), average);
+            for boost in [0.0, 1.0, 3.25, -2.0] {
+                let weight = native.boost_by(boost);
+                for norm in 0..=255 {
+                    for frequency in [0, 1, 7, 128, 16_777_217, u32::MAX] {
+                        let score = weight.score(norm, frequency);
+                        for threshold in [
+                            score.next_down(),
+                            score,
+                            score.next_up(),
+                            Score::NEG_INFINITY,
+                            Score::INFINITY,
+                            Score::NAN,
+                        ] {
+                            assert_eq!(
+                                weight.can_score_exceed(norm, frequency, threshold),
+                                score > threshold
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn field_statistics_custom_provider_keeps_legacy_average_and_scores() -> crate::Result<()> {
@@ -435,7 +568,7 @@ mod tests {
             top[0].1.doc_id, 2,
             "field-sensitive IDF must rank dense b above ubiquitous sparse a"
         );
-        let expected = Bm25Weight::for_one_term(2, 2, 1.0);
+        let expected = Bm25Weight::new_native(super::native_idf_explanation(2, 2), 1.0);
         assert_eq!(weight.average_fieldnorm, 1.0);
         assert_eq!(weight.score(1, 1), expected.score(1, 1));
         Ok(())

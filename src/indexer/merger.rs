@@ -1561,8 +1561,8 @@ mod tests {
             .term_scorer_for_test(searcher.segment_reader(0u32), 1.0)?
             .unwrap();
         assert_eq!(term_scorer.doc(), 0);
-        assert_nearly_equals!(term_scorer.block_max_score(), 0.0079681855);
-        assert_nearly_equals!(term_scorer.score(), 0.0079681855);
+        assert_nearly_equals!(term_scorer.block_max_score(), 0.0036218953);
+        assert_nearly_equals!(term_scorer.score(), 0.0036218953);
         for _ in 0..81 {
             writer.add_document(doc!(text=>"hello happy tax payer"))?;
         }
@@ -1580,8 +1580,8 @@ mod tests {
             // there.
             for doc in segment_reader.doc_ids_alive() {
                 assert_eq!(term_scorer.doc(), doc);
-                assert_nearly_equals!(term_scorer.block_max_score(), 0.003478312);
-                assert_nearly_equals!(term_scorer.score(), 0.003478312);
+                assert_nearly_equals!(term_scorer.block_max_score(), 0.0015810292);
+                assert_nearly_equals!(term_scorer.score(), 0.0015810292);
                 term_scorer.advance();
             }
         }
@@ -1605,8 +1605,15 @@ mod tests {
         // the difference compared to before is intrinsic to the bm25 formula. no worries there.
         for doc in segment_reader.doc_ids_alive() {
             assert_eq!(term_scorer.doc(), doc);
-            assert_nearly_equals!(term_scorer.block_max_score(), 0.003478312);
-            assert_nearly_equals!(term_scorer.score(), 0.003478312);
+            // Version 10 pairs use legacy rational-factor selection. Native
+            // scoring uses a conservative global bound for complete old blocks.
+            let expected_bound = if doc < 128 {
+                (1.0f64 + 0.5 / 143.5).ln() as f32
+            } else {
+                0.0015810292
+            };
+            assert_nearly_equals!(term_scorer.block_max_score(), expected_bound);
+            assert_nearly_equals!(term_scorer.score(), 0.0015810292);
             term_scorer.advance();
         }
 

@@ -848,9 +848,9 @@ mod tests {
         assert_results_equals(
             &score_docs,
             &[
-                (0.81221175, DocAddress::new(0u32, 1)),
-                (0.5376842, DocAddress::new(0u32, 2)),
-                (0.48527452, DocAddress::new(0, 0)),
+                (0.36918718, DocAddress::new(0u32, 1)),
+                (0.2444019, DocAddress::new(0u32, 2)),
+                (0.22057931, DocAddress::new(0, 0)),
             ],
         );
         Ok(())
@@ -871,7 +871,7 @@ mod tests {
                 &TopDocs::with_limit(4).and_offset(2).order_by_score(),
             )
             .unwrap();
-        assert_results_equals(&score_docs[..], &[(0.48527452, DocAddress::new(0, 0))]);
+        assert_results_equals(&score_docs[..], &[(0.22057931, DocAddress::new(0, 0))]);
     }
 
     #[test]
@@ -889,8 +889,8 @@ mod tests {
         assert_results_equals(
             &score_docs,
             &[
-                (0.81221175, DocAddress::new(0u32, 1)),
-                (0.5376842, DocAddress::new(0u32, 2)),
+                (0.36918718, DocAddress::new(0u32, 1)),
+                (0.2444019, DocAddress::new(0u32, 2)),
             ],
         );
     }
@@ -913,8 +913,8 @@ mod tests {
         assert_results_equals(
             &score_docs[..],
             &[
-                (0.5376842, DocAddress::new(0u32, 2)),
-                (0.48527452, DocAddress::new(0, 0)),
+                (0.2444019, DocAddress::new(0u32, 2)),
+                (0.22057931, DocAddress::new(0, 0)),
             ],
         );
     }

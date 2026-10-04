@@ -253,12 +253,12 @@ mod tests {
         {
             let mut boolean_scorer = boolean_weight.scorer(searcher.segment_reader(0u32), 1.0)?;
             assert_eq!(boolean_scorer.doc(), 0u32);
-            assert_nearly_equals!(boolean_scorer.score(), 0.84163445);
+            assert_nearly_equals!(boolean_scorer.score(), 0.3825611);
         }
         {
             let mut boolean_scorer = boolean_weight.scorer(searcher.segment_reader(0u32), 2.0)?;
             assert_eq!(boolean_scorer.doc(), 0u32);
-            assert_nearly_equals!(boolean_scorer.score(), 1.6832689);
+            assert_nearly_equals!(boolean_scorer.score(), 0.7651222);
         }
         Ok(())
     }
@@ -290,8 +290,8 @@ mod tests {
                 (Occur::Must, make_term_query("b")),
             ]);
             let scores = score_docs(&boolean_query);
-            assert_nearly_equals!(scores[0], 0.977973);
-            assert_nearly_equals!(scores[1], 0.84699446);
+            assert_nearly_equals!(scores[0], 0.44453317);
+            assert_nearly_equals!(scores[1], 0.38499755);
         }
         Ok(())
     }
@@ -317,7 +317,7 @@ mod tests {
         ));
         let query = BooleanQuery::from(vec![(Occur::Should, term_a), (Occur::Should, term_b)]);
         let explanation = query.explain(&searcher, DocAddress::new(0, 0u32))?;
-        assert_nearly_equals!(explanation.value(), std::f32::consts::LN_2);
+        assert_nearly_equals!(explanation.value(), 0.31506687);
         Ok(())
     }
 

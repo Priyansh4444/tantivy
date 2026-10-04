@@ -39,7 +39,7 @@ mod tests {
         let segment_reader = searcher.segment_reader(0);
         let mut term_scorer = term_weight.scorer(segment_reader, 1.0)?;
         assert_eq!(term_scorer.doc(), 0);
-        assert_nearly_equals!(term_scorer.score(), 0.28768212);
+        assert_nearly_equals!(term_scorer.score(), 0.13076457);
         Ok(())
     }
 
@@ -103,7 +103,7 @@ mod tests {
             let topdocs = searcher.search(&term_query, &TopDocs::with_limit(2).order_by_score())?;
             assert_eq!(topdocs.len(), 1);
             let (score, _) = topdocs[0];
-            assert_nearly_equals!(0.77802235, score);
+            assert_nearly_equals!(0.3536465, score);
         }
         {
             let term = Term::from_field_text(left_field, "left1");
@@ -112,9 +112,9 @@ mod tests {
                 searcher.search(&term_query, &TopDocs::with_limit(2).order_by_score())?;
             assert_eq!(top_docs.len(), 2);
             let (score1, _) = top_docs[0];
-            assert_nearly_equals!(0.27101856, score1);
+            assert_nearly_equals!(0.12319024, score1);
             let (score2, _) = top_docs[1];
-            assert_nearly_equals!(0.13736556, score2);
+            assert_nearly_equals!(0.062438883, score2);
         }
         {
             let query_parser = QueryParser::for_index(&index, Vec::new());
@@ -122,9 +122,9 @@ mod tests {
             let top_docs = searcher.search(&query, &TopDocs::with_limit(2).order_by_score())?;
             assert_eq!(top_docs.len(), 2);
             let (score1, _) = top_docs[0];
-            assert_nearly_equals!(0.9153879, score1);
+            assert_nearly_equals!(0.41608536, score1);
             let (score2, _) = top_docs[1];
-            assert_nearly_equals!(0.27101856, score2);
+            assert_nearly_equals!(0.12319024, score2);
         }
         Ok(())
     }
@@ -198,7 +198,7 @@ mod tests {
         let searcher = index.reader()?.searcher();
         {
             let explanation = term_query.explain(&searcher, DocAddress::new(0u32, 1u32))?;
-            assert_nearly_equals!(explanation.value(), std::f32::consts::LN_2);
+            assert_nearly_equals!(explanation.value(), 0.31506687);
         }
         {
             let explanation_err = term_query.explain(&searcher, DocAddress::new(0u32, 0u32));

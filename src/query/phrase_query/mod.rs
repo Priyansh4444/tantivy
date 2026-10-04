@@ -164,18 +164,17 @@ pub(crate) mod tests {
     pub fn test_phrase_score() -> crate::Result<()> {
         let index = create_index(&["a b c", "a b c a b"])?;
         let scores = test_query(0, &index, vec!["a", "b"]);
-        assert_nearly_equals!(scores[0], 0.40618482);
-        assert_nearly_equals!(scores[1], 0.46844664);
+        assert_nearly_equals!(scores[0], 0.18462943);
+        assert_nearly_equals!(scores[1], 0.21293029);
         Ok(())
     }
 
-    #[ignore]
     #[test]
     pub fn test_phrase_score_with_slop() -> crate::Result<()> {
         let index = create_index(&["a c b", "a b c a b"])?;
         let scores = test_query(1, &index, vec!["a", "b"]);
-        assert_nearly_equals!(scores[0], 0.40618482);
-        assert_nearly_equals!(scores[1], 0.46844664);
+        assert_nearly_equals!(scores[0], 0.12360783);
+        assert_nearly_equals!(scores[1], 0.21293029);
         Ok(())
     }
 
@@ -230,9 +229,9 @@ pub(crate) mod tests {
         let index = create_index(&["a b e c", "a e e e c", "a e e e e c"])?;
         let scores = test_query(3, &index, vec!["a", "c"]);
         assert_eq!(scores.len(), 2);
-        // Frozen Lucene 10.4 native scores times the current BM25 factor 2.2.
-        assert_nearly_equals!(scores[0], 0.14471380);
-        assert_nearly_equals!(scores[1], 0.10129970);
+        // Frozen Lucene 10.4 native raw scores.
+        assert_nearly_equals!(scores[0], 0.06577900);
+        assert_nearly_equals!(scores[1], 0.04604532);
         Ok(())
     }
 
@@ -269,9 +268,9 @@ pub(crate) mod tests {
         ])?;
         let scores = test_query(3, &index, vec!["a", "b", "c"]);
         // Frozen distance-weighted scores, in document order.
-        assert_nearly_equals!(scores[0], 0.11232231);
-        assert_nearly_equals!(scores[1], 0.14501993);
-        assert_nearly_equals!(scores[3], 0.12659387);
+        assert_nearly_equals!(scores[0], 0.051055595);
+        assert_nearly_equals!(scores[1], 0.06591815);
+        assert_nearly_equals!(scores[3], 0.057542667);
         Ok(())
     }
 
