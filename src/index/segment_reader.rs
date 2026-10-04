@@ -275,21 +275,27 @@ impl SegmentReader {
             DataCorruption::comment_only(error_msg)
         })?;
 
+        let count_metadata = self
+            .postings_composite
+            .open_read_with_idx(field, 1)
+            .map(|file| file.read_bytes())
+            .transpose()?;
         let inv_idx_reader = Arc::new(InvertedIndexReader::new(
             TermDictionary::open(termdict_file)?,
             postings_file,
             positions_file,
             record_option,
+            self.max_doc(),
+            count_metadata.as_deref(),
         )?);
 
-        // by releasing the lock in between, we may end up opening the inverting index
-        // twice, but this is fine.
-        self.inv_idx_reader_cache
+        // Opening is outside the lock. Racing callers must return the same Arc
+        // so a legacy statistics reduction is shared, rather than repeated.
+        let mut cache = self
+            .inv_idx_reader_cache
             .write()
-            .expect("Field reader cache lock poisoned. This should never happen.")
-            .insert(field, Arc::clone(&inv_idx_reader));
-
-        Ok(inv_idx_reader)
+            .expect("Field reader cache lock poisoned. This should never happen.");
+        Ok(Arc::clone(cache.entry(field).or_insert(inv_idx_reader)))
     }
 
     /// Returns the list of fields that have been indexed in the segment.

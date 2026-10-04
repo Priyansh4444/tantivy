@@ -5,6 +5,7 @@ use std::ops::Range;
 use stacker::Addr;
 
 use crate::fieldnorm::FieldNormReaders;
+use crate::index::field_statistics::FieldStatistics;
 use crate::indexer::doc_id_mapping::DocIdMapping;
 use crate::indexer::indexing_term::IndexingTerm;
 use crate::indexer::path_to_unordered_id::OrderedPathId;
@@ -50,6 +51,7 @@ pub(crate) fn serialize_postings(
     ctx: IndexingContext,
     schema: Schema,
     per_field_postings_writers: &PerFieldPostingsWriter,
+    field_doc_counts: &[u32],
     fieldnorm_readers: FieldNormReaders,
     doc_id_map: Option<&DocIdMapping>,
     serializer: &mut InvertedIndexSerializer,
@@ -82,8 +84,12 @@ pub(crate) fn serialize_postings(
     for (field, byte_offsets) in field_offsets {
         let postings_writer = per_field_postings_writers.get_for_field(field);
         let fieldnorm_reader = fieldnorm_readers.get_field(field)?;
+        let statistics = FieldStatistics {
+            doc_count: field_doc_counts[field.field_id() as usize],
+            sum_total_term_freq: postings_writer.total_num_tokens(),
+        };
         let mut field_serializer =
-            serializer.new_field(field, postings_writer.total_num_tokens(), fieldnorm_reader)?;
+            serializer.new_field_with_statistics(field, statistics, fieldnorm_reader)?;
         postings_writer.serialize(
             &term_offsets[byte_offsets],
             &ordered_id_to_path,
@@ -212,11 +218,14 @@ impl<Rec: Recorder> PostingsWriter for SpecializedPostingsWriter<Rec> {
         ctx: &mut IndexingContext,
     ) {
         debug_assert!(term.serialized_term().len() >= 4);
-        self.total_num_tokens += 1;
+        let total_num_tokens = &mut self.total_num_tokens;
         let (term_index, arena) = (&mut ctx.term_index, &mut ctx.arena);
         term_index.mutate_or_create(term.serialized_term(), |opt_recorder: Option<Rec>| {
             if let Some(mut recorder) = opt_recorder {
                 let current_doc = recorder.current_doc();
+                if recorder.has_term_freq() || current_doc != doc {
+                    *total_num_tokens += 1;
+                }
                 if current_doc != doc {
                     recorder.close_doc(arena);
                     recorder.new_doc(doc, arena);
@@ -224,6 +233,7 @@ impl<Rec: Recorder> PostingsWriter for SpecializedPostingsWriter<Rec> {
                 recorder.record_position(position, arena);
                 recorder
             } else {
+                *total_num_tokens += 1;
                 let mut recorder = Rec::default();
                 recorder.new_doc(doc, arena);
                 recorder.record_position(position, arena);

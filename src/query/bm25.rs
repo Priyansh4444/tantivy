@@ -5,6 +5,47 @@ use crate::query::Explanation;
 use crate::schema::Field;
 use crate::{Score, Searcher, Term};
 
+/// A coherent collection-statistics snapshot used for BM25.
+///
+/// `new` preserves the historical custom-provider average rounding. Native index
+/// statistics use double-precision division before converting their average to f32.
+#[derive(Clone, Copy, Debug)]
+pub struct Bm25FieldStatistics {
+    doc_count: u64,
+    sum_total_term_freq: u64,
+    average_fieldnorm: Score,
+}
+
+impl Bm25FieldStatistics {
+    /// Construct custom statistics without changing historical average rounding.
+    pub fn new(doc_count: u64, sum_total_term_freq: u64) -> Self {
+        Self {
+            doc_count,
+            sum_total_term_freq,
+            average_fieldnorm: sum_total_term_freq as Score / doc_count as Score,
+        }
+    }
+    /// Number of documents represented by this field's statistics.
+    pub fn doc_count(&self) -> u64 {
+        self.doc_count
+    }
+    /// Sum of the field's stored term frequencies.
+    pub fn sum_total_term_freq(&self) -> u64 {
+        self.sum_total_term_freq
+    }
+
+    fn native(doc_count: u64, sum_total_term_freq: u64) -> Self {
+        Self {
+            doc_count,
+            sum_total_term_freq,
+            average_fieldnorm: crate::index::field_statistics::native_average(
+                sum_total_term_freq,
+                doc_count,
+            ),
+        }
+    }
+}
+
 const K1: Score = 1.2;
 const B: Score = 0.75;
 
@@ -22,15 +63,35 @@ pub trait Bm25StatisticsProvider {
 
     /// The number of documents containing the given term.
     fn doc_freq(&self, term: &Term) -> crate::Result<u64>;
+
+    /// Return the population and token total together. The default preserves
+    /// existing custom providers, including their average rounding policy.
+    /// Native statistics describe physical postings, including pending deletes.
+    /// A JSON field combines its indexed paths into one field population.
+    fn field_statistics(&self, field: Field) -> crate::Result<Bm25FieldStatistics> {
+        let tokens = self.total_num_tokens(field)?;
+        Ok(Bm25FieldStatistics::new(self.total_num_docs()?, tokens))
+    }
 }
 
 impl Bm25StatisticsProvider for Searcher {
+    fn field_statistics(&self, field: Field) -> crate::Result<Bm25FieldStatistics> {
+        let mut docs = 0u64;
+        let mut tokens = 0u64;
+        for segment in self.segment_readers() {
+            let statistics = segment.inverted_index(field)?.field_statistics()?;
+            docs += u64::from(statistics.doc_count);
+            tokens += statistics.sum_total_term_freq;
+        }
+        Ok(Bm25FieldStatistics::native(docs, tokens))
+    }
+
     fn total_num_tokens(&self, field: Field) -> crate::Result<u64> {
         let mut total_num_tokens = 0u64;
 
         for segment_reader in self.segment_readers() {
             let inverted_index = segment_reader.inverted_index(field)?;
-            total_num_tokens += inverted_index.total_num_tokens();
+            total_num_tokens += inverted_index.field_statistics()?.sum_total_term_freq;
         }
         Ok(total_num_tokens)
     }
@@ -106,9 +167,9 @@ impl Bm25Weight {
             );
         }
 
-        let total_num_tokens = statistics.total_num_tokens(field)?;
-        let total_num_docs = statistics.total_num_docs()?;
-        let average_fieldnorm = total_num_tokens as Score / total_num_docs as Score;
+        let collection = statistics.field_statistics(field)?;
+        let total_num_docs = collection.doc_count;
+        let average_fieldnorm = collection.average_fieldnorm;
 
         if terms.len() == 1 {
             let term_doc_freq = statistics.doc_freq(&terms[0])?;
@@ -288,6 +349,51 @@ impl Bm25Weight {
 mod tests {
     use super::{idf, Bm25Weight};
     use crate::{assert_nearly_equals, Score};
+
+    #[test]
+    fn field_statistics_custom_provider_keeps_legacy_average_and_scores() -> crate::Result<()> {
+        use super::Bm25StatisticsProvider;
+        use crate::schema::Field;
+        use crate::Term;
+
+        struct Custom {
+            docs: u64,
+            tokens: u64,
+        }
+        impl Bm25StatisticsProvider for Custom {
+            fn total_num_tokens(&self, _: Field) -> crate::Result<u64> {
+                Ok(self.tokens)
+            }
+            fn total_num_docs(&self) -> crate::Result<u64> {
+                Ok(self.docs)
+            }
+            fn doc_freq(&self, _: &Term) -> crate::Result<u64> {
+                Ok(self.docs.min(1))
+            }
+        }
+        let term = Term::from_field_text(Field::from_field_id(0), "a");
+        for (tokens, docs) in [
+            (16_777_217, 3),
+            (16_777_229, 7),
+            (u64::MAX, 3),
+            (0, 0),
+            (1, 0),
+            (0, 3),
+        ] {
+            let provider = Custom { docs, tokens };
+            let actual = Bm25Weight::for_terms(&provider, std::slice::from_ref(&term))?;
+            let average = tokens as Score / docs as Score;
+            let expected = Bm25Weight::for_one_term(docs.min(1), docs, average);
+            assert_eq!(actual.average_fieldnorm.to_bits(), average.to_bits());
+            for norm in [0, 1, 255] {
+                assert_eq!(
+                    actual.score(norm, 3).to_bits(),
+                    expected.score(norm, 3).to_bits()
+                );
+            }
+        }
+        Ok(())
+    }
 
     #[test]
     fn field_statistics_regression_sparse_population_and_ranking() -> crate::Result<()> {

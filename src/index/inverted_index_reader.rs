@@ -10,10 +10,12 @@ use itertools::Itertools;
 use tantivy_fst::automaton::{AlwaysMatch, Automaton};
 
 use crate::directory::FileSlice;
+use crate::index::field_statistics::{FieldStatistics, StatisticsSource};
 use crate::positions::PositionReader;
 use crate::postings::{BlockSegmentPostings, SegmentPostings, TermInfo};
 use crate::schema::{IndexRecordOption, Term, Type};
 use crate::termdict::TermDictionary;
+use crate::Score;
 
 /// The inverted index reader is in charge of accessing
 /// the inverted index associated with a specific field.
@@ -32,7 +34,7 @@ pub struct InvertedIndexReader {
     postings_file_slice: FileSlice,
     positions_file_slice: FileSlice,
     record_option: IndexRecordOption,
-    total_num_tokens: u64,
+    statistics: StatisticsSource,
 }
 
 /// Object that records the amount of space used by a field in an inverted index.
@@ -68,6 +70,8 @@ impl InvertedIndexReader {
         postings_file_slice: FileSlice,
         positions_file_slice: FileSlice,
         record_option: IndexRecordOption,
+        max_doc: u32,
+        field_doc_count: Option<&[u8]>,
     ) -> io::Result<InvertedIndexReader> {
         let (total_num_tokens_slice, postings_body) = postings_file_slice.split(8);
         let total_num_tokens = u64::deserialize(&mut total_num_tokens_slice.read_bytes()?)?;
@@ -76,7 +80,7 @@ impl InvertedIndexReader {
             postings_file_slice: postings_body,
             positions_file_slice,
             record_option,
-            total_num_tokens,
+            statistics: StatisticsSource::open(total_num_tokens, max_doc, field_doc_count)?,
         })
     }
 
@@ -88,7 +92,7 @@ impl InvertedIndexReader {
             postings_file_slice: FileSlice::empty(),
             positions_file_slice: FileSlice::empty(),
             record_option,
-            total_num_tokens: 0u64,
+            statistics: StatisticsSource::Empty,
         }
     }
 
@@ -246,10 +250,20 @@ impl InvertedIndexReader {
         ))
     }
 
-    /// Returns the total number of tokens recorded for all documents
-    /// (including deleted documents).
+    /// Returns the serialized token total, including physically stored deleted documents.
+    /// New DOCS-only fields count distinct term-document relations. Historical
+    /// headers may contain approximate merge totals; native BM25 derives exact
+    /// statistics for such fields without changing this header accessor.
     pub fn total_num_tokens(&self) -> u64 {
-        self.total_num_tokens
+        self.statistics.header_tokens()
+    }
+
+    pub(crate) fn field_statistics(&self) -> io::Result<FieldStatistics> {
+        self.statistics.exact(self)
+    }
+
+    pub(crate) fn stored_selection_average_fieldnorm(&self) -> Score {
+        self.statistics.selection_average()
     }
 
     /// Returns the segment postings associated with the term, and with the given option,

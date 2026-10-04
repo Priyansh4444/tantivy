@@ -260,7 +260,7 @@ pub(crate) mod tests {
             segment_writer.finalize()?;
         }
         {
-            let segment_reader = SegmentReader::open(&segment)?;
+            let segment_reader = SegmentReader::open(&segment.clone().with_max_doc(1000))?;
             {
                 let fieldnorm_reader = segment_reader.get_fieldnorms_reader(text_field)?;
                 assert_eq!(fieldnorm_reader.fieldnorm(0), 8 + 5);

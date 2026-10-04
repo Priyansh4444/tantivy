@@ -6,6 +6,7 @@ use common::{BinarySerializable, CountingWriter, VInt};
 use super::TermInfo;
 use crate::directory::{CompositeWrite, WritePtr};
 use crate::fieldnorm::FieldNormReader;
+use crate::index::field_statistics::{legacy_average, FieldStatistics};
 use crate::index::Segment;
 use crate::positions::PositionSerializer;
 use crate::postings::compression::{
@@ -97,6 +98,32 @@ impl InvertedIndexSerializer {
         )
     }
 
+    // The side entry certifies both exact totals and native selection semantics.
+    pub(crate) fn new_field_with_statistics(
+        &mut self,
+        field: Field,
+        statistics: FieldStatistics,
+        fieldnorm_reader: Option<FieldNormReader>,
+    ) -> io::Result<FieldSerializer<'_>> {
+        statistics
+            .doc_count
+            .serialize(self.postings_write.for_field_with_idx(field, 1))?;
+        let field_entry = self.schema.get_field_entry(field);
+        let index_record_option = field_entry
+            .field_type()
+            .index_record_option()
+            .unwrap_or(IndexRecordOption::Basic);
+        FieldSerializer::create_with_average(
+            index_record_option,
+            statistics.sum_total_term_freq,
+            self.terms_write.for_field(field),
+            self.postings_write.for_field(field),
+            self.positions_write.for_field(field),
+            fieldnorm_reader,
+            statistics.average(),
+        )
+    }
+
     /// Closes the serializer.
     pub fn close(self) -> io::Result<()> {
         self.terms_write.close()?;
@@ -128,12 +155,32 @@ impl<'a, W: Write> FieldSerializer<'a, W> {
         positions_write: &'a mut CountingWriter<W>,
         fieldnorm_reader: Option<FieldNormReader>,
     ) -> io::Result<FieldSerializer<'a, W>> {
+        let average = fieldnorm_reader
+            .as_ref()
+            .map(|reader| legacy_average(total_num_tokens, reader.num_docs()))
+            .unwrap_or(0.0);
+        Self::create_with_average(
+            index_record_option,
+            total_num_tokens,
+            term_dictionary_write,
+            postings_write,
+            positions_write,
+            fieldnorm_reader,
+            average,
+        )
+    }
+
+    fn create_with_average(
+        index_record_option: IndexRecordOption,
+        total_num_tokens: u64,
+        term_dictionary_write: &'a mut CountingWriter<W>,
+        postings_write: &'a mut CountingWriter<W>,
+        positions_write: &'a mut CountingWriter<W>,
+        fieldnorm_reader: Option<FieldNormReader>,
+        average_fieldnorm: Score,
+    ) -> io::Result<FieldSerializer<'a, W>> {
         total_num_tokens.serialize(postings_write)?;
         let term_dictionary_builder = TermDictionaryBuilder::create(term_dictionary_write)?;
-        let average_fieldnorm = fieldnorm_reader
-            .as_ref()
-            .map(|ff_reader| total_num_tokens as Score / ff_reader.num_docs() as Score)
-            .unwrap_or(0.0);
         let postings_serializer =
             PostingsSerializer::new(average_fieldnorm, index_record_option, fieldnorm_reader);
         let positions_serializer_opt = if index_record_option.has_positions() {

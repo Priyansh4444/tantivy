@@ -2,6 +2,7 @@
 //!
 //! It contains `Index` and `Segment`, where a `Index` consists of one or more `Segment`s.
 
+pub(crate) mod field_statistics;
 mod index;
 mod index_meta;
 mod inverted_index_plugin;

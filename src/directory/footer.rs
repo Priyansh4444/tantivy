@@ -114,8 +114,15 @@ impl Footer {
         const SUPPORTED_INDEX_FORMAT_VERSION_RANGE: std::ops::RangeInclusive<u32> =
             INDEX_FORMAT_OLDEST_SUPPORTED_VERSION..=INDEX_FORMAT_VERSION;
 
+        self.is_compatible_with_range(SUPPORTED_INDEX_FORMAT_VERSION_RANGE)
+    }
+
+    fn is_compatible_with_range(
+        &self,
+        supported: std::ops::RangeInclusive<u32>,
+    ) -> Result<(), Incompatibility> {
         let library_version = crate::version();
-        if !SUPPORTED_INDEX_FORMAT_VERSION_RANGE.contains(&self.version.index_format_version) {
+        if !supported.contains(&self.version.index_format_version) {
             return Err(Incompatibility::IndexMismatch {
                 library_version: library_version.clone(),
                 index_version: self.version.clone(),
@@ -173,6 +180,20 @@ mod tests {
 
     use crate::directory::footer::{Footer, FOOTER_MAGIC_NUMBER};
     use crate::directory::{FileSlice, OwnedBytes};
+
+    #[test]
+    fn field_statistics_version_boundary_rejects_native_bounds_in_v9_reader() {
+        let mut footer = Footer::new(0);
+        assert_eq!(footer.version.index_format_version, 10);
+        assert!(footer.is_compatible().is_ok());
+        assert!(footer.is_compatible_with_range(4..=9).is_err());
+        for version in 4..=9 {
+            footer.version.index_format_version = version;
+            assert!(footer.is_compatible().is_ok());
+        }
+        footer.version.index_format_version = 11;
+        assert!(footer.is_compatible().is_err());
+    }
 
     #[test]
     fn test_deserialize_footer() {
