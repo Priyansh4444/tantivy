@@ -1,0 +1,10 @@
+[package]
+name = "tantivy-synthetic-parity"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+tantivy = { path = "../../../../.." }
+serde_json = "1"

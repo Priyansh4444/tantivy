@@ -1,0 +1,16 @@
+{
+  "cases": 16,
+  "queries": 330,
+  "structural_issues": 182,
+  "native_raw_score_mismatches": 301,
+  "same_convention_statistic_and_phrase_mismatches": 235,
+  "semantic_and_ranking_passed": false,
+  "same_convention_diagnostic_passed": false,
+  "passed": false,
+  "issue_types": {
+    "literal_matches/tantivy": 48,
+    "cross_engine_canonical_top_ids": 83,
+    "cross_engine_matches": 49,
+    "count_vs_exhaustive/tantivy": 2
+  }
+}
