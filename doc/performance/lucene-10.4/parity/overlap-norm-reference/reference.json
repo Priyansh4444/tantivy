@@ -1,0 +1,187 @@
+{
+  "source_commit": "9983b7ce7fdd04f4d357688fb85c14277c15ea8d",
+  "source_sha256": "771f61b706e10dc240e6361602baa8a37c4120b66bdbc25263f6d8600c50c76f",
+  "command": [
+    "java",
+    "--add-modules",
+    "jdk.incubator.vector",
+    "-cp",
+    "/tmp/native-overlap-reference-oct04:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+    "OverlapNormReference"
+  ],
+  "jars": {
+    "lucene-analysis-common-10.4.0.jar": "8e768c9b2a3870f1fc2655181516699e719a56b9aaf8664226a11ae7d90cb4e9",
+    "lucene-queryparser-10.4.0.jar": "4635f2a14e9c01574c4cf9ad60e018ab2b041b7889369107a991ef950648c847",
+    "lucene-sandbox-10.4.0.jar": "49f5aa75aa6eda166652be4f294e2efc720e59b9325ee6f60403166edca0e70c",
+    "lucene-queries-10.4.0.jar": "c5cfbb892dfa78d272d6c0b46442159d75f92adfd7577c03bf5fe9e6067b475b",
+    "lucene-facet-10.4.0.jar": "c4d602a389945a8347bc39f904e8bd2504d823333f5cf9da16cda364c6f9eae8",
+    "lucene-core-10.4.0.jar": "8f894d211a8123938ccb9ff6827d136747e0eb6b1782ada6ac9086aa911b52e2"
+  },
+  "records": [
+    {
+      "lucene_version": "10.4.0"
+    },
+    {
+      "name": "default",
+      "discount": true,
+      "basic": false,
+      "doc_count": 2,
+      "sum_total_term_freq": 5,
+      "norms": [
+        2,
+        2
+      ],
+      "alpha": [
+        {
+          "doc": 0,
+          "score": 0.09025819,
+          "bits": 1035524425
+        },
+        {
+          "doc": 1,
+          "score": 0.09025819,
+          "bits": 1035524425
+        }
+      ]
+    },
+    {
+      "name": "count_all",
+      "discount": false,
+      "basic": false,
+      "doc_count": 2,
+      "sum_total_term_freq": 5,
+      "norms": [
+        3,
+        2
+      ],
+      "alpha": [
+        {
+          "doc": 1,
+          "score": 0.09025819,
+          "bits": 1035524425
+        },
+        {
+          "doc": 0,
+          "score": 0.0766057,
+          "bits": 1033692019
+        }
+      ]
+    },
+    {
+      "name": "basic",
+      "discount": true,
+      "basic": true,
+      "doc_count": 2,
+      "sum_total_term_freq": 5,
+      "norms": [
+        3,
+        2
+      ],
+      "alpha": [
+        {
+          "doc": 1,
+          "score": 0.09025819,
+          "bits": 1035524425
+        },
+        {
+          "doc": 0,
+          "score": 0.0766057,
+          "bits": 1033692019
+        }
+      ]
+    },
+    {
+      "name": "same_term",
+      "discount": true,
+      "basic": false,
+      "doc_count": 2,
+      "sum_total_term_freq": 5,
+      "norms": [
+        2,
+        2
+      ],
+      "alpha": [
+        {
+          "doc": 0,
+          "score": 0.12074275,
+          "bits": 1039615994
+        },
+        {
+          "doc": 1,
+          "score": 0.09025819,
+          "bits": 1035524425
+        }
+      ]
+    },
+    {
+      "name": "multi_value",
+      "discount": true,
+      "basic": false,
+      "doc_count": 2,
+      "sum_total_term_freq": 5,
+      "norms": [
+        2,
+        2
+      ],
+      "alpha": [
+        {
+          "doc": 0,
+          "score": 0.09025819,
+          "bits": 1035524425
+        },
+        {
+          "doc": 1,
+          "score": 0.09025819,
+          "bits": 1035524425
+        }
+      ]
+    },
+    {
+      "name": "position_length",
+      "discount": true,
+      "basic": false,
+      "doc_count": 2,
+      "sum_total_term_freq": 5,
+      "norms": [
+        2,
+        2
+      ],
+      "alpha": [
+        {
+          "doc": 0,
+          "score": 0.09025819,
+          "bits": 1035524425
+        },
+        {
+          "doc": 1,
+          "score": 0.09025819,
+          "bits": 1035524425
+        }
+      ]
+    },
+    {
+      "name": "start_gap",
+      "discount": true,
+      "basic": false,
+      "doc_count": 2,
+      "sum_total_term_freq": 5,
+      "norms": [
+        2,
+        2
+      ],
+      "alpha": [
+        {
+          "doc": 0,
+          "score": 0.09025819,
+          "bits": 1035524425
+        },
+        {
+          "doc": 1,
+          "score": 0.09025819,
+          "bits": 1035524425
+        }
+      ]
+    }
+  ],
+  "scope": "Native BM25Similarity default/explicit discount flag, no statistics override, no timings."
+}
