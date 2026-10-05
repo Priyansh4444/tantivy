@@ -1,5 +1,9 @@
 # Wikipedia 1M comparison with Lucene 10.4
 
+The [October 4 configuration checkpoint](results/2026-10-04-configuration/README.md)
+adds native overlap norm policy and immutable per-field BM25 parameters. It retains
+the frozen correctness gate and DEFAULT latency leads after integration.
+
 The [October 4 native comparison](results/2026-10-04-native/README.md) matches
 native collection statistics and raw scores on the corrected equivalent corpus.
 It records both-order query wins, complete term/ID/sort/norm comparison, and

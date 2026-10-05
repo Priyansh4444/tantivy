@@ -1,0 +1,68 @@
+{
+  "commit": "872c9f55dcc91034dcf8c15fe060dd0b1cfd3ccd",
+  "index_format": 11,
+  "rust_flags": "-C target-cpu=native",
+  "profile": {
+    "lto": true,
+    "opt-level": 3,
+    "overflow-checks": false
+  },
+  "command": [
+    "cargo",
+    "build",
+    "--manifest-path",
+    "/home/pronsh/Coding/playground/search/bench/native-perf-adapter-oct03/Cargo.toml",
+    "--target-dir",
+    "/home/pronsh/Coding/playground/search/bench/native-perf-adapter-oct03/target",
+    "--release",
+    "--jobs",
+    "4",
+    "--bin",
+    "do_query",
+    "--bin",
+    "validate_index",
+    "--bin",
+    "reencode_index",
+    "--bin",
+    "payload_identity",
+    "--bin",
+    "payload_fixtures",
+    "--bin",
+    "build_index",
+    "--bin",
+    "dump_termtotals",
+    "--bin",
+    "dump_docmap"
+  ],
+  "rustc": "rustc 1.101.0-nightly (c36f14571 2026-10-01)\nbinary: rustc\ncommit-hash: c36f1457196e315bc204b9564a6a5a7fe7f5a51f\ncommit-date: 2026-10-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.101.0-nightly\nLLVM version: 23.1.1",
+  "cargo": "cargo 1.101.0-nightly (f3865b2a4 2026-09-29)",
+  "manifest_sha256": "572456cfbfeedb2fb0a8488dbab28931340c162a07ef3d47d231f15692f11da4",
+  "cargo_lock_sha256": "d76025d353e04e60ffc3db15b573be1c9b8ea5d050257e13aaf1f95221399a9e",
+  "sources_sha256": {
+    "do_query.rs": "495c0beb376ae6c43409b013f1e1ced86b6b692b1e95b0696123003998c13c24",
+    "validate_index.rs": "1b18fc61a59c4e5ac32fadbc3c42c1a7bff1a456d4b9477a4c797fe1791f4c57",
+    "reencode_index.rs": "82bfdd686553ef4b09e6fad2633876ffecf3caca8822af3454062ea62ec62c9b",
+    "payload_identity.rs": "2ac08388b9fa2a8478f8b4a41c21aca80cfade7c355cfc6b7b8919ddb72be418",
+    "payload_fixtures.rs": "850ac6950867d0aa0370bfec243fd8f68ea6971f2a354b612bac56de8b6fdfbc",
+    "build_index.rs": "052ef01c4707472adb829c11798174b6cfc58e07a006139362909fa160a04c89",
+    "dump_termtotals.rs": "8df19739b229c6d12e839818156a976e1081e4335c16b8f47d805865686829d2",
+    "dump_docmap.rs": "b504282ef5d149ea6ae8d27ad2b95a8a053e474a3af8f7d4ee555985fdb8dbca"
+  },
+  "binaries_sha256": {
+    "do_query": "08def66818616d8d83449a9af1582e4d45beea3ff80b8842b60fafb6ca7e6802",
+    "validate_index": "c40f790fd57f5aaff31c7a62a1de9619f43b5badea2ed7545db19a049a30e3f9",
+    "reencode_index": "a44aa82a24838cf4c3b9361db2b3c3845dcac5c8715fe52966edbb83eb195799",
+    "payload_identity": "2079fdc6afb325245d3c556f559dcfe94b0e5b38daea4c17d3b91d777725a52f",
+    "payload_fixtures": "651eb6c1f3b815909712b394b0c7c61aa214b965ede4e055b58712092f771d29",
+    "build_index": "e5626a6991f92ba195f01b0b97100f65d7616f091b5d454badf93dc78be0ac28",
+    "dump_termtotals": "905033ca42c8610bea957084063c89f7b386f3d3cd3c9952687c658504a27eb9",
+    "dump_docmap": "dc9ce564e748585d39fcd178b51c698e15cb427ff31b7affee31311ec0c87935"
+  },
+  "retained_baselines_sha256": {
+    "/home/pronsh/Coding/playground/search/bench/do_query-final-unroll4-native-oct03": "4d137b62a472de03ff6fda611f56bb73280488eb014da347dbee8eb1fc72450d",
+    "/home/pronsh/Coding/playground/search/bench/do_query-final-combined-native-oct03": "80f7d173690023257263bffa43780c238761dd52d0dcbd50ff1afc2a5244e0c6",
+    "/home/pronsh/Coding/playground/search/bench/validate_index-final-unroll4-native-oct03": "0bf7b1146cea7d4b1ff63c42354a47ebbb9a832a380930d0f64c31060f243c26",
+    "/home/pronsh/Coding/playground/search/bench/reencode_index-frequency-pfor-v9-native-oct03": "28242634a7241c38d579b76f08fbcc61584e69db71a2fd3d6c47c6d1a1937977"
+  },
+  "built_at_utc": "2026-10-04T13:42:31.026380+00:00"
+}

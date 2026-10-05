@@ -1,0 +1,41 @@
+{
+  "tantivy": {
+    "directory": "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-equivalent-v11-oct03.idx",
+    "total_bytes": 619508124,
+    "files": {
+      ".tantivy-writer.lock": 0,
+      ".tantivy-meta.lock": 0,
+      "db6cd4d01c834f4ebd19bd6b3fb8f1b0.fieldnorm": 1000106,
+      "db6cd4d01c834f4ebd19bd6b3fb8f1b0.term": 19165012,
+      "db6cd4d01c834f4ebd19bd6b3fb8f1b0.idx": 207481546,
+      "db6cd4d01c834f4ebd19bd6b3fb8f1b0.pos": 377879920,
+      "db6cd4d01c834f4ebd19bd6b3fb8f1b0.fast": 4000188,
+      "db6cd4d01c834f4ebd19bd6b3fb8f1b0.store": 9980229,
+      "meta.json": 865,
+      ".managed.json": 258
+    }
+  },
+  "lucene": {
+    "directory": "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx",
+    "total_bytes": 626810511,
+    "files": {
+      "write.lock": 0,
+      "_h.fdm": 159,
+      "_h.fdt": 7704835,
+      "_h.fdx": 3502,
+      "_h.nvd": 1000059,
+      "_h.nvm": 103,
+      "_h_Lucene104_0.psm": 112,
+      "_h_Lucene104_0.doc": 212923632,
+      "_h_Lucene104_0.pos": 384975346,
+      "_h_Lucene104_0.tim": 15922764,
+      "_h_Lucene104_0.tip": 278608,
+      "_h_Lucene104_0.tmd": 188,
+      "_h_Lucene90_0.dvd": 4000073,
+      "_h_Lucene90_0.dvm": 158,
+      "_h.fnm": 279,
+      "_h.si": 538,
+      "segments_1": 155
+    }
+  }
+}

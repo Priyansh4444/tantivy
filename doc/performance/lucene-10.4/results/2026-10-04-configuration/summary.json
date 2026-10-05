@@ -1,0 +1,116 @@
+{
+  "production_commit": "872c9f55dcc91034dcf8c15fe060dd0b1cfd3ccd",
+  "acceptance_commit": "c8a8c96b6cbb54acc7185426f5d4576c4f6eec5c",
+  "scoring": "native DEFAULT BM25 1.2/.75, scale 1, no statistics override",
+  "synthetic": {
+    "passed": true,
+    "configurations": 16,
+    "queries": 330
+  },
+  "wiki": {
+    "queries": 20,
+    "correctness_passed": true
+  },
+  "latency": {
+    "count-tantivy-first": {
+      "tantivy_lucene_geomean": 0.7613412295468994,
+      "lucene_tantivy_speedup": 1.3134714910883452,
+      "tantivy_lower_median_queries": 20,
+      "queries": 20
+    },
+    "count-lucene-first": {
+      "tantivy_lucene_geomean": 0.7591485567533262,
+      "lucene_tantivy_speedup": 1.3172652323502143,
+      "tantivy_lower_median_queries": 20,
+      "queries": 20
+    },
+    "top_10-tantivy-first": {
+      "tantivy_lucene_geomean": 0.5483568002897607,
+      "lucene_tantivy_speedup": 1.8236301610039003,
+      "tantivy_lower_median_queries": 20,
+      "queries": 20
+    },
+    "top_10-lucene-first": {
+      "tantivy_lucene_geomean": 0.5589253459880984,
+      "lucene_tantivy_speedup": 1.7891477049267572,
+      "tantivy_lower_median_queries": 20,
+      "queries": 20
+    }
+  },
+  "memory": {
+    "tantivy": {
+      "rounds": 810,
+      "status": {
+        "VmRSS": "15136 kB",
+        "VmHWM": "15136 kB",
+        "VmSize": "749256 kB",
+        "RssAnon": "616 kB",
+        "RssFile": "14520 kB"
+      },
+      "smaps_rollup": {
+        "619d6770b000-7fff2a0d9000 ---p 00000000 00": "00 0                          [rollup]",
+        "Rss": "15136 kB",
+        "Pss": "12423 kB",
+        "Pss_Dirty": "616 kB",
+        "Pss_Anon": "616 kB",
+        "Pss_File": "11807 kB",
+        "Pss_Shmem": "0 kB",
+        "Shared_Clean": "2736 kB",
+        "Shared_Dirty": "0 kB",
+        "Private_Clean": "11784 kB",
+        "Private_Dirty": "616 kB",
+        "Referenced": "15136 kB",
+        "Anonymous": "616 kB",
+        "KSM": "0 kB",
+        "LazyFree": "0 kB",
+        "AnonHugePages": "0 kB",
+        "ShmemPmdMapped": "0 kB",
+        "FilePmdMapped": "0 kB",
+        "Shared_Hugetlb": "0 kB",
+        "Private_Hugetlb": "0 kB",
+        "Swap": "0 kB",
+        "SwapPss": "0 kB",
+        "Locked": "0 kB"
+      }
+    },
+    "lucene": {
+      "rounds": 317,
+      "status": {
+        "VmRSS": "375356 kB",
+        "VmHWM": "381760 kB",
+        "VmSize": "11388568 kB",
+        "RssAnon": "343876 kB",
+        "RssFile": "31448 kB"
+      },
+      "smaps_rollup": {
+        "614200000-7ffecaf16000 ---p 00000000 00": "00 0                             [rollup]",
+        "Rss": "375356 kB",
+        "Pss": "370705 kB",
+        "Pss_Dirty": "343908 kB",
+        "Pss_Anon": "343876 kB",
+        "Pss_File": "26797 kB",
+        "Pss_Shmem": "32 kB",
+        "Shared_Clean": "4796 kB",
+        "Shared_Dirty": "0 kB",
+        "Private_Clean": "26652 kB",
+        "Private_Dirty": "343908 kB",
+        "Referenced": "375356 kB",
+        "Anonymous": "343876 kB",
+        "KSM": "0 kB",
+        "LazyFree": "0 kB",
+        "AnonHugePages": "266240 kB",
+        "ShmemPmdMapped": "0 kB",
+        "FilePmdMapped": "0 kB",
+        "Shared_Hugetlb": "0 kB",
+        "Private_Hugetlb": "0 kB",
+        "Swap": "0 kB",
+        "SwapPss": "0 kB",
+        "Locked": "0 kB"
+      }
+    }
+  },
+  "storage": {
+    "tantivy": 619508124,
+    "lucene": 626810511
+  }
+}

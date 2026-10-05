@@ -8,7 +8,10 @@ The requested target remains all Lucene 10.4 public APIs and feature modules.
 | Contract | Current evidence | Remaining boundary |
 | --- | --- | --- |
 | Native field statistics | Exact physical field population and token totals; missing/empty fields, pending deletes, Basic terms and deletion merges | Broader field types and all public statistics/error contracts remain open |
-| Native default BM25 | Raw scale 1, default 1.2/.75 term/boost/fractional phrase checks, frozen 330 and Wiki 20 green | Configurable parameters, overlap norms and arbitrary Similarity hooks remain open |
+| Native default BM25 | Raw scale 1, default 1.2/.75 term/boost/fractional phrase checks, frozen 330 and Wiki 20 green | Arbitrary Similarity subclasses and full scoring/API contracts remain open |
+| BM25 query parameters | Validated immutable global/per-field Searcher parameters; native/classic coherent snapshots; pinned Java queries and 30 scalar digests; conservative complete-block/tail bounds | Nondefault pruning may be weaker; performance outside DEFAULT and NaN collector ordering remain unverified |
+| Overlap norm policy | Native DiscountOverlaps default; persisted explicit CountAll; old Boolean append policy; actual empty-index old-reader rejection; multi-value, Basic, reopen/delete/merge and pruning fixtures | Existing norms require reindexing to change policy; arbitrary token graphs/position/error contracts remain open |
+| Overlap/query configuration independence | Eight pinned native Java combinations, both policies/four profiles; exact norm/statistics/raw score/order/COUNT/explanation checks | This is a bounded matrix, not arbitrary Similarity/token-graph certification |
 | Boolean default sums and pruning | f64 sum contract, identical-document ties, serialized bound witnesses, eight-config exhaustive gate | Arbitrary compound queries, custom combiners and full API behavior not exhaustively certified |
 | Repeated sloppy phrases | Native frontier traversal, wide slop and repeated-term fixtures | Graphs, alternatives, explicit gaps/end states, full phrase-prefix/multi-phrase parity remain open |
 | Supplied prefix statistics | Custom scalar/coherent providers and errors reach prefix weights; COUNT avoids statistics | This preserves existing prefix behavior; it does not establish Lucene MultiPhrase parity |
@@ -18,7 +21,9 @@ The requested target remains all Lucene 10.4 public APIs and feature modules.
 | Format11 migration | Full format 9→11 payload identity; explicit old format 9 reader rejection; footer version tests | Not Lucene file interchange or a general backward-codec certification |
 | All 47 feature families | Finite inventory and per-member worklist published | No family is exhaustively verified; Java facade and Lucene file compatibility absent |
 
-The [October 4 native report](../results/2026-10-04-native/README.md) contains raw
+The [October 4 configuration report](../results/2026-10-04-configuration/README.md)
+records the integrated overlap/parameter units and new DEFAULT measurements at
+`872c9f55d`. The [earlier October 4 native report](../results/2026-10-04-native/README.md) contains raw
 results, tolerances, commands, hashes and limitations at `7db890908`.
 [Inventory extraction](inventory/README.md) and [scope](COMPATIBILITY.md) retain
 the complete target. No language choice guarantees a performance result.
