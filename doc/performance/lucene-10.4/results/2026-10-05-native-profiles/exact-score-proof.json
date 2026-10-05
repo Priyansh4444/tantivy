@@ -1,0 +1,17 @@
+{
+  "default": {
+    "common_top100": 1913,
+    "f32_mismatches": 0,
+    "max_relative_difference": 5.7179102494286677e-08
+  },
+  "k09-b04": {
+    "common_top100": 1913,
+    "f32_mismatches": 0,
+    "max_relative_difference": 5.806709203327821e-08
+  },
+  "k25-b1": {
+    "common_top100": 1913,
+    "f32_mismatches": 0,
+    "max_relative_difference": 5.891804072756284e-08
+  }
+}
