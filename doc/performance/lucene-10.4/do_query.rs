@@ -1,6 +1,9 @@
 #![macro_use]
 extern crate tantivy;
 
+#[path = "shared/bm25_profile.rs"]
+mod bm25_profile;
+
 use tantivy::collector::{Collector, Count, SegmentCollector, TopDocs};
 use tantivy::query::{QueryParser, Weight};
 use tantivy::tokenizer::{LowerCaser, RemoveLongFilter, SimpleTokenizer, TextAnalyzer};
@@ -9,11 +12,11 @@ use tantivy::{DocId, Index, Order, Score, SegmentReader, TERMINATED};
 use std::collections::BinaryHeap;
 use std::env;
 use std::io::BufRead;
-use std::path::Path;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    main_inner(Path::new(&args[1])).unwrap()
+    let profile = bm25_profile::ProfileArgs::parse(&args[1..]).unwrap();
+    main_inner(&profile).unwrap()
 }
 
 struct Float(Score);
@@ -160,7 +163,8 @@ impl Collector for UnoptimizedCount {
     }
 }
 
-fn main_inner(index_dir: &Path) -> tantivy::Result<()> {
+fn main_inner(profile: &bm25_profile::ProfileArgs) -> tantivy::Result<()> {
+    let index_dir = &profile.index;
     let index = Index::open_in_dir(index_dir).expect("failed to open index");
     let text_field = index.schema().get_field("text").expect("no all field?!");
     let tokenizers = index.tokenizers().clone();
@@ -177,11 +181,16 @@ fn main_inner(index_dir: &Path) -> tantivy::Result<()> {
         tokenizers,
     );
     let reader = index.reader()?;
-    let searcher = reader.searcher();
+    let searcher = profile.configure(reader.searcher());
 
     let stdin = std::io::stdin();
     for line_res in stdin.lock().lines() {
         let line = line_res?;
+        if profile.is_configured() && line == "BM25_CONFIG\t" {
+            println!("{}", profile.receipt(&searcher, text_field)?);
+            std::io::Write::flush(&mut std::io::stdout())?;
+            continue;
+        }
         let fields: Vec<&str> = line.split("\t").collect();
         assert_eq!(
             fields.len(),

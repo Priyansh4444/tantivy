@@ -12,7 +12,9 @@ def digest(path):
         return hashlib.file_digest(source, 'sha256').hexdigest()
 
 
-def capture(binary, lucene_dir, classes, matched=True, *, native=False, score_scale=None):
+def capture(binary, lucene_dir, classes, matched=True, *, native=False, score_scale=None, configured=False):
+    if configured and not native:
+        raise ValueError("Configured provenance requires native mode")
     if native and matched:
         raise ValueError("Native and matched provenance modes are mutually exclusive")
     binary = Path(binary).resolve()
@@ -22,6 +24,9 @@ def capture(binary, lucene_dir, classes, matched=True, *, native=False, score_sc
                    [classes/'DoQueryMatched.class', classes/'MatchedStatisticsSearcher.class',
                     classes/'DumpLuceneResults.class'] if matched else
                    [lucene_dir/'build/classes/java/main/DoQuery.class'])
+    support = classes/'NativeBm25Profile.class'
+    if native and (configured or support.exists()):
+        class_files.append(support)
     java = subprocess.run(['java', '-version'], capture_output=True, text=True, check=True)
     return {
         'lucene_mode': 'native' if native else ('matched' if matched else 'adapter'),
@@ -32,6 +37,7 @@ def capture(binary, lucene_dir, classes, matched=True, *, native=False, score_sc
         'query_suite_sha256': digest(HERE/'queries-wiki.jsonl'),
         'java_classes_sha256': {str(path): digest(path) for path in class_files},
         'lucene_jars_sha256': {path.name: digest(path) for path in sorted((lucene_dir/'build/dependencies').glob('*.jar'))},
-        'tool_sources_sha256': {path.name: digest(path) for path in sorted(HERE.iterdir())
-                               if path.suffix in ('.py', '.java', '.rs')},
+        'tool_sources_sha256': {str(path.relative_to(HERE)): digest(path) for path in
+                               sorted([p for p in HERE.iterdir() if p.suffix in ('.py', '.java', '.rs')]
+                                      + list((HERE/'shared').glob('*.rs')))},
     }

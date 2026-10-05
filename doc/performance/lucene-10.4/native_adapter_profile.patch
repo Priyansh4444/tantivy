@@ -1,0 +1,15 @@
+--- a/build.py
++++ b/build.py
+@@ -16,2 +16,3 @@
+ BINS = ("do_query", "validate_index", "reencode_index")
++SUPPORT = ("shared/bm25_profile.rs",)
+ FLAGS = "-C target-cpu=native"
+@@ -60,2 +61,8 @@
+         sources[source.name] = digest(source)
++    for name in SUPPORT:
++        source = TOOLS/name
++        destination = ROOT/"src/bin"/name
++        destination.parent.mkdir(parents=True, exist_ok=True)
++        shutil.copy2(source, destination)
++        sources[name] = digest(source)
+     local_sources = {name:digest(ROOT/"src/bin"/name) for name in (*sources, "payload_identity.rs", "payload_fixtures.rs", "build_index.rs", "dump_termtotals.rs", "dump_docmap.rs")}

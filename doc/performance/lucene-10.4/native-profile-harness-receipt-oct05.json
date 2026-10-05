@@ -1,0 +1,1592 @@
+{
+  "base": "f596e25a98084a841ccbe9120db976a8de96542e",
+  "runtime": {
+    "invalid_cases": [
+      {
+        "engine": "do_query",
+        "args": [],
+        "returncode": 101
+      },
+      {
+        "engine": "do_query",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3f666666"
+        ],
+        "returncode": 101
+      },
+      {
+        "engine": "do_query",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3f666666",
+          "3ecccccd",
+          "extra"
+        ],
+        "returncode": 101
+      },
+      {
+        "engine": "do_query",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3F666666",
+          "3ecccccd"
+        ],
+        "returncode": 101
+      },
+      {
+        "engine": "do_query",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "7f800000",
+          "3ecccccd"
+        ],
+        "returncode": 101
+      },
+      {
+        "engine": "do_query",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "7fc00000",
+          "3ecccccd"
+        ],
+        "returncode": 101
+      },
+      {
+        "engine": "do_query",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "bf800000",
+          "3ecccccd"
+        ],
+        "returncode": 101
+      },
+      {
+        "engine": "do_query",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3f666666",
+          "3f800001"
+        ],
+        "returncode": 101
+      },
+      {
+        "engine": "do_query",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3f666666",
+          "bf800000"
+        ],
+        "returncode": 101
+      },
+      {
+        "engine": "do_query",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3ecccccd"
+        ],
+        "returncode": 101
+      },
+      {
+        "engine": "validate_index",
+        "args": [],
+        "returncode": 1
+      },
+      {
+        "engine": "validate_index",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3f666666"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "validate_index",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3f666666",
+          "3ecccccd",
+          "extra"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "validate_index",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3F666666",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "validate_index",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "7f800000",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "validate_index",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "7fc00000",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "validate_index",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "bf800000",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "validate_index",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3f666666",
+          "3f800001"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "validate_index",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "3f666666",
+          "bf800000"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "validate_index",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3f666666"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3f666666",
+          "3ecccccd",
+          "extra"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "2.2",
+          "3f666666",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "NaN",
+          "3f666666",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3F666666",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "7f800000",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "7fc00000",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "bf800000",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3f666666",
+          "3f800001"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3f666666",
+          "bf800000"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DoQueryNative",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "1",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3f666666"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3f666666",
+          "3ecccccd",
+          "extra"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "2.2",
+          "3f666666",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "NaN",
+          "3f666666",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3F666666",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "7f800000",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "7fc00000",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "bf800000",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3f666666",
+          "3f800001"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "3f666666",
+          "bf800000"
+        ],
+        "returncode": 1
+      },
+      {
+        "engine": "DumpNativeLuceneResults",
+        "args": [
+          "/absent-native-profile-index-oct05",
+          "1",
+          "1",
+          "3ecccccd"
+        ],
+        "returncode": 1
+      }
+    ],
+    "query": "+griffith +observatory",
+    "dumps": {
+      "DEFAULT": {
+        "tantivy": {
+          "count": 13,
+          "count_matches_exhaustive": true,
+          "query": "+griffith +observatory",
+          "ranking_matches_exhaustive": true,
+          "top100": [
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=645747",
+              "score": 10.806175231933594
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2439979",
+              "score": 8.06602954864502
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=48635190",
+              "score": 7.5150957107543945
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=711997",
+              "score": 7.093209743499756
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12401310",
+              "score": 6.927319526672363
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12685875",
+              "score": 5.354337692260742
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=206631",
+              "score": 5.354337692260742
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=715297",
+              "score": 5.15787410736084
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2493454",
+              "score": 3.8422086238861084
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=33976394",
+              "score": 3.773343086242676
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2196573",
+              "score": 3.2499170303344727
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=664075",
+              "score": 2.0901570320129395
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=224716",
+              "score": 1.1287727355957031
+            }
+          ]
+        },
+        "lucene": {
+          "query": "+griffith +observatory",
+          "count": 13,
+          "top100": [
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=645747",
+              "score": 10.806175
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2439979",
+              "score": 8.06603
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=48635190",
+              "score": 7.5150957
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=711997",
+              "score": 7.0932097
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12401310",
+              "score": 6.9273195
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12685875",
+              "score": 5.3543377
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=206631",
+              "score": 5.3543377
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=715297",
+              "score": 5.157874
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2493454",
+              "score": 3.8422086
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=33976394",
+              "score": 3.773343
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2196573",
+              "score": 3.249917
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=664075",
+              "score": 2.090157
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=224716",
+              "score": 1.1287727
+            }
+          ]
+        }
+      },
+      "k09-b04": {
+        "tantivy": {
+          "count": 13,
+          "count_matches_exhaustive": true,
+          "query": "+griffith +observatory",
+          "ranking_matches_exhaustive": true,
+          "top100": [
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=645747",
+              "score": 11.43572998046875
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2439979",
+              "score": 9.113075256347656
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=48635190",
+              "score": 8.509689331054688
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=711997",
+              "score": 8.09084415435791
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12401310",
+              "score": 7.9714813232421875
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12685875",
+              "score": 6.424272537231445
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=206631",
+              "score": 6.424272537231445
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=715297",
+              "score": 6.308940887451172
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2493454",
+              "score": 5.653041362762451
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=33976394",
+              "score": 5.348718643188477
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2196573",
+              "score": 4.901144981384277
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=664075",
+              "score": 3.6720547676086426
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=224716",
+              "score": 2.34078311920166
+            }
+          ]
+        },
+        "lucene": {
+          "query": "+griffith +observatory",
+          "count": 13,
+          "top100": [
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=645747",
+              "score": 11.43573
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2439979",
+              "score": 9.113075
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=48635190",
+              "score": 8.509689
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=711997",
+              "score": 8.090844
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12401310",
+              "score": 7.9714813
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12685875",
+              "score": 6.4242725
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=206631",
+              "score": 6.4242725
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=715297",
+              "score": 6.308941
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2493454",
+              "score": 5.6530414
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=33976394",
+              "score": 5.3487186
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2196573",
+              "score": 4.901145
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=664075",
+              "score": 3.6720548
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=224716",
+              "score": 2.340783
+            }
+          ]
+        }
+      },
+      "k25-b1": {
+        "tantivy": {
+          "count": 13,
+          "count_matches_exhaustive": true,
+          "query": "+griffith +observatory",
+          "ranking_matches_exhaustive": true,
+          "top100": [
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=645747",
+              "score": 9.070718765258789
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2439979",
+              "score": 5.657370567321777
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=48635190",
+              "score": 5.11611270904541
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=711997",
+              "score": 4.908600807189941
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12401310",
+              "score": 4.657512187957764
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12685875",
+              "score": 3.2097034454345703
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=206631",
+              "score": 3.2097034454345703
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=715297",
+              "score": 3.0182666778564453
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2493454",
+              "score": 1.89790678024292
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=33976394",
+              "score": 1.8906326293945312
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2196573",
+              "score": 1.544431209564209
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=664075",
+              "score": 0.8914675712585449
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=224716",
+              "score": 0.44299745559692383
+            }
+          ]
+        },
+        "lucene": {
+          "query": "+griffith +observatory",
+          "count": 13,
+          "top100": [
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=645747",
+              "score": 9.070719
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2439979",
+              "score": 5.6573706
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=48635190",
+              "score": 5.1161127
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=711997",
+              "score": 4.908601
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12401310",
+              "score": 4.657512
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=12685875",
+              "score": 3.2097034
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=206631",
+              "score": 3.2097034
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=715297",
+              "score": 3.0182667
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2493454",
+              "score": 1.8979068
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=33976394",
+              "score": 1.8906326
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=2196573",
+              "score": 1.5444312
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=664075",
+              "score": 0.8914676
+            },
+            {
+              "id": "https://en.wikipedia.org/wiki?curid=224716",
+              "score": 0.44299746
+            }
+          ]
+        }
+      }
+    },
+    "installed_receipts": {
+      "k09-b04": {
+        "tantivy": {
+          "raw": "{\"b_bits\":\"3ecccccd\",\"collection_statistics\":\"physical\",\"doc_count\":917578,\"engine\":\"tantivy\",\"field\":\"text\",\"k1_bits\":\"3f666666\",\"protocol\":\"bm25-profile-v1\",\"query_cache\":\"disabled\",\"scale_bits\":\"3f800000\",\"sum_total_term_freq\":294827020}",
+          "observed": {
+            "b_bits": "3ecccccd",
+            "collection_statistics": "physical",
+            "doc_count": 917578,
+            "engine": "tantivy",
+            "field": "text",
+            "k1_bits": "3f666666",
+            "protocol": "bm25-profile-v1",
+            "query_cache": "disabled",
+            "scale_bits": "3f800000",
+            "sum_total_term_freq": 294827020
+          },
+          "policy_evidence": "native/cache declarations are helper claims; bits and N/TTF are getters"
+        },
+        "lucene": {
+          "raw": "{\"protocol\":\"bm25-profile-v1\",\"engine\":\"lucene\",\"field\":\"text\",\"k1_bits\":\"3f666666\",\"b_bits\":\"3ecccccd\",\"scale_bits\":\"3f800000\",\"collection_statistics\":\"physical\",\"query_cache\":\"disabled\",\"doc_count\":917578,\"sum_total_term_freq\":294827020}",
+          "observed": {
+            "protocol": "bm25-profile-v1",
+            "engine": "lucene",
+            "field": "text",
+            "k1_bits": "3f666666",
+            "b_bits": "3ecccccd",
+            "scale_bits": "3f800000",
+            "collection_statistics": "physical",
+            "query_cache": "disabled",
+            "doc_count": 917578,
+            "sum_total_term_freq": 294827020
+          },
+          "policy_evidence": "native/cache declarations are helper claims; bits and N/TTF are getters"
+        }
+      },
+      "k25-b1": {
+        "tantivy": {
+          "raw": "{\"b_bits\":\"3f800000\",\"collection_statistics\":\"physical\",\"doc_count\":917578,\"engine\":\"tantivy\",\"field\":\"text\",\"k1_bits\":\"40200000\",\"protocol\":\"bm25-profile-v1\",\"query_cache\":\"disabled\",\"scale_bits\":\"3f800000\",\"sum_total_term_freq\":294827020}",
+          "observed": {
+            "b_bits": "3f800000",
+            "collection_statistics": "physical",
+            "doc_count": 917578,
+            "engine": "tantivy",
+            "field": "text",
+            "k1_bits": "40200000",
+            "protocol": "bm25-profile-v1",
+            "query_cache": "disabled",
+            "scale_bits": "3f800000",
+            "sum_total_term_freq": 294827020
+          },
+          "policy_evidence": "native/cache declarations are helper claims; bits and N/TTF are getters"
+        },
+        "lucene": {
+          "raw": "{\"protocol\":\"bm25-profile-v1\",\"engine\":\"lucene\",\"field\":\"text\",\"k1_bits\":\"40200000\",\"b_bits\":\"3f800000\",\"scale_bits\":\"3f800000\",\"collection_statistics\":\"physical\",\"query_cache\":\"disabled\",\"doc_count\":917578,\"sum_total_term_freq\":294827020}",
+          "observed": {
+            "protocol": "bm25-profile-v1",
+            "engine": "lucene",
+            "field": "text",
+            "k1_bits": "40200000",
+            "b_bits": "3f800000",
+            "scale_bits": "3f800000",
+            "collection_statistics": "physical",
+            "query_cache": "disabled",
+            "doc_count": 917578,
+            "sum_total_term_freq": 294827020
+          },
+          "policy_evidence": "native/cache declarations are helper claims; bits and N/TTF are getters"
+        }
+      }
+    },
+    "stale_helpers": [
+      {
+        "engine": "tantivy",
+        "error": "Expecting value: line 1 column 1 (char 0)",
+        "seconds": 0.015178082001511939
+      },
+      {
+        "engine": "lucene",
+        "error": "lucene: EOF before profile receipt",
+        "seconds": 0.615890593999211
+      }
+    ],
+    "sha256": {
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query": "07b89604c2c8896a13c8c2601cea51bca12e08b80348a3dfbb71f5f5b2933fd9",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index": "f9f8c549ad23d7c837925975038fa3eb19d4b3617c7e5014ec05572d1785f39f",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes/DoQueryNative.class": "644a8f32b6296cd424a09fa74b0a862ca9c897ba2de68d7881124c704002969b",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes/DumpNativeLuceneResults.class": "3ce85576d2e0687ca317dff1f7764419c35eb3657fbfb0c9ebc291b41a1dc1ed",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes/NativeBm25Profile.class": "01fe7a03322112a431ba6d17b3f3704ff64c816487b794031254e09a5b093a66",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/doc/performance/lucene-10.4/shared/bm25_profile.rs": "1f17806dcaa5f5ab5a065c2034bd2a1acaeab53ac9519482648f22ddfa7a50d4",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/doc/performance/lucene-10.4/NativeBm25Profile.java": "511793f196c9d745f274f0a561149bb3fdd83b3686b7e143a099e3df3337d08f"
+    }
+  },
+  "java_build": {
+    "command": [
+      "javac",
+      "-cp",
+      "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+      "-d",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes/DoQueryNative.java",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes/DumpNativeLuceneResults.java",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes/NativeBm25Profile.java"
+    ],
+    "configured_source": true,
+    "sources_sha256": {
+      "DoQueryNative.java": "e2782f9cf86f9d56ef6eda105caff731362269981c57910afc0a2be2e539d413",
+      "DumpNativeLuceneResults.java": "ae5569b24f63f39fc2b227043516a0951f19d97f7ecf2e8fa5e980bd5c8da5da",
+      "NativeBm25Profile.java": "511793f196c9d745f274f0a561149bb3fdd83b3686b7e143a099e3df3337d08f"
+    },
+    "classes_sha256": {
+      "DoQueryNative.class": "644a8f32b6296cd424a09fa74b0a862ca9c897ba2de68d7881124c704002969b",
+      "DumpNativeLuceneResults.class": "3ce85576d2e0687ca317dff1f7764419c35eb3657fbfb0c9ebc291b41a1dc1ed",
+      "NativeBm25Profile.class": "01fe7a03322112a431ba6d17b3f3704ff64c816487b794031254e09a5b093a66"
+    }
+  },
+  "rust_build": {
+    "command": [
+      "cargo",
+      "build",
+      "--manifest-path",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/Cargo.toml",
+      "--target-dir",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build",
+      "--jobs",
+      "4",
+      "--bin",
+      "do_query",
+      "--bin",
+      "validate_index"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "warning: `package.homepage` is redundant with `package.repository`\n  --> /home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/Cargo.toml:9:12\n   |\n 9 | homepage = \"https://github.com/quickwit-oss/tantivy\"\n   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n10 | repository = \"https://github.com/quickwit-oss/tantivy\"\n   |              -----------------------------------------\n   |\n   = note: `cargo::redundant_homepage` is set to `warn` by default\nhelp: consider removing `package.homepage`\nwarning: `tantivy` (manifest) generated 1 warning\nwarning: method `phrase_count` is never used\n   --> /home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/src/query/phrase_query/phrase_scorer.rs:294:12\n    |\n153 | impl<TPostings: Postings> PhraseScorer<TPostings> {\n    | ------------------------------------------------- method in this implementation\n...\n294 |     pub fn phrase_count(&self) -> u32 {\n    |            ^^^^^^^^^^^^\n    |\n    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `tantivy` (lib) generated 1 warning\nwarning: the `macro_use` attribute cannot be used on crates\n --> src/bin/do_query.rs:1:4\n  |\n1 | #![macro_use]\n  |    ^^^^^^^^^\n  |\n  = help: the `macro_use` attribute can be applied to extern crates and modules\n  = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!\n  = note: `#[warn(unused_attributes)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused variable: `checkpoints_left`\n   --> src/bin/do_query.rs:268:25\n    |\n268 |                     let checkpoints_left = checkpoints_no_pruning(&*weight, reader, 10)?;\n    |                         ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_checkpoints_left`\n    |\n    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default\n\nwarning: unused variable: `checkpoints_right`\n   --> src/bin/do_query.rs:269:25\n    |\n269 |                     let checkpoints_right = checkpoints_pruning(&*weight, reader, 10)?;\n    |                         ^^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_checkpoints_right`\n\nwarning: function `assert_nearly_equals` is never used\n  --> src/bin/do_query.rs:96:4\n   |\n96 | fn assert_nearly_equals(left: Score, right: Score) -> bool {\n   |    ^^^^^^^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default\n\nwarning: `native-profile-isolated-check` (bin \"do_query\") generated 4 warnings (run `cargo fix --bin \"do_query\" -p native-profile-isolated-check` to apply 3 suggestions)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s\n"
+  },
+  "python_tests": {
+    "command": [
+      "/home/pronsh/.local/share/mise/installs/python/latest/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/doc/performance/lucene-10.4",
+      "-p",
+      "test_*.py"
+    ],
+    "returncode": 0,
+    "stdout": "Built /tmp/tmp330fw3z8/classes: native Lucene collection statistics, BM25 1.2/0.75, TOP score scale 1 by default; COUNT unwrapped; cache disabled.\n",
+    "stderr": "............................\n----------------------------------------------------------------------\nRan 28 tests in 8.775s\n\nOK\n"
+  },
+  "invalid_argument_results": [
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Usage: INDEX [SCALE [K1_BITS B_BITS]]\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:26)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3f666666"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Usage: INDEX [SCALE [K1_BITS B_BITS]]\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:26)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3f666666",
+        "bf800000"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: illegal b value: -1.0, must be between 0 and 1\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:53)\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:68)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:44)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "1",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Expected eight lowercase hex digits for BM25 bits\n\tat NativeBm25Profile.scalar(NativeBm25Profile.java:19)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:38)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3f666666",
+        "3ecccccd",
+        "extra"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Usage: INDEX [SCALE [K1_BITS B_BITS]]\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:26)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "2.2",
+        "3f666666",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Configured BM25 requires score scale 1\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:36)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "NaN",
+        "3f666666",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Score scale must be finite and positive\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:30)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3F666666",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Expected eight lowercase hex digits for BM25 bits\n\tat NativeBm25Profile.scalar(NativeBm25Profile.java:19)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:38)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "7f800000",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: BM25 parameters must be finite\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:41)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "7fc00000",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: BM25 parameters must be finite\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:41)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "bf800000",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: illegal k1 value: -1.0, must be a non-negative finite value\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:49)\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:68)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:44)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DoQueryNative",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3f666666",
+        "3f800001"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: illegal b value: 1.0000001, must be between 0 and 1\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:53)\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:68)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:44)\n\tat DoQueryNative.main(DoQueryNative.java:24)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Usage: INDEX [SCALE [K1_BITS B_BITS]]\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:26)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3f666666"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Usage: INDEX [SCALE [K1_BITS B_BITS]]\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:26)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3f666666",
+        "bf800000"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: illegal b value: -1.0, must be between 0 and 1\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:53)\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:68)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:44)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "1",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Expected eight lowercase hex digits for BM25 bits\n\tat NativeBm25Profile.scalar(NativeBm25Profile.java:19)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:38)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3f666666",
+        "3ecccccd",
+        "extra"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Usage: INDEX [SCALE [K1_BITS B_BITS]]\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:26)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "2.2",
+        "3f666666",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Configured BM25 requires score scale 1\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:36)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "NaN",
+        "3f666666",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Score scale must be finite and positive\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:30)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3F666666",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: Expected eight lowercase hex digits for BM25 bits\n\tat NativeBm25Profile.scalar(NativeBm25Profile.java:19)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:38)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "7f800000",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: BM25 parameters must be finite\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:41)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "7fc00000",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: BM25 parameters must be finite\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:41)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "bf800000",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: illegal k1 value: -1.0, must be a non-negative finite value\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:49)\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:68)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:44)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "java",
+        "--add-modules",
+        "jdk.incubator.vector",
+        "--enable-native-access=ALL-UNNAMED",
+        "-cp",
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-receipts-oct05/java-finish-classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/classes/java/main:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+        "DumpNativeLuceneResults",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3f666666",
+        "3f800001"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nException in thread \"main\" java.lang.IllegalArgumentException: illegal b value: 1.0000001, must be between 0 and 1\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:53)\n\tat org.apache.lucene.search.similarities.BM25Similarity.<init>(BM25Similarity.java:68)\n\tat NativeBm25Profile.parse(NativeBm25Profile.java:44)\n\tat DumpNativeLuceneResults.main(DumpNativeLuceneResults.java:19)\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508692) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"Usage: INDEX [K1_BITS B_BITS]\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query",
+        "/absent-native-profile-index-oct05",
+        "3f666666"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508693) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"Usage: INDEX [K1_BITS B_BITS]\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query",
+        "/absent-native-profile-index-oct05",
+        "3f666666",
+        "3ecccccd",
+        "extra"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508694) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"Usage: INDEX [K1_BITS B_BITS]\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query",
+        "/absent-native-profile-index-oct05",
+        "3F666666",
+        "3ecccccd"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508695) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"Expected eight lowercase hex digits for BM25 parameter bits\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query",
+        "/absent-native-profile-index-oct05",
+        "7f800000",
+        "3ecccccd"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508696) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"k1 must be a nonnegative finite float, got inf\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query",
+        "/absent-native-profile-index-oct05",
+        "7fc00000",
+        "3ecccccd"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508698) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"k1 must be a nonnegative finite float, got NaN\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query",
+        "/absent-native-profile-index-oct05",
+        "bf800000",
+        "3ecccccd"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508699) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"k1 must be a nonnegative finite float, got -1\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query",
+        "/absent-native-profile-index-oct05",
+        "3f666666",
+        "3f800001"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508700) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"b must be between zero and one, got 1.0000001\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query",
+        "/absent-native-profile-index-oct05",
+        "3f666666",
+        "bf800000"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508701) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"b must be between zero and one, got -1\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/do_query",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3ecccccd"
+      ],
+      "returncode": 101,
+      "stdout": "",
+      "stderr": "\nthread 'main' (508702) panicked at src/bin/do_query.rs:18:64:\ncalled `Result::unwrap()` on an `Err` value: InvalidArgument(\"Expected eight lowercase hex digits for BM25 parameter bits\")\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"Usage: INDEX [K1_BITS B_BITS]\")\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+        "/absent-native-profile-index-oct05",
+        "3f666666"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"Usage: INDEX [K1_BITS B_BITS]\")\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+        "/absent-native-profile-index-oct05",
+        "3f666666",
+        "3ecccccd",
+        "extra"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"Usage: INDEX [K1_BITS B_BITS]\")\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+        "/absent-native-profile-index-oct05",
+        "3F666666",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"Expected eight lowercase hex digits for BM25 parameter bits\")\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+        "/absent-native-profile-index-oct05",
+        "7f800000",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"k1 must be a nonnegative finite float, got inf\")\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+        "/absent-native-profile-index-oct05",
+        "7fc00000",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"k1 must be a nonnegative finite float, got NaN\")\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+        "/absent-native-profile-index-oct05",
+        "bf800000",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"k1 must be a nonnegative finite float, got -1\")\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+        "/absent-native-profile-index-oct05",
+        "3f666666",
+        "3f800001"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"b must be between zero and one, got 1.0000001\")\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+        "/absent-native-profile-index-oct05",
+        "3f666666",
+        "bf800000"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"b must be between zero and one, got -1\")\n"
+    },
+    {
+      "command": [
+        "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+        "/absent-native-profile-index-oct05",
+        "1",
+        "3ecccccd"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Error: InvalidArgument(\"Expected eight lowercase hex digits for BM25 parameter bits\")\n"
+    }
+  ],
+  "source_sha256": {
+    "BuildWikiFixture.java": "060e12663355c64e0f7f6a7471aafa8a09eb2bd9a15171440eec42e39b2ba827",
+    "DumpLuceneResults.java": "e0b3f9d731ea4d0833a7d50f2188cae276603fb9c65dd279f290329b60bc0444",
+    "DumpNativeLuceneResults.java": "ae5569b24f63f39fc2b227043516a0951f19d97f7ecf2e8fa5e980bd5c8da5da",
+    "DumpWikiLogical.java": "9e260583d431077ad5bb50e888f8afbb1bd733ae0128a9e224d3a80b24c2519b",
+    "MatchedStatisticsSearcher.java": "3a921ac2993ff0913b6202a6e6d49a62a8db3fde9ad0cda50f2e7c851e92c9c7",
+    "NativeBm25Profile.java": "511793f196c9d745f274f0a561149bb3fdd83b3686b7e143a099e3df3337d08f",
+    "build_index.rs": "052ef01c4707472adb829c11798174b6cfc58e07a006139362909fa160a04c89",
+    "compare_payload.py": "4edf300c30e4551b7defe39da34cf38543f8a3958c27a2d197c3a83eddac5f44",
+    "compare_process_memory.py": "03d9bd9bcd882e16a52f49a8954cb2b1eb51b0baa1dfab67a779f871bd1eb0de",
+    "compare_wiki_correctness.py": "ca39fcddc1ee2a9e71427c58f729cdeb2868bfe0f822770cb6a1e17256d425ac",
+    "compare_wiki_logical.py": "0dc9796c10a9d992b93bc05ac479ef32f10b5092dbe6b6b906e08acf5045b682",
+    "do_query.rs": "5d02329a2b9161f9960b2258a0692c6b2824c7328a31003edb3876f02fd54066",
+    "dump_docmap.rs": "b504282ef5d149ea6ae8d27ad2b95a8a053e474a3af8f7d4ee555985fdb8dbca",
+    "dump_termtotals.rs": "8df19739b229c6d12e839818156a976e1081e4335c16b8f47d805865686829d2",
+    "lucene_mode.py": "61efbf51b6a51ec15016c43239a7641b6a0b913e8cf8c404f5e079823c7c646e",
+    "payload_fixtures.rs": "850ac6950867d0aa0370bfec243fd8f68ea6971f2a354b612bac56de8b6fdfbc",
+    "payload_identity.rs": "2ac08388b9fa2a8478f8b4a41c21aca80cfade7c355cfc6b7b8919ddb72be418",
+    "prepare_matched_lucene.py": "5365e50c3f57f0c59a63f88f778faca8757de994f66e142fc46ff0fa9a3221dd",
+    "prepare_native_lucene.py": "c2c95c060e55b700e6a931c2b597668d92ba332fda57dadf5f3e96dd5ae9f8b7",
+    "provenance.py": "ae6ad12ef1cedaf4b797bb801b827eec242ee266c75f5b99e57d39925484ec20",
+    "reencode_index.rs": "82bfdd686553ef4b09e6fad2633876ffecf3caca8822af3454062ea62ec62c9b",
+    "shared/bm25_profile.rs": "1f17806dcaa5f5ab5a065c2034bd2a1acaeab53ac9519482648f22ddfa7a50d4",
+    "suite_lucene_interleaved.py": "2ade7efa1a5ac529f31754bba33a9505f3999e542ac0aa53e97b776a6b99e0b6",
+    "tantivy_statistics.py": "b2eeb7d870237894564e8cd5c0e5ad6c326e3a410fc9cd7aa3e12e9042431e75",
+    "test_compare_wiki_correctness.py": "fb4fa3e77219ada092078ae9fa932b30430366029e47fe0261b0affb6d53ac99",
+    "test_native_lucene.py": "6cb0dddc122d8c6252edff875f4ecd87cfbba80534e8d28617adb43388fdf1e5",
+    "test_native_profiles.py": "f2f26fccca6ca436d37d0f51141fce85b1c11eb9d58d8b042e70382cdfb8d676",
+    "validate_index.rs": "55bd70292cc33dcbcdfa891edf3047456d906714db65942b53f05e2106efbdff",
+    "verify_payload_sensitivity.py": "e01140e847ca372e54029b1c1e62beb39e6f0174782cdec46a2e11d572833343",
+    "verify_wiki_analyzer.py": "48e8c4d2100aabf030a1d3f50646e4be4f3bfa01c164c17f574afe51a21dd59a"
+  }
+}

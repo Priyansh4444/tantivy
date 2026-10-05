@@ -6,7 +6,8 @@ import math
 import subprocess
 from pathlib import Path
 from provenance import capture
-from lucene_mode import add_arguments, configuration, report
+from lucene_mode import (add_arguments, configuration, report, engine_commands,
+                         batch_profile, validate_pair)
 
 BENCH = Path(__file__).resolve().parent
 
@@ -115,11 +116,16 @@ def main():
     scoring = configuration(args, parser)
     lucene_dir = args.lucene_dir.resolve()
     queries = [json.loads(line)['query'] for line in (BENCH/'queries-wiki.jsonl').read_text().splitlines()]
-    tantivy = run([str(args.tantivy_validator), str(args.tantivy_index)], queries)
-    lucene_diagnostics = {}
-    lucene = run(['java', '--add-modules', 'jdk.incubator.vector',
-                  '--enable-native-access=ALL-UNNAMED', '-cp', scoring['classpath'],
-                  scoring['dump_class'], str(lucene_dir/'idx')] + scoring['extra_args'], queries, lucene_diagnostics)
+    commands = engine_commands(scoring, args.tantivy_validator, args.tantivy_index,
+                               lucene_dir, task='dump')
+    tantivy_diagnostics, lucene_diagnostics = {}, {}
+    tantivy = run(commands['tantivy'], queries, tantivy_diagnostics)
+    lucene = run(commands['lucene'], queries, lucene_diagnostics)
+    receipts = {}
+    if scoring['profile'] is not None:
+        receipts = {name: batch_profile(diag['stderr'], scoring['profile'], name)
+                    for name, diag in [('tantivy', tantivy_diagnostics), ('lucene', lucene_diagnostics)]}
+        validate_pair(receipts)
     comparisons = []
     for query, t, l in zip(queries, tantivy, lucene):
         comparison = compare_results(query, t, l)
@@ -130,11 +136,14 @@ def main():
               f'max-score-diff={comparison["max_relative_score_difference"]}')
     args.output.write_text(json.dumps({'commit': args.commit,
         **report(scoring),
+        'engine_commands':commands,
+        **({'profile_receipts':receipts, 'tantivy_diagnostics':tantivy_diagnostics} if receipts else {}),
         'tantivy_index': str(args.tantivy_index),
         'lucene_dir': str(lucene_dir), 'lucene_classes': str(args.lucene_classes.resolve()), 'comparisons': comparisons,
         'tantivy': tantivy, 'lucene': lucene, 'lucene_diagnostics': lucene_diagnostics,
         'provenance':capture(args.tantivy_validator, lucene_dir, args.lucene_classes, scoring['matched_bm25'],
-                             native=scoring['native_bm25'], score_scale=scoring['lucene_score_scale'])}, indent=2)+'\n')
+                             native=scoring['native_bm25'], score_scale=scoring['lucene_score_scale'],
+                             configured=scoring['profile'] is not None)}, indent=2)+'\n')
 
 if __name__ == '__main__':
     main()

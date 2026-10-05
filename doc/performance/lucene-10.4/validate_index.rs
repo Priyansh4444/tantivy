@@ -1,3 +1,6 @@
+#[path = "shared/bm25_profile.rs"]
+mod bm25_profile;
+
 use std::io::{self, BufRead};
 use tantivy::collector::TopDocs;
 use tantivy::query::{EnableScoring, QueryParser};
@@ -6,7 +9,9 @@ use tantivy::tokenizer::{LowerCaser, RemoveLongFilter, SimpleTokenizer, TextAnal
 use tantivy::{DocAddress, Index, Score, TantivyDocument, TERMINATED};
 
 fn main() -> tantivy::Result<()> {
-    let index = Index::open_in_dir(std::env::args().nth(1).expect("index path"))?;
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let profile = bm25_profile::ProfileArgs::parse(&args)?;
+    let index = Index::open_in_dir(&profile.index)?;
     let schema = index.schema();
     let text = schema.get_field("text")?;
     let id = schema.get_field("id")?;
@@ -19,7 +24,10 @@ fn main() -> tantivy::Result<()> {
     );
     let parser = QueryParser::for_index(&index, vec![text]);
     let reader = index.reader()?;
-    let searcher = reader.searcher();
+    let searcher = profile.configure(reader.searcher());
+    if profile.is_configured() {
+        eprintln!("BM25_PROFILE\t{}", profile.receipt(&searcher, text)?);
+    }
     for line in io::stdin().lock().lines() {
         let query_text = line?;
         let query = parser.parse_query(&query_text)?;

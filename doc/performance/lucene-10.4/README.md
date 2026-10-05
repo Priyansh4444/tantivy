@@ -54,7 +54,7 @@ PERF_INDEX="/absolute/path/to/wiki-1m-position-pfor-current.idx"
 PERF_ADAPTER="$PERF_FORK/target/wiki-perf-adapter"
 PERF_CLASSES="$PERF_FORK/target/wiki-perf-lucene-classes"
 PERF_RESULTS="$PERF_FORK/target/wiki-perf-results"
-mkdir -p "$PERF_ADAPTER/src/bin" "$PERF_RESULTS"
+mkdir -p "$PERF_ADAPTER/src/bin/shared" "$PERF_RESULTS"
 ```
 
 Build the existing game engine's Java classes and dependencies:
@@ -62,12 +62,15 @@ Build the existing game engine's Java classes and dependencies:
 ```bash
 gradle -p "$PERF_LUCENE" classes copyDependencies
 python "$PERF_TOOLS/prepare_native_lucene.py" \
-  --lucene-dir "$PERF_LUCENE" --output-dir "$PERF_CLASSES"
+  --lucene-dir "$PERF_LUCENE" --output-dir "$PERF_CLASSES" --fresh-output
 ```
 
 `prepare_native_lucene.py` generates `DoQueryNative.java` in the specified
-output directory and compiles it with the native result dumper. The expected game
-source substitutions are checked before compilation. Current binaries use
+output directory and compiles it with the native result dumper and shared
+`NativeBm25Profile` boundary. `--fresh-output` requires an absent output directory;
+choose a new directory for each preparation to preserve existing artifacts. The
+expected game source substitutions are checked before compilation. A
+`native-build.json` records source and compiled-class hashes. Current binaries use
 native scoring, so pass `--native-bm25` explicitly on each comparison below.
 
 ## Build the Rust protocol adapter and validator
@@ -81,6 +84,7 @@ and emits stored external IDs and scores for cross-engine checks.
 cp "$PERF_TOOLS/do_query.rs" "$PERF_ADAPTER/src/bin/do_query.rs"
 cp "$PERF_TOOLS/validate_index.rs" "$PERF_ADAPTER/src/bin/validate_index.rs"
 cp "$PERF_TOOLS/reencode_index.rs" "$PERF_ADAPTER/src/bin/reencode_index.rs"
+cp "$PERF_TOOLS/shared/bm25_profile.rs" "$PERF_ADAPTER/src/bin/shared/bm25_profile.rs"
 cat > "$PERF_ADAPTER/Cargo.toml" <<EOF
 [package]
 name = "wiki-perf-adapter"
@@ -152,6 +156,54 @@ coverage: multiple segments, missing and empty fields, deletions, fieldnorms
 disabled, score ties, negative and mixed boosts, exact phrases, and phrase prefixes.
 Passing the fixed Wikipedia suite alone does not establish correctness for all
 query types and index shapes.
+
+## Check and measure configured native parameters
+
+The same three comparison tools accept `--native-bm25 --bm25-profile k09-b04`
+for `k1=0.9`, `b=0.4`, or `k25-b1` for `k1=2.5`, `b=1`. Use the same profile on
+the correctness, latency and memory commands. Run the correctness gate before
+measuring each profile. Omit `--bm25-profile` to retain the existing defaults.
+There are no custom parameters or explicit DEFAULT alias in this CLI.
+
+Profiles use both engines' physical field statistics and raw native scores.
+They require native mode and score scale exactly 1; invalid combinations fail
+before query, header, artifact or process IO. The supplied preset literals and
+their expected binary32 representations are recorded separately from engine
+observations. Parameters travel as exact eight-digit hexadecimal words, avoiding
+different decimal parsers in the two helpers:
+
+| Profile | k1 bits | b bits |
+| --- | --- | --- |
+| `k09-b04` | `3f666666` | `3ecccccd` |
+| `k25-b1` | `40200000` | `3f800000` |
+
+For example, repeat the correctness command above with
+`--bm25-profile k09-b04` and a new output path. Then add the same option to both
+latency orders and the separate memory command. These runs produce independent
+configured results; DEFAULT timings do not establish their performance.
+
+Use freshly built helpers for configured runs. The shared Rust source must be
+copied under `src/bin/shared`, as shown above, to avoid automatic binary
+discovery. Helpers validate the full argument boundary before opening an index.
+The old Rust form is `INDEX`; the configured form is `INDEX K1_BITS B_BITS`.
+Java retains `INDEX [SCALE]` and adds `INDEX SCALE K1_BITS B_BITS`.
+
+Before warmup, persistent helpers answer an opt-in `BM25_CONFIG` control request.
+Batch validators emit one prefixed stderr receipt. Each receipt observes the
+installed parameters and physical text-field doc count/token total through
+engine getters. The callers check requested bits, engine/field/protocol identity,
+scale 1 and equal cross-engine statistics. Missing, malformed, duplicate,
+mismatched or stale-helper receipts fail the run; persistent receipt reads have
+a complete-line deadline and byte limit. Ordinary runs request no new receipt,
+so retained DEFAULT artifacts remain usable. Reports include raw receipts and
+hash the shared Rust source and compiled Java support class. Native/cache
+declarations are helper policy claims; parameter bits and N/TTF are observations.
+
+The external immutable native-artifact builder also needs the support copy/hash
+guard. [`native_adapter_profile.patch`](native_adapter_profile.patch) is an
+unapplied patch for that builder's `build.py`; apply it to the external builder
+before making a configured per-commit artifact. The patch does not mutate any
+retained binary or index.
 
 ## Measure COUNT and TOP_10
 
@@ -258,4 +310,6 @@ Native provenance hashes `DoQueryNative` and `DumpNativeLuceneResults` classes;
 matched provenance hashes the matched classes. Existing warmup durations,
 iteration counts, alternating order, CPU selection, and COUNT/TOP markers remain
 unchanged. Verify with `python -m unittest discover -s doc/performance/lucene-10.4
--p 'test_*.py'`; these fixture gates launch no search engines.
+-p 'test_*.py'`; these fixture gates launch no search engines. Configured protocol
+and cleanup fixtures start small Python pipe workers to check deadline, duplicate
+output and failed-start handling.

@@ -6,7 +6,8 @@ import json
 import subprocess
 import time
 from pathlib import Path
-from lucene_mode import add_arguments, configuration, report
+from lucene_mode import (add_arguments, configuration, report, engine_commands,
+                         request_profile, validate_pair, stop_process)
 from provenance import capture
 
 
@@ -30,12 +31,9 @@ def main():
     scoring = configuration(args, parser)
     queries = [json.loads(line)['query'] for line in args.query_file.read_text().splitlines()]
     prefix = [] if args.cpu_core == 'none' else ['taskset', '-c', args.cpu_core]
-    commands = {
-        'tantivy': prefix + [str(args.tantivy_binary), str(args.tantivy_index)],
-        'lucene': prefix + ['java', '-XX:+UseParallelGC', '--add-modules', 'jdk.incubator.vector',
-                           '--enable-native-access=ALL-UNNAMED', '-cp', scoring['classpath'],
-                           scoring['query_class'], str(args.lucene_dir.resolve() / 'idx')] + scoring['extra_args'],
-    }
+    commands = engine_commands(scoring, args.tantivy_binary, args.tantivy_index,
+                               args.lucene_dir, pin=prefix)
+    receipts = {}
     result = {
         'method': 'COUNT and TOP_10 over the same query suite, warmed serially per engine; '
                   'snapshot includes mmap pages; default JVM heap; query cache disabled. '
@@ -44,7 +42,8 @@ def main():
         **report(scoring),
         'provenance': capture(args.tantivy_binary, args.lucene_dir, args.lucene_classes,
                               scoring['matched_bm25'], native=scoring['native_bm25'],
-                              score_scale=scoring['lucene_score_scale']),
+                              score_scale=scoring['lucene_score_scale'],
+                             configured=scoring['profile'] is not None),
         'tantivy_binary_sha256': hashlib.sha256(args.tantivy_binary.read_bytes()).hexdigest(),
         'query_file_sha256': hashlib.sha256(args.query_file.read_bytes()).hexdigest(),
         'loadavg_start': Path('/proc/loadavg').read_text().strip(),
@@ -55,6 +54,10 @@ def main():
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                    stderr=subprocess.DEVNULL, text=True, bufsize=1)
         try:
+            if scoring['profile'] is not None:
+                receipts[name] = request_profile(process, scoring['profile'], name)
+                if len(receipts) == 2:
+                    validate_pair(receipts)
             start = time.monotonic()
             rounds = 0
             while time.monotonic() - start < args.warmup_seconds:
@@ -62,8 +65,12 @@ def main():
                     for query in queries:
                         process.stdin.write(f'{mode}\t{query}\n')
                         process.stdin.flush()
-                        if not process.stdout.readline():
+                        response = process.stdout.readline()
+                        if not response:
                             raise RuntimeError(f'{name} exited during warmup')
+                        # Reject delayed duplicate/control output rather than
+                        # treating an arbitrary nonempty line as a query reply.
+                        int(response)
                 rounds += 1
             status = fields(Path(f'/proc/{process.pid}/status'))
             result['engines'][name] = {
@@ -72,8 +79,9 @@ def main():
                 'smaps_rollup': fields(Path(f'/proc/{process.pid}/smaps_rollup')),
             }
         finally:
-            process.stdin.close()
-            process.wait(timeout=10)
+            stop_process(process)
+    if receipts:
+        result['profile_receipts'] = receipts
     result['loadavg_end'] = Path('/proc/loadavg').read_text().strip()
     args.output.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({name: data['status'] for name, data in result['engines'].items()}, indent=2))

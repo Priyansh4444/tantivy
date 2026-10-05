@@ -9,11 +9,10 @@ import subprocess
 import time
 from pathlib import Path
 from provenance import capture
-from lucene_mode import add_arguments, configuration, report
+from lucene_mode import (add_arguments, configuration, report, engine_commands,
+                         request_profile, validate_pair, stop_process)
 
 BENCH = Path(__file__).resolve().parent
-QUERIES = [json.loads(line)['query'] for line in
-           (Path(__file__).parent / 'queries-wiki.jsonl').read_text().splitlines()]
 
 def cpu_core(value):
     if value.lower() == 'none':
@@ -49,19 +48,23 @@ def main():
     add_arguments(ap)
     args = ap.parse_args()
     scoring = configuration(args, ap)
+    QUERIES = [json.loads(line)['query'] for line in
+               (BENCH/'queries-wiki.jsonl').read_text().splitlines()]
     lucene = args.lucene_dir.resolve()
     pin = [] if args.cpu_core is None else ['taskset', '-c', str(args.cpu_core)]
-    commands = {
-        'tantivy': pin + [str(args.tantivy_binary),str(args.tantivy_index)],
-        'lucene': pin + ['java','-XX:+UseParallelGC',
-                   '--add-modules','jdk.incubator.vector','--enable-native-access=ALL-UNNAMED',
-                   '-cp',scoring['classpath'],scoring['query_class'],str(lucene/'idx')] + scoring['extra_args'],
-    }
+    commands = engine_commands(scoring, args.tantivy_binary, args.tantivy_index, lucene, pin=pin)
     names = ['lucene','tantivy'] if args.lucene_first else ['tantivy','lucene']
-    procs = {name: start(commands[name]) for name in names}
+    procs = {}
+    receipts = {}
     samples = {name: {q: [] for q in QUERIES} for name in names}
     counts = {}
     try:
+        for name in names:
+            procs[name] = start(commands[name])
+            if scoring['profile'] is not None:
+                receipts[name] = request_profile(procs[name], scoring['profile'], name)
+        if receipts:
+            validate_pair(receipts)
         i = 0
         until = time.monotonic() + args.warmup_seconds
         while time.monotonic() < until:
@@ -84,8 +87,7 @@ def main():
                     samples[name][q].append(us)
     finally:
         for proc in procs.values():
-            proc.stdin.close()
-            proc.wait(timeout=10)
+            stop_process(proc)
     medians = {name:{q:statistics.median(v) for q,v in values.items()}
                for name,values in samples.items()}
     ratios=[]
@@ -99,11 +101,13 @@ def main():
         'samples_us':samples,'geomean_ratio':overall,'iterations':args.iterations,
         'warmup_seconds':args.warmup_seconds,'lucene_first':args.lucene_first,
         **report(scoring),
+        **({'profile_receipts':receipts} if receipts else {}),
         'tantivy_index':str(args.tantivy_index),
         'lucene_dir':str(lucene), 'lucene_classes':str(args.lucene_classes.resolve()),
         'cpu_core':args.cpu_core, 'engine_commands':commands,
         'provenance':capture(args.tantivy_binary, lucene, args.lucene_classes, scoring['matched_bm25'],
-                             native=scoring['native_bm25'], score_scale=scoring['lucene_score_scale'])},indent=2)+'\n')
+                             native=scoring['native_bm25'], score_scale=scoring['lucene_score_scale'],
+                             configured=scoring['profile'] is not None)},indent=2)+'\n')
 
 if __name__ == '__main__':
     main()

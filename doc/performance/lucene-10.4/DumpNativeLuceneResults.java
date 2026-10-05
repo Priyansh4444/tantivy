@@ -16,15 +16,17 @@ import org.apache.lucene.store.FSDirectory;
 
 public class DumpNativeLuceneResults {
     public static void main(String[] args) throws Exception {
+        NativeBm25Profile profile = NativeBm25Profile.parse(args);
+        float scoreScale = profile.scoreScale;
         try (DirectoryReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(args[0])));
              BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
-            float scoreScale = args.length > 1 ? Float.parseFloat(args[1]) : 1f;
-            if (!Float.isFinite(scoreScale) || scoreScale <= 0f) {
-                throw new IllegalArgumentException("Score scale must be finite and positive");
-            }
             IndexSearcher searcher = new IndexSearcher(reader);
             searcher.setQueryCache(null);
-            searcher.setSimilarity(new BM25Similarity(1.2f, 0.75f));
+            searcher.setSimilarity(profile.configured ? profile.similarity : new BM25Similarity(1.2f, 0.75f));
+            if (profile.configured) {
+                System.err.println("BM25_PROFILE\t" + NativeBm25Profile.receipt(searcher, scoreScale));
+                System.err.flush();
+            }
             var statistics = searcher.collectionStatistics("text");
             System.err.println("text maxDoc=" + statistics.maxDoc() + " docCount="
                 + statistics.docCount() + " sumTotalTermFreq=" + statistics.sumTotalTermFreq());
