@@ -2,6 +2,9 @@ mod all_query;
 mod automaton_weight;
 mod bitset;
 mod bm25;
+pub(crate) use bm25::NativeInputEnvelope;
+#[cfg(test)]
+pub(crate) use term_query::TermScorer;
 mod bm25_parameters;
 mod boolean_query;
 mod boost_query;

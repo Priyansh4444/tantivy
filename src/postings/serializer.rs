@@ -19,6 +19,10 @@ use crate::schema::{Field, FieldEntry, IndexRecordOption, Schema};
 use crate::termdict::TermDictionaryBuilder;
 use crate::{DocId, Score};
 
+#[cfg(test)]
+#[path = "serializer_native_transform_tests.rs"]
+mod native_transform_tests;
+
 /// `InvertedIndexSerializer` is in charge of serializing
 /// postings on disk, in the
 /// * `.idx` (inverted index)

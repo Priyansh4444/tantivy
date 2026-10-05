@@ -1,3 +1,4 @@
+use std::num::NonZeroU32;
 use std::sync::Arc;
 
 use crate::fieldnorm::FieldNormReader;
@@ -9,6 +10,10 @@ use crate::{Score, Searcher, Term};
 #[cfg(test)]
 #[path = "bm25_parameter_tests.rs"]
 mod parameter_tests;
+
+#[cfg(test)]
+#[path = "bm25_native_bound_tests.rs"]
+mod native_bound_tests;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Bm25Scoring {
@@ -224,6 +229,42 @@ pub struct Bm25Weight {
     scoring: Bm25Scoring,
     parameters: Bm25Parameters,
     safe_normalization: bool,
+}
+
+/// Issued only for a native, nondefault query and its actual reader's native
+/// DEFAULT input-selection metadata. The owning term scorer keeps this binding
+/// immutable; the public weight-taking cursor API never receives it.
+#[derive(Clone, Copy)]
+pub(crate) struct NativeSelectionContext {
+    average_fieldnorm: Score,
+}
+
+/// Cold, immutable enclosure of query inputs from stored DEFAULT inputs.
+pub(crate) struct NativeInputEnvelope {
+    selection_inverse: Arc<[Score; 256]>,
+    ratio_up: f64,
+}
+
+impl NativeInputEnvelope {
+    pub(crate) fn input_upper(&self, norm: u8, selected_tf_ceiling: NonZeroU32) -> Option<Score> {
+        // The decoded ceiling covers only the selected posting's TF. The
+        // writer's rounded DEFAULT-input maximum covers the other postings.
+        let maximum = selected_tf_ceiling.get() as Score * self.selection_inverse[norm as usize];
+        if !maximum.is_finite() || maximum <= 0.0 || maximum == Score::MAX {
+            return None;
+        }
+        if self.ratio_up == 0.0 {
+            return Some(0.0);
+        }
+        // A rounded maximum is not an upper bound on the real old product.
+        // Enclose it first, then enclose the ratio multiplication and f32 cast.
+        let old_upper = f64::from(maximum.next_up());
+        let query_upper = (old_upper * self.ratio_up).next_up();
+        if !query_upper.is_finite() || query_upper <= 0.0 {
+            return None;
+        }
+        Some((query_upper as Score).next_up())
+    }
 }
 
 impl Bm25Weight {
@@ -538,6 +579,80 @@ impl Bm25Weight {
             && self.average_fieldnorm.is_finite()
             && self.average_fieldnorm > 0.0
             && self.average_fieldnorm == segment_average_fieldnorm
+    }
+
+    pub(crate) fn native_selection_context(
+        &self,
+        selection_average: Score,
+        selection: BlockMaxSelection,
+    ) -> Option<NativeSelectionContext> {
+        // DEFAULT, including an average mismatch, keeps its existing policy.
+        // Zero/negative weights need no cold enclosure work.
+        if self.scoring != Bm25Scoring::NativeLucene
+            || selection != BlockMaxSelection::NativeSaturationInput
+            || self.parameters.is_default_profile()
+            || self.parameters.k1() <= 0.0
+            || !self.has_safe_score_bounds()
+            || self.weight <= 0.0
+            || !self.average_fieldnorm.is_finite()
+            || self.average_fieldnorm <= 0.0
+            || !selection_average.is_finite()
+            || selection_average <= 0.0
+        {
+            return None;
+        }
+        Some(NativeSelectionContext {
+            average_fieldnorm: selection_average,
+        })
+    }
+
+    pub(crate) fn native_input_envelope(
+        &self,
+        context: NativeSelectionContext,
+    ) -> Option<NativeInputEnvelope> {
+        // Reject known ineligible query caches before allocating/reconstructing
+        // the old cache. In particular b=1/norm0 needs no DEFAULT setup.
+        if self
+            .cache
+            .iter()
+            .any(|inverse| !inverse.is_finite() || inverse.is_sign_negative())
+        {
+            return None;
+        }
+        let (selection_inverse, _) = compute_tf_cache(
+            context.average_fieldnorm,
+            Bm25Scoring::NativeLucene,
+            Bm25Parameters::DEFAULT,
+        );
+        let mut ratio_up = 0.0f64;
+        for (&query_inverse, &old_inverse) in self.cache.iter().zip(selection_inverse.iter()) {
+            // B1 rejects every infinite query inverse, including b=1/norm0.
+            // Positive subnormals and +0 query inverses are valid; -0 is not.
+            if !old_inverse.is_finite() || old_inverse <= 0.0 {
+                return None;
+            }
+            if query_inverse != 0.0 {
+                let ratio = (f64::from(query_inverse) / f64::from(old_inverse)).next_up();
+                if !ratio.is_finite() || ratio <= 0.0 {
+                    return None;
+                }
+                ratio_up = ratio_up.max(ratio);
+            }
+        }
+        Some(NativeInputEnvelope {
+            selection_inverse,
+            ratio_up,
+        })
+    }
+
+    pub(crate) fn score_from_native_input_upper(&self, upper: Score) -> Score {
+        debug_assert_eq!(self.scoring, Bm25Scoring::NativeLucene);
+        debug_assert!(self.has_safe_score_bounds() && self.weight >= 0.0 && upper >= 0.0);
+        // Same literal rounded subtraction as score_with_frequency; no second
+        // multiplication by frequency or reassociation through a TF factor.
+        (self.weight - self.weight / (1.0 + upper))
+            .max(0.0)
+            .min(self.max_score())
     }
 
     #[inline]

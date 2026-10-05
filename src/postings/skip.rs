@@ -1,3 +1,5 @@
+use std::num::NonZeroU32;
+
 use crate::directory::OwnedBytes;
 use crate::postings::compression::{
     compressed_block_size, compressed_freq_block_size, dense_block_size, COMPRESSION_BLOCK_SIZE,
@@ -158,6 +160,14 @@ pub(crate) enum BlockInfo {
     },
 }
 
+/// A complete block's stored DEFAULT-input maximizer. The frequency is a
+/// ceiling for this selected posting, never a block-wide maximum frequency.
+#[derive(Clone, Copy)]
+pub(crate) struct SelectedInputPair {
+    pub(crate) norm: u8,
+    pub(crate) selected_tf_ceiling: NonZeroU32,
+}
+
 impl Default for BlockInfo {
     fn default() -> Self {
         BlockInfo::VInt { num_docs: 0u32 }
@@ -165,6 +175,27 @@ impl Default for BlockInfo {
 }
 
 impl SkipReader {
+    pub(crate) fn selected_input_pair(&self) -> Option<SelectedInputPair> {
+        match self.block_info {
+            BlockInfo::BitPacked {
+                block_wand_fieldnorm_id,
+                block_wand_term_freq,
+                ..
+            }
+            | BlockInfo::Dense {
+                block_wand_fieldnorm_id,
+                block_wand_term_freq,
+                ..
+            } => {
+                NonZeroU32::new(block_wand_term_freq).map(|selected_tf_ceiling| SelectedInputPair {
+                    norm: block_wand_fieldnorm_id,
+                    selected_tf_ceiling,
+                })
+            }
+            BlockInfo::VInt { .. } => None,
+        }
+    }
+
     pub fn new(data: OwnedBytes, doc_freq: u32, skip_info: IndexRecordOption) -> SkipReader {
         let mut skip_reader = SkipReader {
             last_doc_in_block: if doc_freq >= COMPRESSION_BLOCK_SIZE as u32 {

@@ -1,10 +1,12 @@
+use std::sync::Arc;
+
 use common::TinySet;
 
 use crate::docset::DocSet;
 use crate::fieldnorm::FieldNormReader;
 use crate::index::field_statistics::BlockMaxSelection;
 use crate::postings::{BlockSegmentPostings, FreqReadingOption, Postings, SegmentPostings};
-use crate::query::bm25::Bm25Weight;
+use crate::query::bm25::{Bm25Weight, NativeInputEnvelope, NativeSelectionContext};
 use crate::query::{Explanation, Scorer};
 use crate::{DocId, Score};
 
@@ -13,8 +15,16 @@ pub struct TermScorer {
     postings: SegmentPostings,
     fieldnorm_reader: FieldNormReader,
     similarity_weight: Bm25Weight,
-    use_stored_block_max: bool,
+    block_bounds: TermBlockBounds,
     use_alternate_mask: bool,
+}
+
+#[derive(Clone)]
+enum TermBlockBounds {
+    Global,
+    StoredDefault,
+    PendingNative(NativeSelectionContext),
+    NativeTransform(Arc<NativeInputEnvelope>),
 }
 
 impl TermScorer {
@@ -34,7 +44,7 @@ impl TermScorer {
             postings,
             fieldnorm_reader,
             similarity_weight,
-            use_stored_block_max: false,
+            block_bounds: TermBlockBounds::Global,
             use_alternate_mask,
         }
     }
@@ -42,9 +52,14 @@ impl TermScorer {
     /// Test fixtures written by the public serializer use legacy selection.
     #[cfg(test)]
     pub(crate) fn with_segment_average_fieldnorm(mut self, average_fieldnorm: Score) -> Self {
-        self.use_stored_block_max = self
+        self.block_bounds = if self
             .similarity_weight
-            .can_use_stored_block_max(average_fieldnorm);
+            .can_use_stored_block_max(average_fieldnorm)
+        {
+            TermBlockBounds::StoredDefault
+        } else {
+            TermBlockBounds::Global
+        };
         self
     }
 
@@ -53,9 +68,19 @@ impl TermScorer {
         average_fieldnorm: Score,
         selection: BlockMaxSelection,
     ) -> Self {
-        self.use_stored_block_max = self
+        self.block_bounds = if self
             .similarity_weight
-            .can_use_stored_block_max_with_selection(average_fieldnorm, selection);
+            .can_use_stored_block_max_with_selection(average_fieldnorm, selection)
+        {
+            TermBlockBounds::StoredDefault
+        } else if let Some(context) = self
+            .similarity_weight
+            .native_selection_context(average_fieldnorm, selection)
+        {
+            TermBlockBounds::PendingNative(context)
+        } else {
+            TermBlockBounds::Global
+        };
         self
     }
 
@@ -95,14 +120,52 @@ impl TermScorer {
 
     /// Returns a conservative upper bound on the score for the current block.
     ///
-    /// Stored maxima are used only when the selection policy and average fieldnorm
-    /// match the query. Otherwise the term's global bound preserves correctness across
-    /// segments with different length distributions or custom scoring statistics.
+    /// Exact DEFAULT pairs require matching selection statistics. Eligible
+    /// nondefault native queries conservatively enclose the stored DEFAULT input;
+    /// unsupported domains retain the global bound and the existing tail policy.
     pub fn block_max_score(&mut self) -> Score {
+        // DEFAULT remains the first branch, without cold envelope construction.
+        if matches!(self.block_bounds, TermBlockBounds::StoredDefault) {
+            return self.postings.block_cursor.block_max_score_with_stored_max(
+                &self.fieldnorm_reader,
+                &self.similarity_weight,
+                true,
+            );
+        }
+        if !self.similarity_weight.has_safe_score_bounds() {
+            return self.similarity_weight.max_score();
+        }
+        // Tails or absent metadata cannot activate a transform. Shallow complete
+        // block requests can: this test never decompresses postings.
+        if self
+            .postings
+            .block_cursor
+            .skip_reader()
+            .selected_input_pair()
+            .is_some()
+        {
+            if let TermBlockBounds::PendingNative(context) = self.block_bounds {
+                self.block_bounds = self
+                    .similarity_weight
+                    .native_input_envelope(context)
+                    .map(|envelope| TermBlockBounds::NativeTransform(Arc::new(envelope)))
+                    .unwrap_or(TermBlockBounds::Global);
+            }
+            if let TermBlockBounds::NativeTransform(envelope) = &self.block_bounds {
+                return self
+                    .postings
+                    .block_cursor
+                    .block_max_score_with_native_envelope(
+                        &self.fieldnorm_reader,
+                        &self.similarity_weight,
+                        envelope,
+                    );
+            }
+        }
         self.postings.block_cursor.block_max_score_with_stored_max(
             &self.fieldnorm_reader,
             &self.similarity_weight,
-            self.use_stored_block_max,
+            false,
         )
     }
 
@@ -197,6 +260,179 @@ mod tests {
     };
 
     #[test]
+    fn block_bound_layout_receipt() {
+        assert!(std::mem::size_of::<super::TermBlockBounds>() <= 16);
+        eprintln!(
+            "B1_LAYOUT TermScorer={} BlockSegmentPostings={} Bm25Weight={} FieldNormReader={} \
+             TermBlockBounds={}",
+            std::mem::size_of::<TermScorer>(),
+            std::mem::size_of::<crate::postings::BlockSegmentPostings>(),
+            std::mem::size_of::<Bm25Weight>(),
+            std::mem::size_of::<crate::fieldnorm::FieldNormReader>(),
+            std::mem::size_of::<super::TermBlockBounds>()
+        );
+    }
+
+    #[test]
+    fn test_native_bound_policy_is_lazy_and_fixed_to_actual_query() -> crate::Result<()> {
+        use crate::query::Bm25Parameters;
+        let mut schema = Schema::builder();
+        let field = schema.add_text_field("text", TEXT);
+        let index = Index::create_in_ram(schema.build());
+        let mut writer = index.writer_for_tests()?;
+        for doc in 0..300 {
+            writer.add_document(doc!(field => if doc == 0 { "alpha rare" } else { "alpha" }))?;
+        }
+        writer.commit()?;
+        let reader = index.reader()?;
+        let searcher = reader
+            .searcher()
+            .with_bm25_parameters(Bm25Parameters::new(0.9, 0.4)?);
+        let segment = searcher.segment_reader(0);
+        let term = TermQuery::new(
+            Term::from_field_text(field, "alpha"),
+            IndexRecordOption::WithFreqs,
+        );
+        let term_weight =
+            term.specialized_weight(EnableScoring::enabled_from_searcher(&searcher))?;
+        let scorer = term_weight.term_scorer_for_test(segment, 1.0)?.unwrap();
+        assert!(matches!(
+            scorer.block_bounds,
+            super::TermBlockBounds::PendingNative(_)
+        ));
+        let mut exhaustive = scorer.clone();
+        while exhaustive.doc() != TERMINATED {
+            exhaustive.score();
+            exhaustive.advance();
+        }
+        assert!(matches!(
+            exhaustive.block_bounds,
+            super::TermBlockBounds::PendingNative(_)
+        ));
+        let mut bounded = scorer.clone();
+        let bound = bounded.block_max_score();
+        assert!(matches!(
+            bounded.block_bounds,
+            super::TermBlockBounds::NativeTransform(_)
+        ));
+        assert!(bound >= bounded.score());
+        let clone = bounded.clone();
+        match (&bounded.block_bounds, &clone.block_bounds) {
+            (
+                super::TermBlockBounds::NativeTransform(a),
+                super::TermBlockBounds::NativeTransform(b),
+            ) => {
+                assert!(std::sync::Arc::ptr_eq(a, b));
+            }
+            _ => panic!("clone must share its immutable enclosure"),
+        }
+        let mut untrusted = TermScorer::new(
+            scorer.postings.clone(),
+            scorer.fieldnorm_reader.clone(),
+            scorer.similarity_weight.clone(),
+        );
+        assert!(matches!(
+            untrusted.block_bounds,
+            super::TermBlockBounds::Global
+        ));
+        assert_eq!(untrusted.block_max_score(), untrusted.max_score());
+        let rare = TermQuery::new(
+            Term::from_field_text(field, "rare"),
+            IndexRecordOption::WithFreqs,
+        );
+        let rare_weight =
+            rare.specialized_weight(EnableScoring::enabled_from_searcher(&searcher))?;
+        let mut tail = rare_weight.term_scorer_for_test(segment, 1.0)?.unwrap();
+        assert!(matches!(
+            tail.block_bounds,
+            super::TermBlockBounds::PendingNative(_)
+        ));
+        tail.block_max_score();
+        assert!(matches!(
+            tail.block_bounds,
+            super::TermBlockBounds::PendingNative(_)
+        ));
+        let b1_searcher = reader
+            .searcher()
+            .with_bm25_parameters(Bm25Parameters::new(2.5, 1.0)?);
+        let b1_weight =
+            term.specialized_weight(EnableScoring::enabled_from_searcher(&b1_searcher))?;
+        let mut b1 = b1_weight.term_scorer_for_test(segment, 1.0)?.unwrap();
+        assert!(matches!(
+            b1.block_bounds,
+            super::TermBlockBounds::PendingNative(_)
+        ));
+        assert_eq!(b1.block_max_score(), b1.max_score());
+        assert!(matches!(b1.block_bounds, super::TermBlockBounds::Global));
+        let default_searcher = reader.searcher();
+        let default_weight =
+            term.specialized_weight(EnableScoring::enabled_from_searcher(&default_searcher))?;
+        let default = default_weight.term_scorer_for_test(segment, 1.0)?.unwrap();
+        assert!(matches!(
+            default.block_bounds,
+            super::TermBlockBounds::StoredDefault
+        ));
+        let mismatch = default.with_stored_block_max_selection(
+            3.0,
+            crate::index::field_statistics::BlockMaxSelection::NativeSaturationInput,
+        );
+        assert!(matches!(
+            mismatch.block_bounds,
+            super::TermBlockBounds::Global
+        ));
+        Ok(())
+    }
+
+    #[test]
+    fn test_native_absent_metadata_does_not_activate_envelope() -> crate::Result<()> {
+        use crate::query::Bm25Parameters;
+        use crate::schema::{TextFieldIndexing, TextOptions};
+        let mut schema = Schema::builder();
+        let field = schema.add_text_field(
+            "text",
+            TextOptions::default().set_indexing_options(
+                TextFieldIndexing::default()
+                    .set_index_option(IndexRecordOption::WithFreqs)
+                    .set_fieldnorms(false),
+            ),
+        );
+        let index = Index::create_in_ram(schema.build());
+        let mut writer = index.writer_for_tests()?;
+        for _ in 0..256 {
+            writer.add_document(doc!(field => "alpha"))?;
+        }
+        writer.commit()?;
+        let searcher = index
+            .reader()?
+            .searcher()
+            .with_bm25_parameters(Bm25Parameters::new(0.9, 0.4)?);
+        let term = TermQuery::new(
+            Term::from_field_text(field, "alpha"),
+            IndexRecordOption::WithFreqs,
+        );
+        let weight = term.specialized_weight(EnableScoring::enabled_from_searcher(&searcher))?;
+        let mut scorer = weight
+            .term_scorer_for_test(searcher.segment_reader(0), 1.0)?
+            .unwrap();
+        assert!(matches!(
+            scorer.block_bounds,
+            super::TermBlockBounds::PendingNative(_)
+        ));
+        assert_eq!(scorer.block_max_score(), scorer.max_score());
+        assert!(matches!(
+            scorer.block_bounds,
+            super::TermBlockBounds::PendingNative(_)
+        ));
+        scorer.seek_block(128);
+        assert_eq!(scorer.block_max_score(), scorer.max_score());
+        assert!(matches!(
+            scorer.block_bounds,
+            super::TermBlockBounds::PendingNative(_)
+        ));
+        Ok(())
+    }
+
+    #[test]
     fn test_term_scorer_max_score() -> crate::Result<()> {
         let bm25_weight = Bm25Weight::for_one_term(3, 6, 10.0);
         let mut term_scorer = TermScorer::create_for_test(
@@ -274,7 +510,10 @@ mod tests {
                 norm_reader.clone(),
                 weight.boost_by(boost),
             );
-            assert!(!scorer.use_stored_block_max);
+            assert!(matches!(
+                scorer.block_bounds,
+                super::TermBlockBounds::Global
+            ));
             let bound = scorer.block_max_score();
             for _ in 0..128 {
                 assert!(scorer.score() <= bound);

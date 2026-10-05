@@ -6,7 +6,7 @@ use crate::directory::{FileSlice, OwnedBytes};
 use crate::fieldnorm::FieldNormReader;
 use crate::postings::compression::{BlockDecoder, VIntDecoder, COMPRESSION_BLOCK_SIZE};
 use crate::postings::{BlockInfo, FreqReadingOption, SkipReader};
-use crate::query::Bm25Weight;
+use crate::query::{Bm25Weight, NativeInputEnvelope};
 use crate::schema::IndexRecordOption;
 use crate::{DocId, Score, TERMINATED};
 
@@ -214,6 +214,36 @@ impl BlockSegmentPostings {
         // as it is a valid upperbound.
         //
         // We do not cache it however, so that it gets computed when once block is loaded.
+        bm25_weight.max_score()
+    }
+
+    pub(crate) fn block_max_score_with_native_envelope(
+        &mut self,
+        fieldnorm_reader: &FieldNormReader,
+        bm25_weight: &Bm25Weight,
+        envelope: &NativeInputEnvelope,
+    ) -> Score {
+        // Keep exceptional-domain checks before metadata or cached bounds.
+        if !bm25_weight.has_safe_score_bounds() {
+            return bm25_weight.max_score();
+        }
+        if self.skip_reader.last_doc_in_block() == TERMINATED {
+            return self.block_max_score_with_stored_max(fieldnorm_reader, bm25_weight, false);
+        }
+        if let Some(score) = self.block_max_score_cache {
+            return score;
+        }
+        if let Some(pair) = self.skip_reader.selected_input_pair() {
+            if let Some(upper) = envelope.input_upper(pair.norm, pair.selected_tf_ceiling) {
+                if upper.is_finite() {
+                    let bound = bm25_weight.score_from_native_input_upper(upper);
+                    self.block_max_score_cache = Some(bound);
+                    return bound;
+                }
+            }
+        }
+        // Missing/inconsistent metadata and saturated enclosures retain the
+        // complete-block global fallback, without publishing a numeric cache.
         bm25_weight.max_score()
     }
 

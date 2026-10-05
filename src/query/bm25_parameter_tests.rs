@@ -189,16 +189,22 @@ fn parameter_serialized_bounds_and_optimized_queries_match_exhaustive() -> crate
         );
         let term_weight =
             term.specialized_weight(EnableScoring::enabled_from_searcher(&searcher))?;
+        let transformed = bm25
+            .native_selection_context(selection_average, inverted.stored_block_max_selection())
+            .and_then(|context| bm25.native_input_envelope(context));
         let mut scorer = term_weight.term_scorer_for_test(&segment, 1.0)?.unwrap();
         while scorer.doc() != TERMINATED {
             let bound = scorer.block_max_score();
             assert!(bound >= scorer.score(), "{line} doc={}", scorer.doc());
             if !parameters.is_default_profile() && scorer.doc() < 384 {
-                assert_eq!(
-                    bound.to_bits(),
-                    bm25.max_score().to_bits(),
-                    "complete block must distrust DEFAULT pairs"
-                );
+                assert!(bound <= bm25.max_score());
+                if transformed.is_none() {
+                    assert_eq!(
+                        bound.to_bits(),
+                        bm25.max_score().to_bits(),
+                        "ineligible complete block must keep its global fallback"
+                    );
+                }
             }
             scorer.advance();
         }
