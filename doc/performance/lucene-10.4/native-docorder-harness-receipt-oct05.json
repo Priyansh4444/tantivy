@@ -1,0 +1,960 @@
+{
+  "base": "b3d22b8af469013363ee358792b38cd18efa6794",
+  "fixture_run": {
+    "passed": true,
+    "fixture_documents": 19,
+    "field_doc_count": 18,
+    "tokens": 65035,
+    "batch_sizes": [
+      7,
+      7,
+      5
+    ],
+    "high_norm": 135,
+    "empty_norm": 0,
+    "unsigned_max": 18446744073709551615,
+    "sort_ties": true,
+    "raw_crlf_preserved": true,
+    "exact_tie_profiles": {
+      "DEFAULT": {
+        "query": "beta",
+        "count": 16,
+        "same_top10_id_set": true,
+        "same_top10_id_order": true,
+        "top10_order_matches_within_score_ties": true,
+        "common_top100_ids": 16,
+        "max_relative_score_difference": 3.400510829778895e-08
+      },
+      "k09-b04": {
+        "query": "beta",
+        "count": 16,
+        "same_top10_id_set": true,
+        "same_top10_id_order": true,
+        "top10_order_matches_within_score_ties": true,
+        "common_top100_ids": 16,
+        "max_relative_score_difference": 3.6327189892612534e-08
+      },
+      "k25-b1": {
+        "query": "beta",
+        "count": 16,
+        "same_top10_id_set": true,
+        "same_top10_id_order": true,
+        "top10_order_matches_within_score_ties": true,
+        "common_top100_ids": 16,
+        "max_relative_score_difference": 3.2322283353757266e-08
+      }
+    },
+    "physical_proof": {
+      "documents": 19,
+      "field_doc_count": 18,
+      "physical_sha256": "fb3eb9c0951bb09f690ce706fab216df7a664e1378346f3fca2b639408066c43"
+    },
+    "payload_proof": {
+      "documents": 19,
+      "field_doc_count": 18,
+      "serialized_total_tokens": 65035,
+      "sha256": "777c0872b138f239222da8873132f2f8eb04291dfc71a1f76db6b3504006ba13",
+      "terms": 4,
+      "postings": 35,
+      "derived_tokens": 65035,
+      "positions": 65035,
+      "derived_field_docs": 18
+    },
+    "replay_receipt": {
+      "protocol": "wiki-physical-replay-v1",
+      "fixture_mode": true,
+      "corpus": "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/original.jsonl",
+      "physical_map": "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.physical.tsv",
+      "replay": "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.jsonl",
+      "documents": 19,
+      "tokens": 65035,
+      "field_doc_count": 18,
+      "source_bytes": 391087,
+      "replay_bytes": 391087,
+      "corpus_raw_sha256": "407964ed6e51f685217bc3ebd428730a7dde93d3cab3a368fefc2d432a96fa54",
+      "replay_raw_sha256": "0642b05762a0d007ba688bffe8797292b0fba565407c55ed2e4656ca26ef7768",
+      "physical_map_sha256": "fb3eb9c0951bb09f690ce706fab216df7a664e1378346f3fca2b639408066c43",
+      "source_id_lines_sha256": "168fc522bf6b61c59078a35b7cdead6f9584fd48bbf309c24aa64b3df1d40095",
+      "replay_id_lines_sha256": "168fc522bf6b61c59078a35b7cdead6f9584fd48bbf309c24aa64b3df1d40095",
+      "exact_id_bijection": true,
+      "tool_sha256": "647feaa8ae44dbcb40bb5743866e2f83c1ff25838158ba86b7882ea1438590f7"
+    },
+    "rejected": [
+      "position",
+      "frequency",
+      "norm",
+      "sort",
+      "reversed-merge",
+      "changed-bytes",
+      "changed-ending",
+      "reused-replay",
+      "early-multiple-flush"
+    ],
+    "commands": [
+      {
+        "name": "java-build",
+        "command": [
+          "javac",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "-d",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/doc/performance/lucene-10.4/BuildWikiFixture.java",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/doc/performance/lucene-10.4/DumpWikiLogical.java",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/doc/performance/lucene-10.4/DumpNativeLuceneResults.java",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/doc/performance/lucene-10.4/NativeBm25Profile.java"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "name": "java-reference-build",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "BuildWikiFixture",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.idx",
+          "--jsonl"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:58:57 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\n"
+      },
+      {
+        "name": "java-physical",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "DumpWikiLogical",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.idx",
+          "documents-physical"
+        ],
+        "returncode": 0,
+        "stdout": "0\ttie07\t9\t2\n1\tempty\t9223372036854775809\t0\n2\ttie03\t9\t2\n3\thigh\t18446744073709551615\t135\n4\tpositions\t9223372036854775815\t3\n5\ttie00\t9\t2\n6\ttie01\t9\t2\n7\ttie02\t9\t2\n8\ttie04\t9\t2\n9\ttie05\t9\t2\n10\ttie06\t9\t2\n11\ttie08\t9\t2\n12\ttie09\t9\t2\n13\ttie10\t9\t2\n14\ttie11\t9\t2\n15\ttie12\t9\t2\n16\ttie13\t9\t2\n17\ttie14\t9\t2\n18\ttie15\t9\t2\n",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:58:58 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\n"
+      },
+      {
+        "name": "java-documents-legacy",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "DumpWikiLogical",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.idx",
+          "documents"
+        ],
+        "returncode": 0,
+        "stdout": "empty\t9223372036854775809\t0\nhigh\t18446744073709551615\t135\npositions\t9223372036854775815\t3\ntie00\t9\t2\ntie01\t9\t2\ntie02\t9\t2\ntie03\t9\t2\ntie04\t9\t2\ntie05\t9\t2\ntie06\t9\t2\ntie07\t9\t2\ntie08\t9\t2\ntie09\t9\t2\ntie10\t9\t2\ntie11\t9\t2\ntie12\t9\t2\ntie13\t9\t2\ntie14\t9\t2\ntie15\t9\t2\n",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:58:59 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\n"
+      },
+      {
+        "name": "java-terms-legacy",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "DumpWikiLogical",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.idx",
+          "terms"
+        ],
+        "returncode": 0,
+        "stdout": "a\t1\t2\nalpha\t17\t65016\nb\t1\t1\nbeta\t16\t16\n",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:58:59 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\n{\"documents\":19,\"field_doc_count\":18,\"terms\":4,\"derived_total_tokens\":65035,\"serialized_total_tokens\":65035}\n"
+      },
+      {
+        "name": "java-postings",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "DumpWikiLogical",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.idx",
+          "postings-digest"
+        ],
+        "returncode": 0,
+        "stdout": "{\"protocol\":\"wiki-postings-v1\",\"sha256\":\"777c0872b138f239222da8873132f2f8eb04291dfc71a1f76db6b3504006ba13\",\"terms\":4,\"postings\":35,\"derived_tokens\":65035,\"positions\":65035,\"derived_field_docs\":18,\"documents\":19,\"field_doc_count\":18,\"serialized_total_tokens\":65035}\n",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:59:00 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\n"
+      },
+      {
+        "name": "ordered-build",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx",
+          "--fixture-docs",
+          "19",
+          "--ordered-batches",
+          "7",
+          "--physical-map",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.physical.tsv",
+          "--replay-receipt",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.jsonl.replay.json"
+        ],
+        "returncode": 0,
+        "stdout": "{\"analyzer\":\"wiki_ascii_lucene\",\"corpus_canonical_lines_sha256\":\"1c81ea96a2c0ec106ffa129c4cfa2bf51e54b3e3db7c2f3d67070bc8ba8a9193\",\"documents\":19,\"fixture_mode\":true,\"ordered_replay\":{\"actual_physical_sha256\":\"fb3eb9c0951bb09f690ce706fab216df7a664e1378346f3fca2b639408066c43\",\"actual_raw_input_sha256\":\"0642b05762a0d007ba688bffe8797292b0fba565407c55ed2e4656ca26ef7768\",\"batch_size\":7,\"batches\":[{\"after_segment_ids\":[\"ee0abd3430b2424ca71c3e97ff269639\"],\"before_segment_ids\":[],\"documents\":7,\"segment_id\":\"ee0abd3430b2424ca71c3e97ff269639\",\"start_ordinal\":0},{\"after_segment_ids\":[\"4bebe29b89264318996948af8b0fc6a3\",\"ee0abd3430b2424ca71c3e97ff269639\"],\"before_segment_ids\":[\"ee0abd3430b2424ca71c3e97ff269639\"],\"documents\":7,\"segment_id\":\"4bebe29b89264318996948af8b0fc6a3\",\"start_ordinal\":7},{\"after_segment_ids\":[\"4bebe29b89264318996948af8b0fc6a3\",\"d1302b1fa09a4fd88fb1564c476ba8cb\",\"ee0abd3430b2424ca71c3e97ff269639\"],\"before_segment_ids\":[\"4bebe29b89264318996948af8b0fc6a3\",\"ee0abd3430b2424ca71c3e97ff269639\"],\"documents\":5,\"segment_id\":\"d1302b1fa09a4fd88fb1564c476ba8cb\",\"start_ordinal\":14}],\"field_doc_count\":18,\"memory_bytes\":500000000,\"merge_order\":[\"ee0abd3430b2424ca71c3e97ff269639\",\"4bebe29b89264318996948af8b0fc6a3\",\"d1302b1fa09a4fd88fb1564c476ba8cb\"],\"physical_map_sha256\":\"fb3eb9c0951bb09f690ce706fab216df7a664e1378346f3fca2b639408066c43\",\"physical_verified\":true,\"protocol\":\"wiki-ordered-build-v1\",\"replay_receipt_sha256\":\"7d57dfbd322630f11dfcb2acb6f5b7b875883a419cd3a747e9ccbba12845e559\"},\"segments\":1,\"tokens\":65035}\n",
+        "stderr": ""
+      },
+      {
+        "name": "rust-physical",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx",
+          "--physical"
+        ],
+        "returncode": 0,
+        "stdout": "0\ttie07\t9\t2\n1\tempty\t9223372036854775809\t0\n2\ttie03\t9\t2\n3\thigh\t18446744073709551615\t135\n4\tpositions\t9223372036854775815\t3\n5\ttie00\t9\t2\n6\ttie01\t9\t2\n7\ttie02\t9\t2\n8\ttie04\t9\t2\n9\ttie05\t9\t2\n10\ttie06\t9\t2\n11\ttie08\t9\t2\n12\ttie09\t9\t2\n13\ttie10\t9\t2\n14\ttie11\t9\t2\n15\ttie12\t9\t2\n16\ttie13\t9\t2\n17\ttie14\t9\t2\n18\ttie15\t9\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "rust-documents-legacy",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx"
+        ],
+        "returncode": 0,
+        "stdout": "empty\t9223372036854775809\t0\nhigh\t18446744073709551615\t135\npositions\t9223372036854775815\t3\ntie00\t9\t2\ntie01\t9\t2\ntie02\t9\t2\ntie03\t9\t2\ntie04\t9\t2\ntie05\t9\t2\ntie06\t9\t2\ntie07\t9\t2\ntie08\t9\t2\ntie09\t9\t2\ntie10\t9\t2\ntie11\t9\t2\ntie12\t9\t2\ntie13\t9\t2\ntie14\t9\t2\ntie15\t9\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "rust-terms-legacy",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_termtotals",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx"
+        ],
+        "returncode": 0,
+        "stdout": "a\t1\t2\nalpha\t17\t65016\nb\t1\t1\nbeta\t16\t16\n",
+        "stderr": "{\"derived_total_tokens\":65035,\"documents\":19,\"field_doc_count\":18,\"serialized_total_tokens\":65035,\"terms\":4}\n"
+      },
+      {
+        "name": "rust-payload",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/payload_identity",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx"
+        ],
+        "returncode": 0,
+        "stdout": "{\"index\":\"/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx\",\"logical\":{\"fields\":[{\"name\":\"id\"},{\"fieldnorms_sha256\":\"543bafd973ab30bd3aaa5d61ae921a65beef754914fd1a7fbf5dd0a2c76f9b0e\",\"name\":\"text\",\"postings\":{\"derived_field_docs\":18,\"derived_tokens\":65035,\"positions\":65035,\"postings\":35,\"sha256\":\"777c0872b138f239222da8873132f2f8eb04291dfc71a1f76db6b3504006ba13\",\"terms\":4}},{\"fast_u64_sha256\":\"42799c973594860c15ccd73c745480c0bd448ae5c6212fa985e72c6a71600a3e\",\"name\":\"sort_field\"}],\"live_docs\":19,\"max_doc\":19,\"schema_sha256\":\"9a378cab4c2b1118a54d42ec01a852786a8eacb5a6f947d04ea2a70c7006a5fa\",\"stored_documents_sha256\":\"e558175075463246ec9da8d73ce5316e7f865624d554bdc1e97c9086ec665ecf\"},\"metadata_headers\":[{\"name\":\"text\",\"serialized_token_total\":65035}]}\n",
+        "stderr": ""
+      },
+      {
+        "name": "tie-rust-DEFAULT",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx"
+        ],
+        "returncode": 0,
+        "stdout": "{\"count\":16,\"count_matches_exhaustive\":true,\"query\":\"beta\",\"ranking_matches_exhaustive\":true,\"top100\":[{\"id\":\"tie07\",\"score\":0.10848042368888855},{\"id\":\"tie03\",\"score\":0.10848042368888855},{\"id\":\"tie00\",\"score\":0.10848042368888855},{\"id\":\"tie01\",\"score\":0.10848042368888855},{\"id\":\"tie02\",\"score\":0.10848042368888855},{\"id\":\"tie04\",\"score\":0.10848042368888855},{\"id\":\"tie05\",\"score\":0.10848042368888855},{\"id\":\"tie06\",\"score\":0.10848042368888855},{\"id\":\"tie08\",\"score\":0.10848042368888855},{\"id\":\"tie09\",\"score\":0.10848042368888855},{\"id\":\"tie10\",\"score\":0.10848042368888855},{\"id\":\"tie11\",\"score\":0.10848042368888855},{\"id\":\"tie12\",\"score\":0.10848042368888855},{\"id\":\"tie13\",\"score\":0.10848042368888855},{\"id\":\"tie14\",\"score\":0.10848042368888855},{\"id\":\"tie15\",\"score\":0.10848042368888855}]}\n",
+        "stderr": ""
+      },
+      {
+        "name": "tie-java-DEFAULT",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "DumpNativeLuceneResults",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.idx",
+          "1"
+        ],
+        "returncode": 0,
+        "stdout": "{\"query\":\"beta\",\"count\":16,\"top100\":[{\"id\":\"tie07\",\"score\":0.10848042},{\"id\":\"tie03\",\"score\":0.10848042},{\"id\":\"tie00\",\"score\":0.10848042},{\"id\":\"tie01\",\"score\":0.10848042},{\"id\":\"tie02\",\"score\":0.10848042},{\"id\":\"tie04\",\"score\":0.10848042},{\"id\":\"tie05\",\"score\":0.10848042},{\"id\":\"tie06\",\"score\":0.10848042},{\"id\":\"tie08\",\"score\":0.10848042},{\"id\":\"tie09\",\"score\":0.10848042},{\"id\":\"tie10\",\"score\":0.10848042},{\"id\":\"tie11\",\"score\":0.10848042},{\"id\":\"tie12\",\"score\":0.10848042},{\"id\":\"tie13\",\"score\":0.10848042},{\"id\":\"tie14\",\"score\":0.10848042},{\"id\":\"tie15\",\"score\":0.10848042}]}\n",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:59:01 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\ntext maxDoc=19 docCount=18 sumTotalTermFreq=65035\n"
+      },
+      {
+        "name": "tie-rust-k09-b04",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx",
+          "3f666666",
+          "3ecccccd"
+        ],
+        "returncode": 0,
+        "stdout": "{\"count\":16,\"count_matches_exhaustive\":true,\"query\":\"beta\",\"ranking_matches_exhaustive\":true,\"top100\":[{\"id\":\"tie07\",\"score\":0.09159761667251587},{\"id\":\"tie03\",\"score\":0.09159761667251587},{\"id\":\"tie00\",\"score\":0.09159761667251587},{\"id\":\"tie01\",\"score\":0.09159761667251587},{\"id\":\"tie02\",\"score\":0.09159761667251587},{\"id\":\"tie04\",\"score\":0.09159761667251587},{\"id\":\"tie05\",\"score\":0.09159761667251587},{\"id\":\"tie06\",\"score\":0.09159761667251587},{\"id\":\"tie08\",\"score\":0.09159761667251587},{\"id\":\"tie09\",\"score\":0.09159761667251587},{\"id\":\"tie10\",\"score\":0.09159761667251587},{\"id\":\"tie11\",\"score\":0.09159761667251587},{\"id\":\"tie12\",\"score\":0.09159761667251587},{\"id\":\"tie13\",\"score\":0.09159761667251587},{\"id\":\"tie14\",\"score\":0.09159761667251587},{\"id\":\"tie15\",\"score\":0.09159761667251587}]}\n",
+        "stderr": "BM25_PROFILE\t{\"b_bits\":\"3ecccccd\",\"collection_statistics\":\"physical\",\"doc_count\":18,\"engine\":\"tantivy\",\"field\":\"text\",\"k1_bits\":\"3f666666\",\"protocol\":\"bm25-profile-v1\",\"query_cache\":\"disabled\",\"scale_bits\":\"3f800000\",\"sum_total_term_freq\":65035}\n"
+      },
+      {
+        "name": "tie-java-k09-b04",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "DumpNativeLuceneResults",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.idx",
+          "1",
+          "3f666666",
+          "3ecccccd"
+        ],
+        "returncode": 0,
+        "stdout": "{\"query\":\"beta\",\"count\":16,\"top100\":[{\"id\":\"tie07\",\"score\":0.09159762},{\"id\":\"tie03\",\"score\":0.09159762},{\"id\":\"tie00\",\"score\":0.09159762},{\"id\":\"tie01\",\"score\":0.09159762},{\"id\":\"tie02\",\"score\":0.09159762},{\"id\":\"tie04\",\"score\":0.09159762},{\"id\":\"tie05\",\"score\":0.09159762},{\"id\":\"tie06\",\"score\":0.09159762},{\"id\":\"tie08\",\"score\":0.09159762},{\"id\":\"tie09\",\"score\":0.09159762},{\"id\":\"tie10\",\"score\":0.09159762},{\"id\":\"tie11\",\"score\":0.09159762},{\"id\":\"tie12\",\"score\":0.09159762},{\"id\":\"tie13\",\"score\":0.09159762},{\"id\":\"tie14\",\"score\":0.09159762},{\"id\":\"tie15\",\"score\":0.09159762}]}\n",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:59:02 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\nBM25_PROFILE\t{\"protocol\":\"bm25-profile-v1\",\"engine\":\"lucene\",\"field\":\"text\",\"k1_bits\":\"3f666666\",\"b_bits\":\"3ecccccd\",\"scale_bits\":\"3f800000\",\"collection_statistics\":\"physical\",\"query_cache\":\"disabled\",\"doc_count\":18,\"sum_total_term_freq\":65035}\ntext maxDoc=19 docCount=18 sumTotalTermFreq=65035\n"
+      },
+      {
+        "name": "tie-rust-k25-b1",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/validate_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx",
+          "40200000",
+          "3f800000"
+        ],
+        "returncode": 0,
+        "stdout": "{\"count\":16,\"count_matches_exhaustive\":true,\"query\":\"beta\",\"ranking_matches_exhaustive\":true,\"top100\":[{\"id\":\"tie07\",\"score\":0.14088362455368042},{\"id\":\"tie03\",\"score\":0.14088362455368042},{\"id\":\"tie00\",\"score\":0.14088362455368042},{\"id\":\"tie01\",\"score\":0.14088362455368042},{\"id\":\"tie02\",\"score\":0.14088362455368042},{\"id\":\"tie04\",\"score\":0.14088362455368042},{\"id\":\"tie05\",\"score\":0.14088362455368042},{\"id\":\"tie06\",\"score\":0.14088362455368042},{\"id\":\"tie08\",\"score\":0.14088362455368042},{\"id\":\"tie09\",\"score\":0.14088362455368042},{\"id\":\"tie10\",\"score\":0.14088362455368042},{\"id\":\"tie11\",\"score\":0.14088362455368042},{\"id\":\"tie12\",\"score\":0.14088362455368042},{\"id\":\"tie13\",\"score\":0.14088362455368042},{\"id\":\"tie14\",\"score\":0.14088362455368042},{\"id\":\"tie15\",\"score\":0.14088362455368042}]}\n",
+        "stderr": "BM25_PROFILE\t{\"b_bits\":\"3f800000\",\"collection_statistics\":\"physical\",\"doc_count\":18,\"engine\":\"tantivy\",\"field\":\"text\",\"k1_bits\":\"40200000\",\"protocol\":\"bm25-profile-v1\",\"query_cache\":\"disabled\",\"scale_bits\":\"3f800000\",\"sum_total_term_freq\":65035}\n"
+      },
+      {
+        "name": "tie-java-k25-b1",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "DumpNativeLuceneResults",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.idx",
+          "1",
+          "40200000",
+          "3f800000"
+        ],
+        "returncode": 0,
+        "stdout": "{\"query\":\"beta\",\"count\":16,\"top100\":[{\"id\":\"tie07\",\"score\":0.14088362},{\"id\":\"tie03\",\"score\":0.14088362},{\"id\":\"tie00\",\"score\":0.14088362},{\"id\":\"tie01\",\"score\":0.14088362},{\"id\":\"tie02\",\"score\":0.14088362},{\"id\":\"tie04\",\"score\":0.14088362},{\"id\":\"tie05\",\"score\":0.14088362},{\"id\":\"tie06\",\"score\":0.14088362},{\"id\":\"tie08\",\"score\":0.14088362},{\"id\":\"tie09\",\"score\":0.14088362},{\"id\":\"tie10\",\"score\":0.14088362},{\"id\":\"tie11\",\"score\":0.14088362},{\"id\":\"tie12\",\"score\":0.14088362},{\"id\":\"tie13\",\"score\":0.14088362},{\"id\":\"tie14\",\"score\":0.14088362},{\"id\":\"tie15\",\"score\":0.14088362}]}\n",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:59:03 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\nBM25_PROFILE\t{\"protocol\":\"bm25-profile-v1\",\"engine\":\"lucene\",\"field\":\"text\",\"k1_bits\":\"40200000\",\"b_bits\":\"3f800000\",\"scale_bits\":\"3f800000\",\"collection_statistics\":\"physical\",\"query_cache\":\"disabled\",\"doc_count\":18,\"sum_total_term_freq\":65035}\ntext maxDoc=19 docCount=18 sumTotalTermFreq=65035\n"
+      },
+      {
+        "name": "position-build",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/position.idx",
+          "--fixture-docs",
+          "19"
+        ],
+        "returncode": 0,
+        "stdout": "{\"analyzer\":\"wiki_ascii_lucene\",\"corpus_canonical_lines_sha256\":\"c133914b4f03e82b9b5b5f2877a2aa2a910b1948507f8321a1cec64a777478b2\",\"documents\":19,\"fixture_mode\":true,\"segments\":1,\"tokens\":65035}\n",
+        "stderr": ""
+      },
+      {
+        "name": "position-physical",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/position.idx",
+          "--physical"
+        ],
+        "returncode": 0,
+        "stdout": "0\ttie07\t9\t2\n1\tempty\t9223372036854775809\t0\n2\ttie03\t9\t2\n3\thigh\t18446744073709551615\t135\n4\tpositions\t9223372036854775815\t3\n5\ttie00\t9\t2\n6\ttie01\t9\t2\n7\ttie02\t9\t2\n8\ttie04\t9\t2\n9\ttie05\t9\t2\n10\ttie06\t9\t2\n11\ttie08\t9\t2\n12\ttie09\t9\t2\n13\ttie10\t9\t2\n14\ttie11\t9\t2\n15\ttie12\t9\t2\n16\ttie13\t9\t2\n17\ttie14\t9\t2\n18\ttie15\t9\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "position-payload",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/payload_identity",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/position.idx"
+        ],
+        "returncode": 0,
+        "stdout": "{\"index\":\"/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/position.idx\",\"logical\":{\"fields\":[{\"name\":\"id\"},{\"fieldnorms_sha256\":\"543bafd973ab30bd3aaa5d61ae921a65beef754914fd1a7fbf5dd0a2c76f9b0e\",\"name\":\"text\",\"postings\":{\"derived_field_docs\":18,\"derived_tokens\":65035,\"positions\":65035,\"postings\":35,\"sha256\":\"112e458016568e8497d6a184ab7a4dbc801eab4558aad9d954edeb5a24094252\",\"terms\":4}},{\"fast_u64_sha256\":\"42799c973594860c15ccd73c745480c0bd448ae5c6212fa985e72c6a71600a3e\",\"name\":\"sort_field\"}],\"live_docs\":19,\"max_doc\":19,\"schema_sha256\":\"9a378cab4c2b1118a54d42ec01a852786a8eacb5a6f947d04ea2a70c7006a5fa\",\"stored_documents_sha256\":\"e558175075463246ec9da8d73ce5316e7f865624d554bdc1e97c9086ec665ecf\"},\"metadata_headers\":[{\"name\":\"text\",\"serialized_token_total\":65035}]}\n",
+        "stderr": ""
+      },
+      {
+        "name": "position-term-statistics",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_termtotals",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/position.idx"
+        ],
+        "returncode": 0,
+        "stdout": "a\t1\t2\nalpha\t17\t65016\nb\t1\t1\nbeta\t16\t16\n",
+        "stderr": "{\"derived_total_tokens\":65035,\"documents\":19,\"field_doc_count\":18,\"serialized_total_tokens\":65035,\"terms\":4}\n"
+      },
+      {
+        "name": "frequency-build",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/frequency.idx",
+          "--fixture-docs",
+          "19"
+        ],
+        "returncode": 0,
+        "stdout": "{\"analyzer\":\"wiki_ascii_lucene\",\"corpus_canonical_lines_sha256\":\"1a5d485befaafcc286785fbdd52c3909fd5e98709991c4d7309be64456f954fd\",\"documents\":19,\"fixture_mode\":true,\"segments\":1,\"tokens\":65035}\n",
+        "stderr": ""
+      },
+      {
+        "name": "frequency-physical",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/frequency.idx",
+          "--physical"
+        ],
+        "returncode": 0,
+        "stdout": "0\ttie07\t9\t2\n1\tempty\t9223372036854775809\t0\n2\ttie03\t9\t2\n3\thigh\t18446744073709551615\t135\n4\tpositions\t9223372036854775815\t3\n5\ttie00\t9\t2\n6\ttie01\t9\t2\n7\ttie02\t9\t2\n8\ttie04\t9\t2\n9\ttie05\t9\t2\n10\ttie06\t9\t2\n11\ttie08\t9\t2\n12\ttie09\t9\t2\n13\ttie10\t9\t2\n14\ttie11\t9\t2\n15\ttie12\t9\t2\n16\ttie13\t9\t2\n17\ttie14\t9\t2\n18\ttie15\t9\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "frequency-payload",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/payload_identity",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/frequency.idx"
+        ],
+        "returncode": 0,
+        "stdout": "{\"index\":\"/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/frequency.idx\",\"logical\":{\"fields\":[{\"name\":\"id\"},{\"fieldnorms_sha256\":\"543bafd973ab30bd3aaa5d61ae921a65beef754914fd1a7fbf5dd0a2c76f9b0e\",\"name\":\"text\",\"postings\":{\"derived_field_docs\":18,\"derived_tokens\":65035,\"positions\":65035,\"postings\":35,\"sha256\":\"1b56471bdd2631c4cba7b38776a1211c439c51b2df5457467775e417dc694924\",\"terms\":4}},{\"fast_u64_sha256\":\"42799c973594860c15ccd73c745480c0bd448ae5c6212fa985e72c6a71600a3e\",\"name\":\"sort_field\"}],\"live_docs\":19,\"max_doc\":19,\"schema_sha256\":\"9a378cab4c2b1118a54d42ec01a852786a8eacb5a6f947d04ea2a70c7006a5fa\",\"stored_documents_sha256\":\"e558175075463246ec9da8d73ce5316e7f865624d554bdc1e97c9086ec665ecf\"},\"metadata_headers\":[{\"name\":\"text\",\"serialized_token_total\":65035}]}\n",
+        "stderr": ""
+      },
+      {
+        "name": "norm-build",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/norm.idx",
+          "--fixture-docs",
+          "19"
+        ],
+        "returncode": 0,
+        "stdout": "{\"analyzer\":\"wiki_ascii_lucene\",\"corpus_canonical_lines_sha256\":\"fe7c76735d8fd886080f2ec0cfd30036999757ed0d12ae0c4bfe531fdb984382\",\"documents\":19,\"fixture_mode\":true,\"segments\":1,\"tokens\":65036}\n",
+        "stderr": ""
+      },
+      {
+        "name": "norm-physical",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/norm.idx",
+          "--physical"
+        ],
+        "returncode": 0,
+        "stdout": "0\ttie07\t9\t2\n1\tempty\t9223372036854775809\t0\n2\ttie03\t9\t2\n3\thigh\t18446744073709551615\t135\n4\tpositions\t9223372036854775815\t4\n5\ttie00\t9\t2\n6\ttie01\t9\t2\n7\ttie02\t9\t2\n8\ttie04\t9\t2\n9\ttie05\t9\t2\n10\ttie06\t9\t2\n11\ttie08\t9\t2\n12\ttie09\t9\t2\n13\ttie10\t9\t2\n14\ttie11\t9\t2\n15\ttie12\t9\t2\n16\ttie13\t9\t2\n17\ttie14\t9\t2\n18\ttie15\t9\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "norm-payload",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/payload_identity",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/norm.idx"
+        ],
+        "returncode": 0,
+        "stdout": "{\"index\":\"/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/norm.idx\",\"logical\":{\"fields\":[{\"name\":\"id\"},{\"fieldnorms_sha256\":\"6e78d29996b9381b795ea686687f3f4e92584c4f6889ba8c08f337554946ef63\",\"name\":\"text\",\"postings\":{\"derived_field_docs\":18,\"derived_tokens\":65036,\"positions\":65036,\"postings\":35,\"sha256\":\"b891db456f31d08cb7229133ab1bb1766186ca095b8637489c60cc52c60a2c08\",\"terms\":4}},{\"fast_u64_sha256\":\"42799c973594860c15ccd73c745480c0bd448ae5c6212fa985e72c6a71600a3e\",\"name\":\"sort_field\"}],\"live_docs\":19,\"max_doc\":19,\"schema_sha256\":\"9a378cab4c2b1118a54d42ec01a852786a8eacb5a6f947d04ea2a70c7006a5fa\",\"stored_documents_sha256\":\"e558175075463246ec9da8d73ce5316e7f865624d554bdc1e97c9086ec665ecf\"},\"metadata_headers\":[{\"name\":\"text\",\"serialized_token_total\":65036}]}\n",
+        "stderr": ""
+      },
+      {
+        "name": "sort-build",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/sort.idx",
+          "--fixture-docs",
+          "19"
+        ],
+        "returncode": 0,
+        "stdout": "{\"analyzer\":\"wiki_ascii_lucene\",\"corpus_canonical_lines_sha256\":\"1fba890a88f4dcf8a14788e4989548130706b03e71539f22d8a2336d38c0bf03\",\"documents\":19,\"fixture_mode\":true,\"segments\":1,\"tokens\":65035}\n",
+        "stderr": ""
+      },
+      {
+        "name": "sort-physical",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/sort.idx",
+          "--physical"
+        ],
+        "returncode": 0,
+        "stdout": "0\ttie07\t9\t2\n1\tempty\t9223372036854775809\t0\n2\ttie03\t9\t2\n3\thigh\t18446744073709551615\t135\n4\tpositions\t1\t3\n5\ttie00\t9\t2\n6\ttie01\t9\t2\n7\ttie02\t9\t2\n8\ttie04\t9\t2\n9\ttie05\t9\t2\n10\ttie06\t9\t2\n11\ttie08\t9\t2\n12\ttie09\t9\t2\n13\ttie10\t9\t2\n14\ttie11\t9\t2\n15\ttie12\t9\t2\n16\ttie13\t9\t2\n17\ttie14\t9\t2\n18\ttie15\t9\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "reverse-control-sorted",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/tmp/wiki-docorder-reverse-789547-1791190710006253316/ordered.idx"
+        ],
+        "returncode": 0,
+        "stdout": "a\t18446744073709551615\t2\nb\t18446744073709551615\t2\nc\t18446744073709551615\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "reverse-witness-sorted",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/tmp/wiki-docorder-reverse-789547-1791190710006253316/reversed.idx"
+        ],
+        "returncode": 0,
+        "stdout": "a\t18446744073709551615\t2\nb\t18446744073709551615\t2\nc\t18446744073709551615\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "reverse-control-physical",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/tmp/wiki-docorder-reverse-789547-1791190710006253316/ordered.idx",
+          "--physical"
+        ],
+        "returncode": 0,
+        "stdout": "0\tb\t18446744073709551615\t2\n1\tc\t18446744073709551615\t2\n2\ta\t18446744073709551615\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "reverse-witness-physical",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/tmp/wiki-docorder-reverse-789547-1791190710006253316/reversed.idx",
+          "--physical"
+        ],
+        "returncode": 0,
+        "stdout": "0\ta\t18446744073709551615\t2\n1\tb\t18446744073709551615\t2\n2\tc\t18446744073709551615\t2\n",
+        "stderr": ""
+      },
+      {
+        "name": "bad-option-0",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/bad-option-0.idx",
+          "--fixture-docs",
+          "19",
+          "--ordered-batches",
+          "0",
+          "--physical-map",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.physical.tsv",
+          "--replay-receipt",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.jsonl.replay.json"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Error: \"invalid ordered batch size or memory budget\"\n"
+      },
+      {
+        "name": "bad-option-1",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/bad-option-1.idx",
+          "--fixture-docs",
+          "19",
+          "--ordered-batches",
+          "7",
+          "--physical-map",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.physical.tsv",
+          "--replay-receipt",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.jsonl.replay.json",
+          "--memory-bytes",
+          "5368709120"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Error: \"invalid ordered batch size or memory budget\"\n"
+      },
+      {
+        "name": "changed-bytes",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/changed-bytes.idx",
+          "--fixture-docs",
+          "19",
+          "--ordered-batches",
+          "7",
+          "--physical-map",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.physical.tsv",
+          "--replay-receipt",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.jsonl.replay.json"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Error: \"actual input raw bytes/tokens differ from replay receipt\"\n"
+      },
+      {
+        "name": "changed-ending",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/changed-ending.idx",
+          "--fixture-docs",
+          "19",
+          "--ordered-batches",
+          "7",
+          "--physical-map",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.physical.tsv",
+          "--replay-receipt",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.jsonl.replay.json"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Error: \"actual input raw bytes/tokens differ from replay receipt\"\n"
+      },
+      {
+        "name": "reused-index",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.idx",
+          "--fixture-docs",
+          "19",
+          "--ordered-batches",
+          "7",
+          "--physical-map",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/lucene.physical.tsv",
+          "--replay-receipt",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/ordered.jsonl.replay.json"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Error: \"build receipt already exists\"\n"
+      },
+      {
+        "name": "early-multiple-flush",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/heavy.idx",
+          "--fixture-docs",
+          "2",
+          "--ordered-batches",
+          "2",
+          "--physical-map",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/heavy.map.tsv",
+          "--replay-receipt",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/heavy-ordered.jsonl.replay.json",
+          "--memory-bytes",
+          "15000000"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Error: \"ordered batch must expose exactly one new segment and retain all prior segments\"\n"
+      },
+      {
+        "name": "legacy-java-fixture",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "BuildWikiFixture",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/legacy-java.idx"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:59:10 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\n"
+      },
+      {
+        "name": "legacy-rust-fixture",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/build_index",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/legacy-tantivy.idx",
+          "--fixture-docs",
+          "2"
+        ],
+        "returncode": 0,
+        "stdout": "{\"analyzer\":\"wiki_ascii_lucene\",\"corpus_canonical_lines_sha256\":\"7266c537348535435e91c2ddb80480143b3300d79f357afcb917788ecc83a8fc\",\"documents\":2,\"fixture_mode\":true,\"segments\":1,\"tokens\":65000}\n",
+        "stderr": ""
+      },
+      {
+        "name": "legacy-java-map",
+        "command": [
+          "java",
+          "--add-modules",
+          "jdk.incubator.vector",
+          "--enable-native-access=ALL-UNNAMED",
+          "-cp",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/classes:/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/build/dependencies/*",
+          "DumpWikiLogical",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/legacy-java.idx",
+          "documents"
+        ],
+        "returncode": 0,
+        "stdout": "empty\t0\t0\nhigh\t1\t135\n",
+        "stderr": "WARNING: Using incubator modules: jdk.incubator.vector\nOct 05, 2026 1:59:11 AM org.apache.lucene.internal.vectorization.PanamaVectorizationProvider <init>\nINFO: Java vector incubator API enabled; uses preferredBitSize=256; FMA enabled\n"
+      },
+      {
+        "name": "legacy-rust-map",
+        "command": [
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-profile-adapter-oct05/build/debug/dump_docmap",
+          "/home/pronsh/Coding/playground/search/tantivy-native-profiles-oct05/target/native-docorder-real-fixtures-oct05/legacy-tantivy.idx"
+        ],
+        "returncode": 0,
+        "stdout": "empty\t0\t0\nhigh\t1\t135\n",
+        "stderr": ""
+      }
+    ],
+    "source_sha256": {
+      "BuildWikiFixture.java": "8805bd828bceefbb5832549ce37984366ca12280b3793d255a666902a0a5fbf9",
+      "DumpWikiLogical.java": "7105554897264629ac926fbcb1e0b483aa281f3e58be87de0a836706882b5efb",
+      "DumpNativeLuceneResults.java": "ae5569b24f63f39fc2b227043516a0951f19d97f7ecf2e8fa5e980bd5c8da5da",
+      "NativeBm25Profile.java": "511793f196c9d745f274f0a561149bb3fdd83b3686b7e143a099e3df3337d08f",
+      "build_index.rs": "a306cfed2b6a267a2281c7e1b4287ce9eed80cdda46932977b0438d4d5af5a65",
+      "dump_docmap.rs": "9881964158f03b3898e52b634cd113ee194afe9d173d2947c448535fbbc41328",
+      "shared/wiki_physical.rs": "d888546807d1500dea91d50697d4d8bc5fb7f88ba21857e5124ee4cde156e66d",
+      "wiki_docorder.py": "647feaa8ae44dbcb40bb5743866e2f83c1ff25838158ba86b7882ea1438590f7",
+      "verify_wiki_docorder.py": "6ec45666ff1891f720230ba8dc6740c6e9c2102149bc9918683a3fbf6a2595ef"
+    },
+    "binaries_sha256": {
+      "build_index": "32e458fc12a51ad2e48394445202678f75711466f85afb2633fa46773658255d",
+      "dump_docmap": "f6e40a421b9dbea343788286d595d4afa497d4a9f13317cfe6a138dff8299a89",
+      "payload_identity": "9e74b8f3274a10c913bd1612f1ad37bbc47b004c61f59804c39a07f6dc042c3e",
+      "dump_termtotals": "e0cede2172fbbc508cfac62d846a4906ff0ca4a0f3cd5500f3f56b4fdb54d785",
+      "validate_index": "f9f8c549ad23d7c837925975038fa3eb19d4b3617c7e5014ec05572d1785f39f"
+    },
+    "classes_sha256": {
+      "BuildWikiFixture.class": "b5fd0fc576e6a8b65dbc2673cdf1838557108279d460343ea3b57a63f70c35ff",
+      "DumpWikiLogical$Row.class": "8b1228224e92f7dab6024f20bc1bf62c87160922c81eddc970af77eeb75a91e4",
+      "DumpWikiLogical$CanonicalHash.class": "e1fc9716a0f7b6fa852aeff4aa127079824ebbc98b66835b19e479d596bb0792",
+      "DumpWikiLogical.class": "adce358b23907921c3ce3c3da8e0dbc9cb28651a3e11966079e2c49b34dc95b6",
+      "DumpNativeLuceneResults.class": "3ce85576d2e0687ca317dff1f7764419c35eb3657fbfb0c9ebc291b41a1dc1ed",
+      "NativeBm25Profile.class": "01fe7a03322112a431ba6d17b3f3704ff64c816487b794031254e09a5b093a66"
+    },
+    "jars_sha256": {
+      "lucene-analysis-common-10.4.0.jar": "8e768c9b2a3870f1fc2655181516699e719a56b9aaf8664226a11ae7d90cb4e9",
+      "lucene-queryparser-10.4.0.jar": "4635f2a14e9c01574c4cf9ad60e018ab2b041b7889369107a991ef950648c847",
+      "lucene-sandbox-10.4.0.jar": "49f5aa75aa6eda166652be4f294e2efc720e59b9325ee6f60403166edca0e70c",
+      "lucene-queries-10.4.0.jar": "c5cfbb892dfa78d272d6c0b46442159d75f92adfd7577c03bf5fe9e6067b475b",
+      "lucene-facet-10.4.0.jar": "c4d602a389945a8347bc39f904e8bd2504d823333f5cf9da16cda364c6f9eae8",
+      "lucene-core-10.4.0.jar": "8f894d211a8123938ccb9ff6827d136747e0eb6b1782ada6ac9086aa911b52e2",
+      "minimal-json-0.9.5.jar": "69ff84463d1d7cc5cfdb8baf2b6e5f7af153d351bf0dbee3bbc8916247afac74"
+    }
+  },
+  "retained_tie_bits_recheck": {
+    "DEFAULT": {
+      "count": 16,
+      "score_bits": "3dde2afc",
+      "same_top10_id_order": true
+    },
+    "k09-b04": {
+      "count": 16,
+      "score_bits": "3dbb9788",
+      "same_top10_id_order": true
+    },
+    "k25-b1": {
+      "count": 16,
+      "score_bits": "3e1043cc",
+      "same_top10_id_order": true
+    }
+  },
+  "final_python_suite": {
+    "command": [
+      "python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "doc/performance/lucene-10.4",
+      "-p",
+      "test_*.py"
+    ],
+    "passed": 37,
+    "legacy_unchanged": 15,
+    "profile_tests": 13,
+    "docorder_tests": 9
+  },
+  "reverse_merge_test": {
+    "command": [
+      "cargo",
+      "test",
+      "--manifest-path",
+      "target/native-profile-adapter-oct05/Cargo.toml",
+      "--target-dir",
+      "target/native-profile-adapter-oct05/build",
+      "--jobs",
+      "4",
+      "--bin",
+      "build_index",
+      "--",
+      "--nocapture"
+    ],
+    "passed": 1,
+    "physical_rejected": true,
+    "id_sorted_equal": true,
+    "actual_indexes": "/tmp/wiki-docorder-reverse-789547-1791190710006253316"
+  },
+  "final_source_sha256": {
+    "BuildWikiFixture.java": "8805bd828bceefbb5832549ce37984366ca12280b3793d255a666902a0a5fbf9",
+    "DumpWikiLogical.java": "7105554897264629ac926fbcb1e0b483aa281f3e58be87de0a836706882b5efb",
+    "build_index.rs": "a306cfed2b6a267a2281c7e1b4287ce9eed80cdda46932977b0438d4d5af5a65",
+    "dump_docmap.rs": "9881964158f03b3898e52b634cd113ee194afe9d173d2947c448535fbbc41328",
+    "shared/wiki_physical.rs": "d888546807d1500dea91d50697d4d8bc5fb7f88ba21857e5124ee4cde156e66d",
+    "wiki_docorder.py": "647feaa8ae44dbcb40bb5743866e2f83c1ff25838158ba86b7882ea1438590f7",
+    "verify_wiki_docorder.py": "be7bff03e5b044fa3a9866b470c75504ad9cf6f9704b2eb50dbefa9e8614cb64",
+    "test_wiki_docorder.py": "147490348d72eb6c99750b6fff8e8c2365353d2b5f8e52ab806ffe251f2f6cd2",
+    "native_adapter_docorder.patch": "b48ceed202ec92e75b6932df124b402688d1deed6eafb7220f9f64a69bc49bf7"
+  },
+  "fixture_artifacts_sha256": {
+    "changed-bytes.idx/.managed.json": "fdde7de0b18b653a9dfda063acc5419e66fd169a7c4d0555a2038eab850aa235",
+    "changed-bytes.idx/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-bytes.idx/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-bytes.idx/2eeb00f06ea747049e4c38c2650598f6.fast": "72833abfe6f21ee0c920f0783a5cb0954673fd578f8a0818bae98b200ee79a7c",
+    "changed-bytes.idx/2eeb00f06ea747049e4c38c2650598f6.fieldnorm": "bf7febf7288b6b29398a01b4e4de4839b4d3c203aa82a69f7bf83c2be131143a",
+    "changed-bytes.idx/2eeb00f06ea747049e4c38c2650598f6.idx": "e3f9cb1421f354e6507c4fcbf0149e3d6fc83635c17a0f2608f6b2b7f2f11f54",
+    "changed-bytes.idx/2eeb00f06ea747049e4c38c2650598f6.pos": "d4cd4646e6d8a61b766733664ba67cefef263e3c7c81420d25a3538b9f9bad13",
+    "changed-bytes.idx/2eeb00f06ea747049e4c38c2650598f6.store": "258a348565abde1728e7dceaddb7efcf665390190fdc21f9b2d4b57f5d173730",
+    "changed-bytes.idx/2eeb00f06ea747049e4c38c2650598f6.term": "8af8eaa8203ae133ad6d9abd32c47e8e67ba25e23ea0b5fd767ef53163e536e6",
+    "changed-bytes.idx/433cec1e685f41bb8ea4447d1de426f2.fast": "41602f59d78763cc7939da9d639fefc05b975146dcc1c6504458ccf41675ff00",
+    "changed-bytes.idx/433cec1e685f41bb8ea4447d1de426f2.fieldnorm": "80e0122c9f3f9bf2778c2752e9c361a1603022dda37a51f24604c2860002772f",
+    "changed-bytes.idx/433cec1e685f41bb8ea4447d1de426f2.idx": "fc43fa05826704079249f8bee82bc34f6d8fce2e8d3f3b93c387770768454156",
+    "changed-bytes.idx/433cec1e685f41bb8ea4447d1de426f2.pos": "7cdae935e422bd281924c84a5d6fefc04fc85a18c8ee383fa6c4c479470d577b",
+    "changed-bytes.idx/433cec1e685f41bb8ea4447d1de426f2.store": "775f6f596ea4e40f91eb0b1bb9cf35082c5563f487c067794d0f7c9941f6e16e",
+    "changed-bytes.idx/433cec1e685f41bb8ea4447d1de426f2.term": "bdbd2bd420c1238a5b0b6b3de7daea9eb4e85fe8a18023ae95803cd05e5f1cec",
+    "changed-bytes.idx/f1e0eab05e2f4a988be9c4d55740897a.fast": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-bytes.idx/f1e0eab05e2f4a988be9c4d55740897a.fieldnorm": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-bytes.idx/f1e0eab05e2f4a988be9c4d55740897a.idx": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-bytes.idx/f1e0eab05e2f4a988be9c4d55740897a.pos": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-bytes.idx/f1e0eab05e2f4a988be9c4d55740897a.store": "70edecf0d46bbc06579c4ae35fcdb6b52c0bf9855b1b034e5fc1cd0d4d0487e4",
+    "changed-bytes.idx/f1e0eab05e2f4a988be9c4d55740897a.term": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-bytes.idx/meta.json": "cc5bcb3f0656703180c3bdefeb2f905aea99e4892c3952a0f1948f8978baa3ab",
+    "changed-ending.idx/.managed.json": "69d0a64d74579e51b1ab19179e7ca1f3f1e126f591d607c003f65d1478be94bb",
+    "changed-ending.idx/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-ending.idx/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-ending.idx/254ae91fd22a4d91b78542bbc0f23f58.fast": "72833abfe6f21ee0c920f0783a5cb0954673fd578f8a0818bae98b200ee79a7c",
+    "changed-ending.idx/254ae91fd22a4d91b78542bbc0f23f58.fieldnorm": "bf7febf7288b6b29398a01b4e4de4839b4d3c203aa82a69f7bf83c2be131143a",
+    "changed-ending.idx/254ae91fd22a4d91b78542bbc0f23f58.idx": "2268d1ce6b6713141f3f498245358df9df01beae32926dab8a8b0e4e952f6d16",
+    "changed-ending.idx/254ae91fd22a4d91b78542bbc0f23f58.pos": "da2d071568d4aeecb4abb82a4e973b8f6b469dbb81db98b8696ed496dfcd3269",
+    "changed-ending.idx/254ae91fd22a4d91b78542bbc0f23f58.store": "258a348565abde1728e7dceaddb7efcf665390190fdc21f9b2d4b57f5d173730",
+    "changed-ending.idx/254ae91fd22a4d91b78542bbc0f23f58.term": "e255443cf0aa9a98ae777a86973d9028409ca5962ee185abbd3664df7df1fd88",
+    "changed-ending.idx/b2644dfb6eda48bd9a75f209664b6b06.fast": "41602f59d78763cc7939da9d639fefc05b975146dcc1c6504458ccf41675ff00",
+    "changed-ending.idx/b2644dfb6eda48bd9a75f209664b6b06.fieldnorm": "80e0122c9f3f9bf2778c2752e9c361a1603022dda37a51f24604c2860002772f",
+    "changed-ending.idx/b2644dfb6eda48bd9a75f209664b6b06.idx": "fc43fa05826704079249f8bee82bc34f6d8fce2e8d3f3b93c387770768454156",
+    "changed-ending.idx/b2644dfb6eda48bd9a75f209664b6b06.pos": "7cdae935e422bd281924c84a5d6fefc04fc85a18c8ee383fa6c4c479470d577b",
+    "changed-ending.idx/b2644dfb6eda48bd9a75f209664b6b06.store": "775f6f596ea4e40f91eb0b1bb9cf35082c5563f487c067794d0f7c9941f6e16e",
+    "changed-ending.idx/b2644dfb6eda48bd9a75f209664b6b06.term": "bdbd2bd420c1238a5b0b6b3de7daea9eb4e85fe8a18023ae95803cd05e5f1cec",
+    "changed-ending.idx/c4a0f9b7bb0841aa99762e30da505916.fast": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-ending.idx/c4a0f9b7bb0841aa99762e30da505916.fieldnorm": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-ending.idx/c4a0f9b7bb0841aa99762e30da505916.idx": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-ending.idx/c4a0f9b7bb0841aa99762e30da505916.pos": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-ending.idx/c4a0f9b7bb0841aa99762e30da505916.store": "70edecf0d46bbc06579c4ae35fcdb6b52c0bf9855b1b034e5fc1cd0d4d0487e4",
+    "changed-ending.idx/c4a0f9b7bb0841aa99762e30da505916.term": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "changed-ending.idx/meta.json": "94bb94c8043e76abb9dd5fe4df4abda1b987bd430316cc5c4c12ebedd998f5f1",
+    "classes/BuildWikiFixture.class": "b5fd0fc576e6a8b65dbc2673cdf1838557108279d460343ea3b57a63f70c35ff",
+    "classes/DumpNativeLuceneResults.class": "3ce85576d2e0687ca317dff1f7764419c35eb3657fbfb0c9ebc291b41a1dc1ed",
+    "classes/DumpWikiLogical$CanonicalHash.class": "e1fc9716a0f7b6fa852aeff4aa127079824ebbc98b66835b19e479d596bb0792",
+    "classes/DumpWikiLogical$Row.class": "8b1228224e92f7dab6024f20bc1bf62c87160922c81eddc970af77eeb75a91e4",
+    "classes/DumpWikiLogical.class": "adce358b23907921c3ce3c3da8e0dbc9cb28651a3e11966079e2c49b34dc95b6",
+    "classes/NativeBm25Profile.class": "01fe7a03322112a431ba6d17b3f3704ff64c816487b794031254e09a5b093a66",
+    "frequency.idx/.managed.json": "38a8822ae6cf42e2bbd2ff00398a86e3cfe83835db5d59373c95c0cfc77a277e",
+    "frequency.idx/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frequency.idx/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frequency.idx/50238984bb4e4e4b964991cce2b56d04.fast": "d037e9459fe11ef4b1ae7d6a30f3d090c6c499b880680f023e7226bfac614042",
+    "frequency.idx/50238984bb4e4e4b964991cce2b56d04.fieldnorm": "b2d52096ed744ab9c2e43ffc046398608ec8d4c77f4bd63c86f49bdab14b2136",
+    "frequency.idx/50238984bb4e4e4b964991cce2b56d04.idx": "02e0108849adcaaeed34687bbaeda999c5d5910c4f05f9ac84061ca4cc93a2ef",
+    "frequency.idx/50238984bb4e4e4b964991cce2b56d04.pos": "d3cead5812be07eb08171bb4143d521c64f8c02145bcf5741fc9e1b28a1ba428",
+    "frequency.idx/50238984bb4e4e4b964991cce2b56d04.store": "cb1e3907732bff4f3821869c70f5c86683fce051953f7cb52edba2b5faba783c",
+    "frequency.idx/50238984bb4e4e4b964991cce2b56d04.term": "e8620a79a5376461464a372474210453014ec71f59b96116297acb442816b7d4",
+    "frequency.idx/meta.json": "19e21dc0c18a9dbacd4c4b5cc8e3610cf7a64ee14c78bee83432b6d596c5945e",
+    "frequency.idx.build.json": "c09a640f67598254d43694a22d992331284a15fcfadf16313977245d3e399329",
+    "frequency.payload.json": "390daf6956b0af503ff5737960b3dd8f7c953caafda49f30fc1af9606aa87390",
+    "frequency.physical.tsv": "fb3eb9c0951bb09f690ce706fab216df7a664e1378346f3fca2b639408066c43",
+    "heavy-ordered.jsonl": "a3e1970c400713578395f2d0a10dc88775d24443a3e73bb0534aa9a720a4055b",
+    "heavy-ordered.jsonl.locator.sqlite": "3a6ee97d10c9cfba8fcf10a035c3175b693db73addab449f976c046db9f308ea",
+    "heavy-ordered.jsonl.replay.json": "43b9ccf2490ca8e9ebd1eb5b4ee555379962b0798cae82a7d66889d3f8eee04c",
+    "heavy.idx/.managed.json": "a35432f5805564237bbe3599155079a1dd267b9dd69a90851d1a1d78ddb24e17",
+    "heavy.idx/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "heavy.idx/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "heavy.idx/3dc1a1252d5d4588bbdabecfd995f349.fast": "b25d5cd3ba2f911196ba3678ff8f5e9fcc6d2562bd666329a291fee94dfbb4f0",
+    "heavy.idx/3dc1a1252d5d4588bbdabecfd995f349.fieldnorm": "25f7772ba4be296e81bec731c8e971dbf77f3683afb71bb7ded58e0cedbdbcef",
+    "heavy.idx/3dc1a1252d5d4588bbdabecfd995f349.idx": "faf13c3203310f1cf6042012c9baf211a12316bac6bd87ba39c3c0b27a1397d5",
+    "heavy.idx/3dc1a1252d5d4588bbdabecfd995f349.pos": "f475d70df2cffb073154a23b68da13bddb6b27007519550ad320d48bfca6c849",
+    "heavy.idx/3dc1a1252d5d4588bbdabecfd995f349.store": "7f180b61e1d973bda3c65f1e47e44ed8a61526256e0ad7821876305817059556",
+    "heavy.idx/3dc1a1252d5d4588bbdabecfd995f349.term": "1ea5de2590042fb4f6b25ec79e0a49342de89cb23cf46ed7599a297ba54f857a",
+    "heavy.idx/96a3b11af2714373b6a93415a7649d49.fast": "4c1959d0a13db9669ebd9d5ca773c931ddfbd3a3b8ff78e9c762249618d5bc6c",
+    "heavy.idx/96a3b11af2714373b6a93415a7649d49.fieldnorm": "c51c5141b4a43971be6665178c80045505927b7147c7279057fc54de618d6d13",
+    "heavy.idx/96a3b11af2714373b6a93415a7649d49.idx": "d179b6395d3d1cbb27ae069df4e011e157d29036546e1606989a20119105f02c",
+    "heavy.idx/96a3b11af2714373b6a93415a7649d49.pos": "0935aeace4f3e584dc7312d7bfc578fd55b692372f41f68d9b3e955b7ff9e3c5",
+    "heavy.idx/96a3b11af2714373b6a93415a7649d49.store": "dd914625f6fd7c5776b5702e762374cfcac073c6a2a036f8aa6a3c2459008776",
+    "heavy.idx/96a3b11af2714373b6a93415a7649d49.term": "497f12fcec0ea21bb75ac62c312ee1d9ec1c9d2a70935990f6a04557a17fe536",
+    "heavy.idx/meta.json": "9efc8b62c7c6c411151831c631ae5110d858a2979ec50ddce6252c17fe7c0034",
+    "heavy.jsonl": "a3e1970c400713578395f2d0a10dc88775d24443a3e73bb0534aa9a720a4055b",
+    "heavy.map.tsv": "136969e946c6c12feb372ee3113c67993a34c4ca59db928c64a3efc3af3910c2",
+    "legacy-java.idx/_0.cfe": "57c384a7109d2f4b8c948e1cf45e2afd0c0c717521fd7a45e034ff8f55b51d3d",
+    "legacy-java.idx/_0.cfs": "7a5037597a43fe7a62763f18fb2d0bc6593bcdfa842e54b30ad346c0633cf750",
+    "legacy-java.idx/_0.si": "380300b827599d9d8984644b409eaa8f9be164ff1fd236243e1e1c93b53d84d7",
+    "legacy-java.idx/segments_1": "b70e7d484be4d694a67c47d29592b232aee791815527487f685cd8f68f396f1a",
+    "legacy-java.idx/write.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "legacy-tantivy.idx/.managed.json": "4f84e2d7aca663ff186fefb2573ca56a13712bb5a42a5904efdd81cb66a700ac",
+    "legacy-tantivy.idx/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "legacy-tantivy.idx/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "legacy-tantivy.idx/1860e4da12e345ba9b5ebd1eaded88ac.fast": "3e47ae90b86198d1a3e72e8e222002fb0fd22fb154059fdc150ff904f28e1ecd",
+    "legacy-tantivy.idx/1860e4da12e345ba9b5ebd1eaded88ac.fieldnorm": "55d1e2b7a466ea6cb5a36c81f170f9221f69dde8daf65fd66e315749b1e88dba",
+    "legacy-tantivy.idx/1860e4da12e345ba9b5ebd1eaded88ac.idx": "d41842926f26a54945bc2b6bc9a5a00ebcfceb4c12ac495dc792e5877c1ce10d",
+    "legacy-tantivy.idx/1860e4da12e345ba9b5ebd1eaded88ac.pos": "897487b87bc1ea614038397842f671603f2f443c76ac179a2a78911613b90b25",
+    "legacy-tantivy.idx/1860e4da12e345ba9b5ebd1eaded88ac.store": "c84246b71a313f3bb39208ab71d44f630e9c6f2f1290032d8ed4e2f1dabc10ca",
+    "legacy-tantivy.idx/1860e4da12e345ba9b5ebd1eaded88ac.term": "9ad43d6cb1bcc3dbbbe538fa4748904518b1b43e6ef30c3f41fa0b2a727cd189",
+    "legacy-tantivy.idx/meta.json": "a617e55852b39f0740fe3d2e796e04e18773610d416c77c93ac1ff26c489a130",
+    "legacy-tantivy.idx.build.json": "4528fd4cf8fb4238d4d9ab71d18689251c35ea2785ac3109e14feb64d316b7c9",
+    "lucene.idx/_0.cfe": "02451a46ec06ea0778d43e5c10e26460857c37c945862c9c6355f727411e3c9c",
+    "lucene.idx/_0.cfs": "7595827e3eeb1e3dc34b641ffc32c990e586b87d3f9d9cbfb82b04f9498578a4",
+    "lucene.idx/_0.si": "07b4c610bfcbbd52b43c2d3d74b0e3fb53ed8e275e5431ecb43e51c5fb2e7a17",
+    "lucene.idx/segments_1": "30ebc7582be4b59c37fc135e95ccf81052810115db489e7a39dfa593510bebc9",
+    "lucene.idx/write.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "lucene.physical.tsv": "fb3eb9c0951bb09f690ce706fab216df7a664e1378346f3fca2b639408066c43",
+    "lucene.postings.json": "30bf36b87c610a5c60687e823edd9f801733f35a14075d7624bb7d3c8ea0d923",
+    "lucene.sorted.tsv": "39132e1152791548fb0cab3051d21b9c9c667c54722b1dbcf407fa058b6a425f",
+    "lucene.terms.tsv": "fbfbe17831af1b08361e541c427a764b19074d23b9bfe3fa1c6c26f9e6b567fa",
+    "merge-control.physical.tsv": "f0e6a28fab64d753234b47a79c760259ae3bbd18ae26ac31419e90721d3aa234",
+    "merge-reversed.physical.tsv": "04943a28d771487fbe412eac80c9bd2d19c5bfc8f3ec8a04671c9b8c2aed24b1",
+    "norm.idx/.managed.json": "73e0552b4a1eaf2f71eefeb9860012e4f9c1cfd24a89d2c0b1fa95ec283f90b3",
+    "norm.idx/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "norm.idx/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "norm.idx/52395c64fbb441068cf022be47e0f7cf.fast": "d037e9459fe11ef4b1ae7d6a30f3d090c6c499b880680f023e7226bfac614042",
+    "norm.idx/52395c64fbb441068cf022be47e0f7cf.fieldnorm": "342fa1777da5cc426bf183856ef83a88faf0c075e91d5629348457e379a64be1",
+    "norm.idx/52395c64fbb441068cf022be47e0f7cf.idx": "45bc8460e293e89072610bec9098f3a21e9f1b6931b7cf6e79145afe718e6b21",
+    "norm.idx/52395c64fbb441068cf022be47e0f7cf.pos": "d1312013e6c374da8d9625f3d1f0d5ac48286cc16dd6b7793f17adc7ee6ce0cb",
+    "norm.idx/52395c64fbb441068cf022be47e0f7cf.store": "cb1e3907732bff4f3821869c70f5c86683fce051953f7cb52edba2b5faba783c",
+    "norm.idx/52395c64fbb441068cf022be47e0f7cf.term": "ed53aca2148128586992bf24dc52566aa221952b2690660a6c6923093f3153a5",
+    "norm.idx/meta.json": "c0ea1da1157ff51ce1c710a207e7f6170339b584a793b196fce930609dd274a4",
+    "norm.idx.build.json": "984dcb4abb76441f1a46dd8185935fdfecd7c3d265172b189f73f11992aaa52e",
+    "norm.payload.json": "74de0b8c183103a84fbd7a7f8f35dbb4006d7940458d595bf0b026abf0db91aa",
+    "norm.physical.tsv": "b4c2b789b268593249095e706d208f2508e4502c1dbba5ec920179ca2e9a3df5",
+    "ordered.idx/.managed.json": "2c7efa9ca531505f752bbc521c8078a17cda5ffe56f2de9da0d2e5beca35c0ea",
+    "ordered.idx/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ordered.idx/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ordered.idx/0d504c889e2f47b985cf9ea233dcf194.fast": "d037e9459fe11ef4b1ae7d6a30f3d090c6c499b880680f023e7226bfac614042",
+    "ordered.idx/0d504c889e2f47b985cf9ea233dcf194.fieldnorm": "b2d52096ed744ab9c2e43ffc046398608ec8d4c77f4bd63c86f49bdab14b2136",
+    "ordered.idx/0d504c889e2f47b985cf9ea233dcf194.idx": "534b890d9079d424a7cb5759d80f8d7bd89209bb35713c36230e770457cf9703",
+    "ordered.idx/0d504c889e2f47b985cf9ea233dcf194.pos": "2de4412514f32613994a6bb99653d4d3ec5dd77d469f95ff5321dbae38b93ed8",
+    "ordered.idx/0d504c889e2f47b985cf9ea233dcf194.store": "cb1e3907732bff4f3821869c70f5c86683fce051953f7cb52edba2b5faba783c",
+    "ordered.idx/0d504c889e2f47b985cf9ea233dcf194.term": "bd2830c4f4c659972dec3173c3030deb4dedf7cfdb7ec486a4af6994109378c6",
+    "ordered.idx/meta.json": "65021979f3b52441989b52d5e1b5fdba119ee5682043764610760a985931e171",
+    "ordered.idx.build.json": "40f262a9f491ce3069d49e83c37a698cce8b6b57928f3d067ff81fb9325f08fd",
+    "ordered.jsonl": "0642b05762a0d007ba688bffe8797292b0fba565407c55ed2e4656ca26ef7768",
+    "ordered.jsonl.locator.sqlite": "467a3e2c5516ef41623310eed73bf9f1b0fce3d575012fd3960e48f583ab6db3",
+    "ordered.jsonl.replay.json": "7d57dfbd322630f11dfcb2acb6f5b7b875883a419cd3a747e9ccbba12845e559",
+    "original.jsonl": "407964ed6e51f685217bc3ebd428730a7dde93d3cab3a368fefc2d432a96fa54",
+    "payload-comparison.json": "a56430a0ea78f7f24d9ed7205b72e6f10f714c3e911a101c78bb17b8b02ade80",
+    "physical-comparison.json": "ea9150227447838225fffffb5ffaf813f76cb2b0af72291fc79f4f37834fd31b",
+    "position.idx/.managed.json": "f966d2f55d1a05adbedec38966ba5cf7b935cb566b38746fe047224ba5a920e8",
+    "position.idx/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "position.idx/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "position.idx/84efb3a6c6b14fb2bad309312c64b1cb.fast": "d037e9459fe11ef4b1ae7d6a30f3d090c6c499b880680f023e7226bfac614042",
+    "position.idx/84efb3a6c6b14fb2bad309312c64b1cb.fieldnorm": "b2d52096ed744ab9c2e43ffc046398608ec8d4c77f4bd63c86f49bdab14b2136",
+    "position.idx/84efb3a6c6b14fb2bad309312c64b1cb.idx": "534b890d9079d424a7cb5759d80f8d7bd89209bb35713c36230e770457cf9703",
+    "position.idx/84efb3a6c6b14fb2bad309312c64b1cb.pos": "f344ccd51255acc7356b2e395285ec1233a57add4e28d90dd90c5e6f0a2b4462",
+    "position.idx/84efb3a6c6b14fb2bad309312c64b1cb.store": "cb1e3907732bff4f3821869c70f5c86683fce051953f7cb52edba2b5faba783c",
+    "position.idx/84efb3a6c6b14fb2bad309312c64b1cb.term": "bd2830c4f4c659972dec3173c3030deb4dedf7cfdb7ec486a4af6994109378c6",
+    "position.idx/meta.json": "625bd3a8334309047e13d9cc1b981e9d9208a1e3ef5346b4efb4f7d97efb96ed",
+    "position.idx.build.json": "35a6acee29fb9135af9429aafd315cbe6923f07dd0b28f30360a66933914f1f2",
+    "position.payload.json": "19c815e372e1bcf0592e6c744aafa508e2ad4b0a9c5136a4afbe2487a3ecf1d0",
+    "position.physical.tsv": "fb3eb9c0951bb09f690ce706fab216df7a664e1378346f3fca2b639408066c43",
+    "sort.idx/.managed.json": "af1843a5683b291cc89852f3b0d98f1b8e427d38b1147d7d6475684ff676e44a",
+    "sort.idx/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sort.idx/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sort.idx/e7b1320075314277b67d041383e1509f.fast": "4bab3cda2d700fd0ee4e3e4c151ee8b54e2793ff51192025940d257456905806",
+    "sort.idx/e7b1320075314277b67d041383e1509f.fieldnorm": "b2d52096ed744ab9c2e43ffc046398608ec8d4c77f4bd63c86f49bdab14b2136",
+    "sort.idx/e7b1320075314277b67d041383e1509f.idx": "534b890d9079d424a7cb5759d80f8d7bd89209bb35713c36230e770457cf9703",
+    "sort.idx/e7b1320075314277b67d041383e1509f.pos": "2de4412514f32613994a6bb99653d4d3ec5dd77d469f95ff5321dbae38b93ed8",
+    "sort.idx/e7b1320075314277b67d041383e1509f.store": "cb1e3907732bff4f3821869c70f5c86683fce051953f7cb52edba2b5faba783c",
+    "sort.idx/e7b1320075314277b67d041383e1509f.term": "bd2830c4f4c659972dec3173c3030deb4dedf7cfdb7ec486a4af6994109378c6",
+    "sort.idx/meta.json": "e2efaeefc821c8f47541afab722120158b7023ec88653df5371f1d363d1c6a7a",
+    "sort.idx.build.json": "ff69022e119e48683542cdff69bda77dfdb6db9ca049a5d8dd6e76db38a3ba49",
+    "sort.physical.tsv": "4b22381308cd89bc7edac733dee1dfec7c94fc22e19920bbc867741e5134905a",
+    "summary.json": "462773dff5a4b84ba857ed30fa5270456cdf65f9e0c9b97783ed0c11368d03ee",
+    "tantivy.payload.json": "9db29af4db0c89679b27d5a9e5e9b0605d79c6af0d94ac51193e8fcd72e7ac9a",
+    "tantivy.physical.tsv": "fb3eb9c0951bb09f690ce706fab216df7a664e1378346f3fca2b639408066c43",
+    "tantivy.sorted.tsv": "39132e1152791548fb0cab3051d21b9c9c667c54722b1dbcf407fa058b6a425f",
+    "tantivy.terms.tsv": "fbfbe17831af1b08361e541c427a764b19074d23b9bfe3fa1c6c26f9e6b567fa"
+  },
+  "verification_executor_note": "The actual fixture run predates receipt-only stdin-hash recording and explicit f32 tie-bit assertion in verify_wiki_docorder.py. Every producer/comparator source and binary hash is unchanged. Retained raw dumps were rechecked for exact f32 bits after these observer additions; both executor hashes are preserved, not rewritten."
+}

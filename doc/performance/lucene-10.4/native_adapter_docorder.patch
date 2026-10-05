@@ -1,0 +1,25 @@
+--- a/build.py
++++ b/build.py
+@@ -15,4 +15,5 @@
+ TOOLS = FORK / "doc/performance/lucene-10.4"
+-BINS = ("do_query", "validate_index", "reencode_index")
+-SUPPORT = ("shared/bm25_profile.rs",)
++BINS = ("do_query", "validate_index", "reencode_index", "payload_identity", "payload_fixtures",
++        "build_index", "dump_termtotals", "dump_docmap")
++SUPPORT = ("shared/bm25_profile.rs", "shared/wiki_physical.rs")
+ FLAGS = "-C target-cpu=native"
+@@ -39,3 +40,3 @@
+             "--target-dir", str(ROOT/"target"), "--release", "--jobs", str(args.jobs)]
+-    for binary in (*BINS, "payload_identity", "payload_fixtures", "build_index", "dump_termtotals", "dump_docmap"):
++    for binary in BINS:
+         argv += ["--bin", binary]
+@@ -67,3 +68,3 @@
+         sources[name] = digest(source)
+-    local_sources = {name:digest(ROOT/"src/bin"/name) for name in (*sources, "payload_identity.rs", "payload_fixtures.rs", "build_index.rs", "dump_termtotals.rs", "dump_docmap.rs")}
++    local_sources = {name:digest(ROOT/"src/bin"/name) for name in sources}
+     manifest_hash = digest(ROOT/"Cargo.toml")
+@@ -81,3 +82,3 @@
+     binaries = {}
+-    for binary in (*BINS, "payload_identity", "payload_fixtures", "build_index", "dump_termtotals", "dump_docmap"):
++    for binary in BINS:
+         path = artifact/binary

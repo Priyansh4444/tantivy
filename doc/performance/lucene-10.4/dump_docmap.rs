@@ -1,3 +1,6 @@
+#[path = "shared/wiki_physical.rs"]
+mod wiki_physical;
+
 use std::io::Write;
 use tantivy::schema::Value;
 use tantivy::{Index, TantivyDocument};
@@ -6,12 +9,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let stdout = std::io::stdout();
     let mut output = std::io::BufWriter::new(stdout.lock());
     let path = std::env::args().nth(1).ok_or("expected index directory")?;
+    let physical = match std::env::args().nth(2).as_deref() {
+        None => false,
+        Some("--physical") if std::env::args().count() == 3 => true,
+        _ => return Err("Usage: INDEX [--physical]".into()),
+    };
     let index = Index::open_in_dir(path)?;
     let schema = index.schema();
     let id = schema.get_field("id")?;
     let text = schema.get_field("text")?;
     let reader = index.reader()?;
     let searcher = reader.searcher();
+    if physical {
+        wiki_physical::visit(&searcher, |row| {
+            output.write_all(row.wire().as_bytes())?;
+            Ok(())
+        })?;
+        output.flush()?;
+        return Ok(());
+    }
     let mut rows = Vec::with_capacity(searcher.num_docs() as usize);
     for segment in searcher.segment_readers() {
         if segment.num_docs() != segment.max_doc() {
