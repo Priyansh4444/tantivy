@@ -167,10 +167,15 @@ impl BlockSegmentPostings {
         fieldnorm_reader: &FieldNormReader,
         bm25_weight: &Bm25Weight,
     ) -> Score {
-        // This public API accepts a different weight on each call. A cached
-        // maximum computed for an earlier weight cannot be reused.
-        self.block_max_score_cache = None;
-        self.block_max_score_with_stored_max(fieldnorm_reader, bm25_weight, false)
+        // Public callers may supply a different weight or fieldnorm reader.
+        // Neither read nor populate the fixed TermScorer's numeric cache.
+        if !bm25_weight.has_safe_score_bounds()
+            || self.skip_reader.last_doc_in_block() != TERMINATED
+        {
+            return bm25_weight.max_score();
+        }
+        self.loaded_block_max_score(fieldnorm_reader, bm25_weight)
+            .unwrap_or_else(|| bm25_weight.max_score())
     }
 
     pub(crate) fn block_max_score_with_stored_max(
@@ -201,16 +206,7 @@ impl BlockSegmentPostings {
         // A loaded tail, or a trusted complete block with absent metadata,
         // allows an exact maximum using the query statistics. Complete blocks
         // with untrusted provenance already returned the global bound above.
-        if self.block_is_loaded() {
-            let docs = self.doc_decoder.output_array().iter().cloned();
-            let bm25_scores = docs.enumerate().map(|(idx, doc)| {
-                let fieldnorm_id = fieldnorm_reader.fieldnorm_id(doc);
-                let term_freq = self.freq_decoder.output(idx);
-                bm25_weight.score(fieldnorm_id, term_freq)
-            });
-            // A document without this term contributes zero to a union, so
-            // even an all-negative block needs a nonnegative contribution bound.
-            let block_max_score = max_score(bm25_scores).unwrap_or(0.0).max(0.0);
+        if let Some(block_max_score) = self.loaded_block_max_score(fieldnorm_reader, bm25_weight) {
             self.block_max_score_cache = Some(block_max_score);
             return block_max_score;
         }
@@ -219,6 +215,25 @@ impl BlockSegmentPostings {
         //
         // We do not cache it however, so that it gets computed when once block is loaded.
         bm25_weight.max_score()
+    }
+
+    // Callers check score-bound safety before this literal loaded-block reduction.
+    fn loaded_block_max_score(
+        &self,
+        fieldnorm_reader: &FieldNormReader,
+        bm25_weight: &Bm25Weight,
+    ) -> Option<Score> {
+        if !self.block_is_loaded() {
+            return None;
+        }
+        let docs = self.doc_decoder.output_array().iter().copied();
+        let bm25_scores = docs.enumerate().map(|(idx, doc)| {
+            let fieldnorm_id = fieldnorm_reader.fieldnorm_id(doc);
+            let term_freq = self.freq_decoder.output(idx);
+            bm25_weight.score(fieldnorm_id, term_freq)
+        });
+        // An absent term contributes zero to a union, including all-negative blocks.
+        Some(max_score(bm25_scores).unwrap_or(0.0).max(0.0))
     }
 
     pub(crate) fn freq_reading_option(&self) -> FreqReadingOption {

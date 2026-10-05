@@ -321,6 +321,126 @@ mod tests {
     }
 
     #[test]
+    fn test_tail_cache_public_weight_does_not_poison_fixed_scorer() {
+        let docs = [(0, 1), (1, 2), (2, 3)];
+        let norms = [10; 3];
+        for (profile, base) in [
+            ("native", Bm25Weight::for_native_block_bounds(10.0)),
+            ("classic", Bm25Weight::for_one_term(3, 1024, 10.0)),
+        ] {
+            let fixed_weight = base.boost_by(100.0);
+            let expected = docs
+                .iter()
+                .map(|&(doc, tf)| {
+                    fixed_weight.score(
+                        crate::fieldnorm::FieldNormReader::for_test(&norms).fieldnorm_id(doc),
+                        tf,
+                    )
+                })
+                .fold(0.0f32, f32::max);
+            let mut scorer = TermScorer::new(
+                SegmentPostings::create_from_docs_and_tfs(&docs, Some(&norms)),
+                crate::fieldnorm::FieldNormReader::for_test(&norms),
+                fixed_weight,
+            );
+            assert_eq!(scorer.block_max_score().to_bits(), expected.to_bits());
+            let reader = scorer.fieldnorm_reader.clone();
+            let public_low = scorer.block_cursor().block_max_score(&reader, &base);
+            let after_public = scorer.block_max_score();
+            eprintln!(
+                "weight {profile}: public={public_low} fixed={after_public} expected={expected}"
+            );
+            assert!(public_low < expected);
+            let public_expected = docs
+                .iter()
+                .map(|&(doc, tf)| base.score(reader.fieldnorm_id(doc), tf))
+                .fold(0.0f32, f32::max);
+            assert_eq!(public_low.to_bits(), public_expected.to_bits(), "{profile}");
+            assert_eq!(after_public.to_bits(), expected.to_bits(), "{profile}");
+        }
+    }
+
+    #[test]
+    fn test_tail_cache_public_reader_does_not_poison_fixed_scorer() {
+        let docs = [(0, 1), (1, 2), (2, 3)];
+        let fixed_reader = crate::fieldnorm::FieldNormReader::for_test(&[1; 3]);
+        let public_reader = crate::fieldnorm::FieldNormReader::for_test(&[1000; 3]);
+        for (profile, weight) in [
+            ("native", Bm25Weight::for_native_block_bounds(10.0)),
+            ("classic", Bm25Weight::for_one_term(3, 1024, 10.0)),
+        ] {
+            let expected = docs
+                .iter()
+                .map(|&(doc, tf)| weight.score(fixed_reader.fieldnorm_id(doc), tf))
+                .fold(0.0f32, f32::max);
+            let mut scorer = TermScorer::new(
+                SegmentPostings::create_from_docs_and_tfs(&docs, Some(&[1; 3])),
+                fixed_reader.clone(),
+                weight.clone(),
+            );
+            assert_eq!(scorer.block_max_score().to_bits(), expected.to_bits());
+            let public_low = scorer
+                .block_cursor()
+                .block_max_score(&public_reader, &weight);
+            let after_public = scorer.block_max_score();
+            eprintln!(
+                "reader {profile}: public={public_low} fixed={after_public} expected={expected}"
+            );
+            assert!(public_low < expected);
+            let public_expected = docs
+                .iter()
+                .map(|&(doc, tf)| weight.score(public_reader.fieldnorm_id(doc), tf))
+                .fold(0.0f32, f32::max);
+            assert_eq!(public_low.to_bits(), public_expected.to_bits(), "{profile}");
+            assert_eq!(after_public.to_bits(), expected.to_bits(), "{profile}");
+        }
+    }
+
+    #[test]
+    fn test_public_block_max_keeps_full_global_and_tail_semantics() {
+        let docs: Vec<_> = (0..129).map(|doc| (doc, 1)).collect();
+        let norms = [10; 129];
+        let reader = crate::fieldnorm::FieldNormReader::for_test(&norms);
+        for weight in [
+            Bm25Weight::for_native_block_bounds(10.0),
+            Bm25Weight::for_one_term(129, 1024, 10.0),
+        ] {
+            let mut scorer = TermScorer::new(
+                SegmentPostings::create_from_docs_and_tfs(&docs, Some(&norms)),
+                reader.clone(),
+                weight.clone(),
+            );
+            // Public complete blocks keep the global bound even when decoded.
+            assert_eq!(
+                scorer.block_cursor().block_max_score(&reader, &weight),
+                weight.max_score()
+            );
+            scorer.seek_block(128);
+            // A shallow-selected tail has no decoded certificate yet.
+            assert_eq!(
+                scorer.block_cursor().block_max_score(&reader, &weight),
+                weight.max_score()
+            );
+            assert_eq!(scorer.seek(128), 128);
+            let expected = weight.score(reader.fieldnorm_id(128), 1);
+            assert_eq!(scorer.block_max_score().to_bits(), expected.to_bits());
+            for boost in [3.0, -1.0, f32::INFINITY, f32::NAN] {
+                let public_weight = weight.boost_by(boost);
+                let public_bound = scorer
+                    .block_cursor()
+                    .block_max_score(&reader, &public_weight);
+                let public_expected = if public_weight.has_safe_score_bounds() {
+                    public_weight.score(reader.fieldnorm_id(128), 1).max(0.0)
+                } else {
+                    f32::INFINITY
+                };
+                assert_eq!(public_bound.to_bits(), public_expected.to_bits());
+                assert_eq!(scorer.block_max_score().to_bits(), expected.to_bits());
+            }
+        }
+    }
+
+    #[test]
     fn test_missing_stored_block_max_remains_conservative() -> crate::Result<()> {
         use crate::query::Query;
         use crate::schema::{TextFieldIndexing, TextOptions};
