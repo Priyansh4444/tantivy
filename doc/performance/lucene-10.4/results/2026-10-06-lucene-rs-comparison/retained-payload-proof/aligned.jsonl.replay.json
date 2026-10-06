@@ -1,0 +1,19 @@
+{
+  "protocol": "wiki-physical-replay-v1",
+  "fixture_mode": false,
+  "corpus": "/home/pronsh/Coding/playground/search/bench/wiki-1m.jsonl",
+  "physical_map": "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/lucene-physical.tsv",
+  "replay": "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/aligned.jsonl",
+  "documents": 1000000,
+  "tokens": 294827020,
+  "field_doc_count": 917578,
+  "source_bytes": 1831702900,
+  "replay_bytes": 1831702900,
+  "corpus_raw_sha256": "2b630549676f1c58a579017b6cd949e25115fe63989f9e75cadadc5c1a1a8238",
+  "replay_raw_sha256": "5a04d4c5f6e418e8d0cf035f27dda8f9781e852ef41adb133237359fca263961",
+  "physical_map_sha256": "6f7082e3ff479c7be7fe6f819857716630fc4b6b64acc2d6005f1107127029c7",
+  "source_id_lines_sha256": "32a4c807d17a6b5f4f88637c0ee53827167fab46f7deef4c2da718b7e9fbb3cd",
+  "replay_id_lines_sha256": "32a4c807d17a6b5f4f88637c0ee53827167fab46f7deef4c2da718b7e9fbb3cd",
+  "exact_id_bijection": true,
+  "tool_sha256": "647feaa8ae44dbcb40bb5743866e2f83c1ff25838158ba86b7882ea1438590f7"
+}

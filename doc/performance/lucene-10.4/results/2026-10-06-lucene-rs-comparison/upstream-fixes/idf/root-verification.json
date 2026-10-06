@@ -1,0 +1,19 @@
+{
+  "guards_verified": true,
+  "command": [
+    "rustc",
+    "+1.99.0",
+    "--edition=2024",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/fixed-witness.rs",
+    "-L",
+    "dependency=/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps",
+    "--extern",
+    "lucene_rs=/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps/liblucene_rs-e28f65f9052ba4f3.rlib",
+    "-o",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/fixed-witness"
+  ],
+  "rust": "idf=3719e736 score=368be976\n",
+  "java": "idf=3719e736 score=368be976\ntoken=abc pos=0\ntoken=def pos=1\ntoken=z pos=2\ntoken=\ud83d\ude00 pos=3\n",
+  "head": "e5d1f81bff42c87886b12770f3c79648bb1963ed",
+  "rlib_sha256": "03c1806468739c83e9a28e77a836c6b52acfe29ddb57f5ef6b16c1281679bdae"
+}

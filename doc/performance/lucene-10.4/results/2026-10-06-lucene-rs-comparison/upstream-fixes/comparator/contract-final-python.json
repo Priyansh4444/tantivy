@@ -1,0 +1,17 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "bench/scripts/tests",
+    "-v"
+  ],
+  "cwd": "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06",
+  "returncode": 0,
+  "start": "2026-10-06T15:15:45.866232+00:00",
+  "end": "2026-10-06T15:15:49.273022+00:00",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "0b7ad438860301a8f410fcb8829043808641ffed688e6d993fb335485a4c35ee"
+}

@@ -1,0 +1,3 @@
+   Compiling lucene-rs v0.1.0 (/home/pronsh/Coding/playground/search/lucene-rs-idf-fix-oct06)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.57s
+     Running unittests src/lib.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps/lucene_rs-7f3373fcc7186827)

@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "+1.99.0",
+    "clippy",
+    "--workspace",
+    "--all-targets",
+    "--all-features",
+    "--locked",
+    "-j",
+    "2",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "cwd": "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06",
+  "returncode": 0,
+  "start": "2026-10-06T15:11:45.911360+00:00",
+  "end": "2026-10-06T15:11:52.656768+00:00",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "f116067a9cfee7a5c85a6b78eea95a315fb19ca9a79493684913ff20cc550790"
+}

@@ -1,0 +1,8 @@
+{
+  "hashes_verified": true,
+  "head": "8f338d0be097746801f739f98e2b87437a12e5f4",
+  "python_tests": "11 pass",
+  "fixture_bits": 41,
+  "fixture_queries": 6,
+  "optimized_python_pass": true
+}

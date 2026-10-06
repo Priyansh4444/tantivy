@@ -1,0 +1,20 @@
+{
+  "command": [
+    "java",
+    "-Xms128m",
+    "-Xmx512m",
+    "-cp",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/java-classes:/home/pronsh/Coding/playground/search/bench/lucene-rs-review-oct06/lucene-core-10.5.2.jar:/home/pronsh/Coding/playground/search/bench/lucene-rs-review-oct06/lucene-analysis-common-10.5.2.jar",
+    "Bench",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/java.idx",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/queries.tsv",
+    "dump",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/java.tsv"
+  ],
+  "cwd": "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06",
+  "returncode": 0,
+  "start": "2026-10-06T15:12:33.190384+00:00",
+  "end": "2026-10-06T15:12:33.823096+00:00",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "0242e7d2675c96cc707ee975b9c94cf44d98d8eab428613ead56762b2ead385f"
+}

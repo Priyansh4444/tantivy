@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/target/debug/bench",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/rust.idx",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/queries.tsv",
+    "dump",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/rust.tsv"
+  ],
+  "cwd": "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06",
+  "returncode": 0,
+  "start": "2026-10-06T15:12:33.181980+00:00",
+  "end": "2026-10-06T15:12:33.189976+00:00",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

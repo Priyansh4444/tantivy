@@ -1,0 +1,16 @@
+test_decimal_spellings_that_round_to_the_same_f32_pass (test_compare.CompareCliTests.test_decimal_spellings_that_round_to_the_same_f32_pass) ... ok
+test_empty_hit_vector_passes (test_compare.CompareCliTests.test_empty_hit_vector_passes) ... ok
+test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) ... ok
+test_identical_dumps_pass (test_compare.CompareCliTests.test_identical_dumps_pass) ... ok
+test_invalid_top10_hit_vectors_fail (test_compare.CompareCliTests.test_invalid_top10_hit_vectors_fail) ... ok
+test_legacy_relationless_dumps_request_regeneration (test_compare.CompareCliTests.test_legacy_relationless_dumps_request_regeneration) ... ok
+test_lower_bound_values_are_strict_dump_equality (test_compare.CompareCliTests.test_lower_bound_values_are_strict_dump_equality) ... ok
+test_malformed_dumps_fail_even_when_identical (test_compare.CompareCliTests.test_malformed_dumps_fail_even_when_identical) ... ok
+test_score_only_difference_is_diagnosed (test_compare.CompareCliTests.test_score_only_difference_is_diagnosed) ... ok
+test_signed_zero_is_a_bit_difference (test_compare.CompareCliTests.test_signed_zero_is_a_bit_difference) ... ok
+test_usage_is_nonzero (test_compare.CompareCliTests.test_usage_is_nonzero) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 3.056s
+
+OK

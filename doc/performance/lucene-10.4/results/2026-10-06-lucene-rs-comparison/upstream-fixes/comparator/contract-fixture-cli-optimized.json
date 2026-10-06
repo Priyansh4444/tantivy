@@ -1,0 +1,15 @@
+{
+  "command": [
+    "python3",
+    "-O",
+    "bench/scripts/compare.py",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/java.tsv",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/rust.tsv"
+  ],
+  "cwd": "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06",
+  "returncode": 0,
+  "start": "2026-10-06T15:15:49.649461+00:00",
+  "end": "2026-10-06T15:15:49.718647+00:00",
+  "stdout_sha256": "6d21c0ab6bdc32edf646615c04e364d01d4f99ffd7627dba9798a70c9ef8e8c0",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

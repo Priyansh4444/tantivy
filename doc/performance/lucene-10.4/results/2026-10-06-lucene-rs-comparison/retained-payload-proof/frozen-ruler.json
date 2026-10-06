@@ -1,0 +1,223 @@
+{
+  "status": "frozen-after-full-physical-postings-and-three-profile-gates",
+  "old_layout_results": "retained separately; cannot be used as this baseline",
+  "query_sha256": "47feb065c35e50ef465beab072ae8549ffef9dd23e20e708c458139adcfccfc5",
+  "queries": 20,
+  "profiles": [
+    "DEFAULT (1.2,.75)",
+    "k09-b04 (.9,.4)",
+    "k25-b1 (2.5,1)"
+  ],
+  "native_scoring": true,
+  "native_collection_statistics": true,
+  "score_scale": 1,
+  "count": "exact COUNT response",
+  "top10": "same strict external ID sets; optimized vs exhaustive before timing",
+  "physical_order": "all physical docID/ID/u64-sort/u8-norm tuples identical",
+  "postings": "canonical all TF/docID/position digest and counters identical",
+  "timing": {
+    "cpu_core": 4,
+    "warmup_seconds": 40,
+    "samples_per_query": 256,
+    "shuffle_seed": 23,
+    "orders": [
+      "Tantivy first",
+      "Lucene first"
+    ],
+    "serial_runs": true
+  },
+  "memory": {
+    "warmup_seconds": 20,
+    "cpu_core": 4,
+    "default_jvm_heap": true,
+    "gc_sensitive": true
+  },
+  "efficiency_target": "each query COUNT/TOP_10 median faster in both orders, smaller total index; warmed RSS reported with JVM limitation",
+  "iteration_stop": "baseline once after green gates; accept changes only on same frozen aligned pair, measured beyond observed noise; plateau requires category pivot",
+  "background_policy": "leave user processes running; all own CPU build/index/hash/test jobs idle during timing",
+  "runner": "/tmp/native-profile-aligned-run-oct05.py",
+  "runner_sha256": "9f5a29321251ae0cd692af2faca3a81e992c012b41e5feeca521ba81e4923077",
+  "release_fixture_gate": "exact integrated committed release source/binary evidence required before full artifact preparation",
+  "commit": "0eb1af15df2fac22b5af46b040382c2e14f5e125",
+  "frozen_utc": "2026-10-05T13:26:42Z",
+  "artifacts": {
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/.managed.json": {
+      "bytes": 258,
+      "sha256": "01ff423ffb4d36cc3fd8395b8e164b975db900d4c4fde3920de055e18adbd8ca"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/.tantivy-meta.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/.tantivy-writer.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.fast": {
+      "bytes": 4000188,
+      "sha256": "cfc07741fbd52bf520634d05670a06ea83967a517db407fdac812a509faa00ed"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.fieldnorm": {
+      "bytes": 1000105,
+      "sha256": "6f90b6ecfd6196ed39cd0beb9fbbeef2451536c7753167f46ee0d441d6bc7cb9"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.idx": {
+      "bytes": 210310604,
+      "sha256": "ca6fda0cd8895d19a3a8f342df2455e98e77a29de5d904254f863c9b46ba3377"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.pos": {
+      "bytes": 380258547,
+      "sha256": "541f733d30c56cb918d2d45176db71c18f2030373c4974e3c97826b49806c6f9"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.store": {
+      "bytes": 11358638,
+      "sha256": "6aa4befab8f8c7767358b28e85c29febe61dbbc42a3b7270e9cfd226669ac3ec"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.term": {
+      "bytes": 19173108,
+      "sha256": "23489e3f51dbaa298271ec4a418d71bb8b5a9542db10b3d9e05899b360a43935"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/meta.json": {
+      "bytes": 945,
+      "sha256": "f9c03e195f2732655eab812b5d689015216fde335ece3369be4c6ed39ff07e51"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h.fdm": {
+      "bytes": 159,
+      "sha256": "43ef13c872d1cfa44f10264776663f03aa9891a980332dc38cf3050a7edd12d3"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h.fdt": {
+      "bytes": 7704835,
+      "sha256": "d9feb09a5a32146e03a1e94e72710aaf809a61b18ce57399ef66f17ee0b870c0"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h.fdx": {
+      "bytes": 3502,
+      "sha256": "05f967d4c3d632e5d95a167c23e3ffe53a651af852798132652fc4304e237935"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h.fnm": {
+      "bytes": 279,
+      "sha256": "2e3167046d949f637559557539b8261173194df353617f2a5f2d51696a03d170"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h.nvd": {
+      "bytes": 1000059,
+      "sha256": "25dfc87fba60354d10d7e8cb8c5f662fa4a873cd4e65b6751284796ddfbfb853"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h.nvm": {
+      "bytes": 103,
+      "sha256": "f413045aad5f2c436dd05159565f676adbf5cfc9f791bed2c1ef76954d747d53"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h.si": {
+      "bytes": 538,
+      "sha256": "3a4aee8eb9464ce34efd388b74f592ccb6754913e4e9e656d85e8873a0ffd112"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h_Lucene104_0.doc": {
+      "bytes": 212923632,
+      "sha256": "9e99aaeaa3eec52e3a6608a9f905c309dd0efa56801c538233dcfd127d527aeb"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h_Lucene104_0.pos": {
+      "bytes": 384975346,
+      "sha256": "380e8f0aa2870ca4b19b73d1df4647b90a8878223b1245e6e37330b902f0ae84"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h_Lucene104_0.psm": {
+      "bytes": 112,
+      "sha256": "9560ae51f7bfe1f3d445d255e4e2aedd7a7d50cb9185f37432d9f2fa43204424"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h_Lucene104_0.tim": {
+      "bytes": 15922764,
+      "sha256": "e739a3c19d9dff2f84a0d73d843cef3a9fda8a25542dd162b112c87aef578556"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h_Lucene104_0.tip": {
+      "bytes": 278608,
+      "sha256": "9414871ea5f5fd26bcc81521c3257ac5a32a677e4c1803fdb5d8cf00abd08c07"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h_Lucene104_0.tmd": {
+      "bytes": 188,
+      "sha256": "911de93b81d69994b53ef00b0d2f0d054cf8f4cc2e6c8f4e9d68f6ba7d303a46"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h_Lucene90_0.dvd": {
+      "bytes": 4000073,
+      "sha256": "73ecdc6b7b2a751ca74d6baaae0e119744d85527a9d46782393f3a5fc9b732b8"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/_h_Lucene90_0.dvm": {
+      "bytes": 158,
+      "sha256": "c25c41a00a1890506d9923d8ab3dabd9e3d0108d247aed1a73d63629cacb8e7a"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/segments_1": {
+      "bytes": 155,
+      "sha256": "84f5e2c8799da4e46fd32994e928c3dbcc9b8819e9a488620e571c2fec3408b5"
+    },
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/engines/lucene-10.4.0/idx/write.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/native-classes/DoQueryNative.class": {
+      "bytes": 5850,
+      "sha256": "644a8f32b6296cd424a09fa74b0a862ca9c897ba2de68d7881124c704002969b"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/native-classes/DoQueryNative.java": {
+      "bytes": 5262,
+      "sha256": "e2782f9cf86f9d56ef6eda105caff731362269981c57910afc0a2be2e539d413"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/native-classes/DumpNativeLuceneResults.class": {
+      "bytes": 5206,
+      "sha256": "3ce85576d2e0687ca317dff1f7764419c35eb3657fbfb0c9ebc291b41a1dc1ed"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/native-classes/DumpNativeLuceneResults.java": {
+      "bytes": 2675,
+      "sha256": "ae5569b24f63f39fc2b227043516a0951f19d97f7ecf2e8fa5e980bd5c8da5da"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/native-classes/NativeBm25Profile.class": {
+      "bytes": 3247,
+      "sha256": "01fe7a03322112a431ba6d17b3f3704ff64c816487b794031254e09a5b093a66"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/native-classes/NativeBm25Profile.java": {
+      "bytes": 3097,
+      "sha256": "511793f196c9d745f274f0a561149bb3fdd83b3686b7e143a099e3df3337d08f"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/native-classes/native-build.json": {
+      "bytes": 1399,
+      "sha256": "f2e1c2f9ec66b78e3fbe0fddbd61f46bea64b6e1490114a77f4d2f4682b377fd"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/logical-classes/DumpWikiLogical$CanonicalHash.class": {
+      "bytes": 1346,
+      "sha256": "e1fc9716a0f7b6fa852aeff4aa127079824ebbc98b66835b19e479d596bb0792"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/logical-classes/DumpWikiLogical$Row.class": {
+      "bytes": 1409,
+      "sha256": "8b1228224e92f7dab6024f20bc1bf62c87160922c81eddc970af77eeb75a91e4"
+    },
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/logical-classes/DumpWikiLogical.class": {
+      "bytes": 9232,
+      "sha256": "adce358b23907921c3ce3c3da8e0dbc9cb28651a3e11966079e2c49b34dc95b6"
+    }
+  },
+  "correctness": {
+    "default": {
+      "queries": 20,
+      "max_relative_score_difference": 5.7179102494286677e-08,
+      "common_top100_scores": 1913,
+      "f32_bit_mismatches": []
+    },
+    "k09-b04": {
+      "queries": 20,
+      "max_relative_score_difference": 5.806709203327821e-08,
+      "common_top100_scores": 1913,
+      "f32_bit_mismatches": []
+    },
+    "k25-b1": {
+      "queries": 20,
+      "max_relative_score_difference": 5.891804072756284e-08,
+      "common_top100_scores": 1913,
+      "f32_bit_mismatches": []
+    }
+  },
+  "gates_sha256": "f13c69dfba49f14c4a6730b282a872a96539c8eb7a46bb18e92fd53b7d9ca50a",
+  "proof_sha256": "a58b660f04a607dfee8629a61d3eec3045130d4dd30bc8ea1ca4289f4f2d9122",
+  "sensitivity": {
+    "passed": true,
+    "changed_common_scores": {
+      "k09-b04": 875,
+      "k25-b1": 241
+    },
+    "commit": "0eb1af15df2fac22b5af46b040382c2e14f5e125"
+  }
+}

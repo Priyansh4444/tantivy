@@ -1,0 +1,13 @@
+{
+  "command": [
+    "rustc",
+    "+1.99.0",
+    "-Vv"
+  ],
+  "cwd": "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06",
+  "returncode": 0,
+  "start": "2026-10-06T15:11:45.594232+00:00",
+  "end": "2026-10-06T15:11:45.617082+00:00",
+  "stdout_sha256": "b569b0c98ea3133c7252b4b8ea6b39b7b353813df0dd5f5c412c355691424112",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

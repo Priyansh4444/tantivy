@@ -1,0 +1,311 @@
+test_decimal_spellings_that_round_to_the_same_f32_pass (test_compare.CompareCliTests.test_decimal_spellings_that_round_to_the_same_f32_pass) ... FAIL
+test_empty_hit_vector_passes (test_compare.CompareCliTests.test_empty_hit_vector_passes) ... FAIL
+test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) ... 
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='kind', optimized=False) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='kind', optimized=True) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='query', optimized=False) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='query', optimized=True) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='row_count', optimized=False) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='row_count', optimized=True) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='hit_count', optimized=False) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='hit_count', optimized=True) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='doc_order', optimized=False) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='doc_order', optimized=True) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='doc_id', optimized=False) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='doc_id', optimized=True) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='one_ulp_score', optimized=False) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='one_ulp_score', optimized=True) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='total', optimized=False) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='total', optimized=True) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='relation', optimized=False) ... FAIL
+  test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='relation', optimized=True) ... FAIL
+test_identical_dumps_pass (test_compare.CompareCliTests.test_identical_dumps_pass) ... 
+  test_identical_dumps_pass (test_compare.CompareCliTests.test_identical_dumps_pass) (optimized=False) ... FAIL
+  test_identical_dumps_pass (test_compare.CompareCliTests.test_identical_dumps_pass) (optimized=True) ... FAIL
+test_legacy_relationless_dumps_request_regeneration (test_compare.CompareCliTests.test_legacy_relationless_dumps_request_regeneration) ... FAIL
+test_lower_bound_values_are_strict_dump_equality (test_compare.CompareCliTests.test_lower_bound_values_are_strict_dump_equality) ... ok
+test_malformed_dumps_fail_even_when_identical (test_compare.CompareCliTests.test_malformed_dumps_fail_even_when_identical) ... 
+  test_malformed_dumps_fail_even_when_identical (test_compare.CompareCliTests.test_malformed_dumps_fail_even_when_identical) (name='empty') ... FAIL
+test_score_only_difference_is_diagnosed (test_compare.CompareCliTests.test_score_only_difference_is_diagnosed) ... FAIL
+test_signed_zero_is_a_bit_difference (test_compare.CompareCliTests.test_signed_zero_is_a_bit_difference) ... FAIL
+test_usage_is_nonzero (test_compare.CompareCliTests.test_usage_is_nonzero) ... FAIL
+
+======================================================================
+FAIL: test_decimal_spellings_that_round_to_the_same_f32_pass (test_compare.CompareCliTests.test_decimal_spellings_that_round_to_the_same_f32_pass)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 68, in test_decimal_spellings_that_round_to_the_same_f32_pass
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py", line 16, in <module>
+    a, b = load(sys.argv[1]), load(sys.argv[2])
+           ~~~~^^^^^^^^^^^^^
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py", line 11, in load
+    kind, terms, total, hits = line.rstrip("\n").split("\t")
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 4, got 5)
+
+
+======================================================================
+FAIL: test_empty_hit_vector_passes (test_compare.CompareCliTests.test_empty_hit_vector_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 73, in test_empty_hit_vector_passes
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py", line 16, in <module>
+    a, b = load(sys.argv[1]), load(sys.argv[2])
+           ~~~~^^^^^^^^^^^^^
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py", line 11, in load
+    kind, terms, total, hits = line.rstrip("\n").split("\t")
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 4, got 5)
+
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='kind', optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='kind', optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='query', optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='query', optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='row_count', optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='row_count', optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='hit_count', optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='hit_count', optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='doc_order', optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='doc_order', optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='doc_id', optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='doc_id', optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='one_ulp_score', optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='one_ulp_score', optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='total', optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='total', optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='relation', optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_every_observable_mismatch_fails (test_compare.CompareCliTests.test_every_observable_mismatch_fails) (name='relation', optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 52, in test_every_observable_mismatch_fails
+    self.assertIn("DIFF", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'DIFF' not found in ''
+
+======================================================================
+FAIL: test_identical_dumps_pass (test_compare.CompareCliTests.test_identical_dumps_pass) (optimized=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 31, in test_identical_dumps_pass
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py", line 16, in <module>
+    a, b = load(sys.argv[1]), load(sys.argv[2])
+           ~~~~^^^^^^^^^^^^^
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py", line 11, in load
+    kind, terms, total, hits = line.rstrip("\n").split("\t")
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 4, got 5)
+
+
+======================================================================
+FAIL: test_identical_dumps_pass (test_compare.CompareCliTests.test_identical_dumps_pass) (optimized=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 31, in test_identical_dumps_pass
+    self.assertEqual(result.returncode, 0, result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py", line 16, in <module>
+    a, b = load(sys.argv[1]), load(sys.argv[2])
+           ~~~~^^^^^^^^^^^^^
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py", line 11, in load
+    kind, terms, total, hits = line.rstrip("\n").split("\t")
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 4, got 5)
+
+
+======================================================================
+FAIL: test_legacy_relationless_dumps_request_regeneration (test_compare.CompareCliTests.test_legacy_relationless_dumps_request_regeneration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 84, in test_legacy_relationless_dumps_request_regeneration
+    self.assertNotEqual(result.returncode, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_malformed_dumps_fail_even_when_identical (test_compare.CompareCliTests.test_malformed_dumps_fail_even_when_identical) (name='empty')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 112, in test_malformed_dumps_fail_even_when_identical
+    self.assertNotEqual(result.returncode, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_score_only_difference_is_diagnosed (test_compare.CompareCliTests.test_score_only_difference_is_diagnosed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 57, in test_score_only_difference_is_diagnosed
+    self.assertIn("score", result.stdout.lower())
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'score' not found in ''
+
+======================================================================
+FAIL: test_signed_zero_is_a_bit_difference (test_compare.CompareCliTests.test_signed_zero_is_a_bit_difference)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 64, in test_signed_zero_is_a_bit_difference
+    self.assertIn("bit_identical_scores: 0", result.stdout)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bit_identical_scores: 0' not found in ''
+
+======================================================================
+FAIL: test_usage_is_nonzero (test_compare.CompareCliTests.test_usage_is_nonzero)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/tests/test_compare.py", line 118, in test_usage_is_nonzero
+    self.assertIn("usage", result.stderr.lower())
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'usage' not found in 'traceback (most recent call last):\n  file "/home/pronsh/coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py", line 16, in <module>\n    a, b = load(sys.argv[1]), load(sys.argv[2])\n                ~~~~~~~~^^^\nindexerror: list index out of range\n'
+
+----------------------------------------------------------------------
+Ran 10 tests in 3.033s
+
+FAILED (failures=27)

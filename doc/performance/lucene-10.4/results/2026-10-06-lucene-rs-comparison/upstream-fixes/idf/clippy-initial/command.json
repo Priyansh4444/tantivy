@@ -1,0 +1,11 @@
+[
+  "cargo",
+  "clippy",
+  "--locked",
+  "--workspace",
+  "--all-targets",
+  "--all-features",
+  "--",
+  "-D",
+  "warnings"
+]

@@ -1,0 +1,18 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--workspace",
+    "--all-features"
+  ],
+  "returncode": 0,
+  "wall_seconds": 33.43195063299936,
+  "source_lock_unchanged": true,
+  "toolchain": "1.99.0",
+  "jobs": "2",
+  "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+  "cargo_profile_overrides": {},
+  "stdout_sha256": "64764106170dd51f3a0631f6a7b8b4041c455e122144540693678318f8a689a3",
+  "stderr_sha256": "d5612c4058f1a1fc8631661ffeea6f5ad127fd14bde74092f7420fdebab22797"
+}

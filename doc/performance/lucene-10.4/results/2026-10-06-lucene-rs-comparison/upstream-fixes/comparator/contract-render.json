@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3",
+    "bench/scripts/render.py",
+    "--check"
+  ],
+  "cwd": "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06",
+  "returncode": 0,
+  "start": "2026-10-06T15:15:49.530322+00:00",
+  "end": "2026-10-06T15:15:49.587098+00:00",
+  "stdout_sha256": "2d0472e1a508578811de780edaa090f9858d09e0f588fd65bd2c34a4addc90cc",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

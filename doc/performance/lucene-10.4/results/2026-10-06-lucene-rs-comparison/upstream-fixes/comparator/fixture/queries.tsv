@@ -1,0 +1,6 @@
+TERM	x
+TERM	y
+TERM	absent
+AND	x a
+OR	x y
+PHRASE	x a

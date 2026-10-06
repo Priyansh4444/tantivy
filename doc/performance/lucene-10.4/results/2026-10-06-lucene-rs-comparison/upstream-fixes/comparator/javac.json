@@ -1,0 +1,17 @@
+{
+  "command": [
+    "javac",
+    "-cp",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-review-oct06/lucene-core-10.5.2.jar:/home/pronsh/Coding/playground/search/bench/lucene-rs-review-oct06/lucene-analysis-common-10.5.2.jar",
+    "-d",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/java-classes",
+    "bench/java/Indexer.java",
+    "bench/java/Bench.java"
+  ],
+  "cwd": "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06",
+  "returncode": 0,
+  "start": "2026-10-06T15:12:30.992477+00:00",
+  "end": "2026-10-06T15:12:32.320810+00:00",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

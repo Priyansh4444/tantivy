@@ -1,0 +1,7 @@
+[
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/target/release/port_prepare",
+  "index",
+  "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/aligned.jsonl",
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/port.idx",
+  "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/lucene-physical.tsv"
+]

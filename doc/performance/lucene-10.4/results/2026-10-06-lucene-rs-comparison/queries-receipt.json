@@ -1,0 +1,11 @@
+{
+  "queries": 1227,
+  "wiki20": 20,
+  "port_style": 1201,
+  "correctness_only": 6,
+  "inputs": {
+    "/home/pronsh/Coding/playground/search/tantivy-pr2937/doc/performance/lucene-10.4/queries-wiki.jsonl": "47feb065c35e50ef465beab072ae8549ffef9dd23e20e708c458139adcfccfc5",
+    "/home/pronsh/Coding/playground/search/search-benchmark-game/queries.txt": "a8e8f2c1a4bede53063de22fb13be83b585683da1c28208da4921de73ce254bd"
+  },
+  "output_sha256": "39a54b200392befbde83469841ce6eaefe7ec1850bb5b0e25c74a0eefa709a4e"
+}

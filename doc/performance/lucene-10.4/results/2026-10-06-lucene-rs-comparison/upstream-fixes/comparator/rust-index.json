@@ -1,0 +1,14 @@
+{
+  "command": [
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/target/debug/index",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/corpus.txt",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/rust.idx",
+    "--positions"
+  ],
+  "cwd": "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06",
+  "returncode": 0,
+  "start": "2026-10-06T15:12:32.321572+00:00",
+  "end": "2026-10-06T15:12:32.366381+00:00",
+  "stdout_sha256": "4f3ee2473496d82d97c69535f4e9c5c86acfd8b7cd165ebe7fe06f160e79a07b",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

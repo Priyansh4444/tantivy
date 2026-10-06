@@ -1,0 +1,25 @@
+{
+  "protocol": "wiki-physical-comparison-v1",
+  "documents": 1000000,
+  "field_doc_count": 917578,
+  "physical_sha256": "6f7082e3ff479c7be7fe6f819857716630fc4b6b64acc2d6005f1107127029c7",
+  "postings_verified": true,
+  "postings": {
+    "documents": 1000000,
+    "field_doc_count": 917578,
+    "serialized_total_tokens": 294827020,
+    "sha256": "893a75958e6d15c997d414d5fb5fc47c633aa18c68fcd33bc0f8e13abfa8dbb8",
+    "terms": 1642896,
+    "postings": 126703012,
+    "derived_tokens": 294827020,
+    "positions": 294827020,
+    "derived_field_docs": 917578
+  },
+  "inputs_sha256": {
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/tantivy-physical.tsv": "6f7082e3ff479c7be7fe6f819857716630fc4b6b64acc2d6005f1107127029c7",
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/lucene-physical.tsv": "6f7082e3ff479c7be7fe6f819857716630fc4b6b64acc2d6005f1107127029c7",
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/tantivy-payload.json": "21c9dd301e76fe004ef54541706e58c75bcb284e42147a11291a5ee8c71710e1",
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/lucene-postings.json": "d5b7a8e36cd9bac75d355603606bf38188c2df2887d02a378dc1646ca6fb4871"
+  },
+  "tool_sha256": "647feaa8ae44dbcb40bb5743866e2f83c1ff25838158ba86b7882ea1438590f7"
+}

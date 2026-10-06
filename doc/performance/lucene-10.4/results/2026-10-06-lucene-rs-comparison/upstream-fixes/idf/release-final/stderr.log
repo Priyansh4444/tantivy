@@ -1,0 +1,12 @@
+   Compiling lucene-rs v0.1.0 (/home/pronsh/Coding/playground/search/lucene-rs-idf-fix-oct06)
+   Compiling lucene-rs-bench v0.0.0 (/home/pronsh/Coding/playground/search/lucene-rs-idf-fix-oct06/bench/rust)
+    Finished `release` profile [optimized + debuginfo] target(s) in 57.82s
+     Running unittests src/lib.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/release/deps/lucene_rs-ea758540ad5bdb14)
+     Running unittests src/bin/lucene-rs.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/release/deps/lucene_rs-f277c6a8ec27e3e2)
+     Running tests/index_lifecycle.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/release/deps/index_lifecycle-ea438140b9ba9d65)
+     Running tests/random_vs_reference.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/release/deps/random_vs_reference-3f7d7f8c5be0073c)
+     Running unittests src/lib.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/release/deps/lucene_rs_bench-0be1e3746134e430)
+     Running unittests src/bin/bench.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/release/deps/bench-4e1bbea40744e53d)
+     Running unittests src/bin/index.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/release/deps/index-931fcef08514e437)
+   Doc-tests lucene_rs
+   Doc-tests lucene_rs_bench

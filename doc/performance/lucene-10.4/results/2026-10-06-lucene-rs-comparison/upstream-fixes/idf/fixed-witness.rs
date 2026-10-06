@@ -1,0 +1,1 @@
+fn main() { let n=54505; let i=lucene_rs::sim::idf(n,n); let s=lucene_rs::sim::Bm25::for_term(1.0,n,n,n).score(1.0,1); println!("idf={:08x} score={:08x}",i.to_bits(),s.to_bits()); assert_eq!(i.to_bits(),0x3719e736); assert_eq!(s.to_bits(),0x368be976); }

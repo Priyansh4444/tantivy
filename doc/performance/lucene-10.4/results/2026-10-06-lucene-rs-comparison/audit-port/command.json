@@ -1,0 +1,7 @@
+[
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/target/release/port_prepare",
+  "audit",
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/port.idx",
+  "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/lucene-physical.tsv",
+  "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/logical-comparison/tantivy_terms.tsv"
+]

@@ -1,0 +1,60 @@
+{
+  "retained_tantivy_index_matches_frozen_ruler": true,
+  "files": {
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/.managed.json": {
+      "bytes": 258,
+      "sha256": "01ff423ffb4d36cc3fd8395b8e164b975db900d4c4fde3920de055e18adbd8ca"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/.tantivy-meta.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/.tantivy-writer.lock": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.fast": {
+      "bytes": 4000188,
+      "sha256": "cfc07741fbd52bf520634d05670a06ea83967a517db407fdac812a509faa00ed"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.fieldnorm": {
+      "bytes": 1000105,
+      "sha256": "6f90b6ecfd6196ed39cd0beb9fbbeef2451536c7753167f46ee0d441d6bc7cb9"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.idx": {
+      "bytes": 210310604,
+      "sha256": "ca6fda0cd8895d19a3a8f342df2455e98e77a29de5d904254f863c9b46ba3377"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.pos": {
+      "bytes": 380258547,
+      "sha256": "541f733d30c56cb918d2d45176db71c18f2030373c4974e3c97826b49806c6f9"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.store": {
+      "bytes": 11358638,
+      "sha256": "6aa4befab8f8c7767358b28e85c29febe61dbbc42a3b7270e9cfd226669ac3ec"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/bf2d4394dc5241a9ae674a9535bf72bb.term": {
+      "bytes": 19173108,
+      "sha256": "23489e3f51dbaa298271ec4a418d71bb8b5a9542db10b3d9e05899b360a43935"
+    },
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx/meta.json": {
+      "bytes": 945,
+      "sha256": "f9c03e195f2732655eab812b5d689015216fde335ece3369be4c6ed39ff07e51"
+    }
+  },
+  "replay_sha256": "5a04d4c5f6e418e8d0cf035f27dda8f9781e852ef41adb133237359fca263961",
+  "queries": {
+    "queries": 1227,
+    "wiki20": 20,
+    "port_style": 1201,
+    "correctness_only": 6,
+    "inputs": {
+      "/home/pronsh/Coding/playground/search/tantivy-pr2937/doc/performance/lucene-10.4/queries-wiki.jsonl": "47feb065c35e50ef465beab072ae8549ffef9dd23e20e708c458139adcfccfc5",
+      "/home/pronsh/Coding/playground/search/search-benchmark-game/queries.txt": "a8e8f2c1a4bede53063de22fb13be83b585683da1c28208da4921de73ce254bd"
+    },
+    "output_sha256": "39a54b200392befbde83469841ce6eaefe7ec1850bb5b0e25c74a0eefa709a4e"
+  },
+  "cpu_topology": "CPU CORE SOCKET NODE ONLINE\n  0    0      0    0    yes\n  1    1      0    0    yes\n  2    2      0    0    yes\n  3    3      0    0    yes\n  4    4      0    0    yes\n  5    5      0    0    yes\n  6    6      0    0    yes\n  7    7      0    0    yes\n  8    8      0    0    yes\n  9    9      0    0    yes\n 10   10      0    0    yes\n 11   11      0    0    yes\n 12   12      0    0    yes\n 13   13      0    0    yes\n 14   14      0    0    yes\n 15   15      0    0    yes\n",
+  "cpu_model": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           42 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  16\nOn-line CPU(s) list:                     0-15\nVendor ID:                               GenuineIntel\nModel name:                              Intel(R) Core(TM) Ultra 7 255H\nCPU family:                              6\nModel:                                   197\nThread(s) per core:                      1\nCore(s) per socket:                      16\nSocket(s):                               1\nStepping:                                2\nMicrocode version:                       0x122\nCPU(s) scaling MHz:                      20%\nCPU max MHz:                             5100.0000\nCPU min MHz:                             400.0000\nBogoMIPS:                                7372.80\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb ssbd ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid rdseed adx smap clflushopt clwb intel_pt sha_ni xsaveopt xsavec xgetbv1 xsaves split_lock_detect user_shstk avx_vnni lass lam wbnoinvd dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp hwp_pkg_req hfi vnmi umip pku ospke waitpkg gfni vaes vpclmulqdq rdpid bus_lock_detect movdiri movdir64b fsrm md_clear serialize arch_lbr ibt flush_l1d arch_capabilities\nVirtualization:                          VT-x\nL1d cache:                               480 KiB (12 instances)\nL1i cache:                               768 KiB (12 instances)\nL2 cache:                                28 MiB (9 instances)\nL3 cache:                                24 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-15\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS Not affected; BHI BHI_DIS_S\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n",
+  "shared_lock_sha256": "21dfbb56abf6714579bdde51f28e1d708a0c82a3f61b3acd3853ec4835116e0c"
+}

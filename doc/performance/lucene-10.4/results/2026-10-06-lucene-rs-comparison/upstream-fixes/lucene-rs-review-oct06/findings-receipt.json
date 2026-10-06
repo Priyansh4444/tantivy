@@ -1,0 +1,32 @@
+{
+  "different-doc": {
+    "returncode": 0,
+    "stdout": "DIFF TERM x 1 1 [(0, 1.0)] [(1, 1.0)]\nqueries: 1\nhits: 1\nsame_docs_in_order: 0\nbit_identical_scores: 1\nsame_total_hits: 1\n",
+    "stderr": ""
+  },
+  "different-score": {
+    "returncode": 0,
+    "stdout": "queries: 1\nhits: 1\nsame_docs_in_order: 1\nbit_identical_scores: 0\nsame_total_hits: 1\n",
+    "stderr": ""
+  },
+  "different-hit-count": {
+    "returncode": 0,
+    "stdout": "DIFF TERM x 1 2 [(0, 1.0)] [(0, 1.0)]\nqueries: 1\nhits: 1\nsame_docs_in_order: 1\nbit_identical_scores: 1\nsame_total_hits: 0\n",
+    "stderr": ""
+  },
+  "java_artifacts": {
+    "lucene-core-10.5.2.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-core/10.5.2/lucene-core-10.5.2.jar",
+      "bytes": 4749314,
+      "sha512": "17933b67509bc271d255e9a8e5c9fff6100653c94bd4d6040fdf6779a17f4f247a15da125578ff3146c0d3c2eeb0dde4a0a44e4395a6f9986ee9689e7b6f5610"
+    },
+    "lucene-analysis-common-10.5.2.jar": {
+      "url": "https://repo.maven.apache.org/maven2/org/apache/lucene/lucene-analysis-common/10.5.2/lucene-analysis-common-10.5.2.jar",
+      "bytes": 1757458,
+      "sha512": "3529f6df0a763ee52c5a35f6e6e35f4dff7436280331240213c40faeb075d1663459463c8199a02ac57082ea7cbac1a5de82edb493fd64aa7110d0c35fae9de2"
+    }
+  },
+  "native_idf_source_sha256": "a51c48ff45a0976c7c61666b8faf6de539a8d5b67c9edd933bd25fb7c63f2fd5",
+  "rust_witness": "idf=3719e737 ours_native_idf=3719e736 score=368be977\ntokens=[(\"abc\", 0), (\"def\", 1), (\"z\", 2)]\n",
+  "java_witness": "idf=3719e736 score=368be976\ntoken=abc pos=0\ntoken=def pos=1\ntoken=z pos=2\ntoken=\ud83d\ude00 pos=3\n"
+}

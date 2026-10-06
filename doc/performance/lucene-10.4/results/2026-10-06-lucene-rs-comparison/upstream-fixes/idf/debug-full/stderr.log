@@ -1,0 +1,17 @@
+   Compiling zmij v1.0.23
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling lucene-rs v0.1.0 (/home/pronsh/Coding/playground/search/lucene-rs-idf-fix-oct06)
+   Compiling lucene-rs-bench v0.0.0 (/home/pronsh/Coding/playground/search/lucene-rs-idf-fix-oct06/bench/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.79s
+     Running unittests src/lib.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps/lucene_rs-f8432c24d9fd6e46)
+     Running unittests src/bin/lucene-rs.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps/lucene_rs-cf9664862bb2e3e7)
+     Running tests/index_lifecycle.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps/index_lifecycle-9ae94188573dd314)
+     Running tests/random_vs_reference.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps/random_vs_reference-e99ab0735a3850ba)
+     Running unittests src/lib.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps/lucene_rs_bench-2a16293d96104383)
+     Running unittests src/bin/bench.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps/bench-b8e5bd8a915115b4)
+     Running unittests src/bin/index.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target/debug/deps/index-c6b2a2b97325b795)
+   Doc-tests lucene_rs
+   Doc-tests lucene_rs_bench

@@ -1,0 +1,214 @@
+{
+  "base": "465ea8f77f4397e35de56b7f7d202158d59e5871",
+  "regression_commit": "298fc4820c85ac4abf8244238760bbdff8931c9f",
+  "fix_commit": "e5d1f81bff42c87886b12770f3c79648bb1963ed",
+  "clean": true,
+  "changed_files": [
+    "src/sim.rs"
+  ],
+  "diff_sha256": "2b54c22b95726a851b4a86c48ae1ce87d17e65a0841fa8d1ba89e58a4fc4f982",
+  "sim_rs_sha256": "0b29bc0fe19fb64fcbda2ec8c3cf162d5bd750c9c88ee79292cd40ba9dc33d19",
+  "lock_sha256": "fe7c68f0929950fb6d6f2ff7d0d023e4fca516ab63f2e3b56278d9d2b859a662",
+  "stages": {
+    "clippy-final": {
+      "head": "e5d1f81bff42c87886b12770f3c79648bb1963ed",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "returncode": 0,
+      "wall_seconds": 3.070913848998316,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "003f750b2104abff048a75ebcf9d4b48a97796975e3c64cdefc2c383aa11ba43"
+    },
+    "clippy-initial": {
+      "head": "2be833380efde6ad95928ab88c3f9b7c2206b34d",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--all-features",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "returncode": 101,
+      "wall_seconds": 4.171212107998144,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "961d208b2dbb71603b1a5929560ae11a1935fdf4d4c5baa1a1bcaa7485663c29"
+    },
+    "debug-final": {
+      "head": "e5d1f81bff42c87886b12770f3c79648bb1963ed",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "--all-features"
+      ],
+      "returncode": 0,
+      "wall_seconds": 24.456976844005112,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "e5f74b2a685a7eb1b823358ad98260e891f2262db2625198144fa68b2bbed3ce",
+      "stderr_sha256": "fbb4a83deccbbd84a428340d1173677e8c463c5ce88b4bac2f2bb64ffa37e482"
+    },
+    "debug-full": {
+      "head": "2be833380efde6ad95928ab88c3f9b7c2206b34d",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "--all-features"
+      ],
+      "returncode": 0,
+      "wall_seconds": 33.43195063299936,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "64764106170dd51f3a0631f6a7b8b4041c455e122144540693678318f8a689a3",
+      "stderr_sha256": "d5612c4058f1a1fc8631661ffeea6f5ad127fd14bde74092f7420fdebab22797"
+    },
+    "fmt": {
+      "head": "2be833380efde6ad95928ab88c3f9b7c2206b34d",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "returncode": 1,
+      "wall_seconds": 0.3137251039952389,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "f7d46a8d3ff075b3f0f5d6c9efd953532ad5e07b01d4d58beb8629be164166ad",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "fmt-final": {
+      "head": "e5d1f81bff42c87886b12770f3c79648bb1963ed",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "returncode": 0,
+      "wall_seconds": 0.32122808800340863,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "regression-after": {
+      "head": "2be833380efde6ad95928ab88c3f9b7c2206b34d",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--lib",
+        "matches_lucene_rounding"
+      ],
+      "returncode": 0,
+      "wall_seconds": 0.625339043996064,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "0e16b4e5212ec722af61ba815a0891ec81a4601613eb0935f61e7aadf4d2e8c9",
+      "stderr_sha256": "ef156b6b5449b2f775630841ce8a15f7639a3da6b811cfd808565066bf48f35a"
+    },
+    "regression-before": {
+      "head": "298fc4820c85ac4abf8244238760bbdff8931c9f",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--lib",
+        "matches_lucene_rounding"
+      ],
+      "returncode": 101,
+      "wall_seconds": 6.084364406000532,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "eae0dd0bc825d1948355c42797c29b3c672f5f1442eef245f803135e7993afd2",
+      "stderr_sha256": "41f8ef5b496f2be7f9ca1328e2457af49c3368bffc39bb7fa063dabd22c5d729"
+    },
+    "release-final": {
+      "head": "e5d1f81bff42c87886b12770f3c79648bb1963ed",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "--all-features",
+        "--release"
+      ],
+      "returncode": 0,
+      "wall_seconds": 63.7139844350022,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "4a13ecc228110fedda7e347d71b2aece71379e8e50f195a37587714b2ee36330",
+      "stderr_sha256": "953d493776dfaa905a575115a0c06243f52362adf2f4469dc121a1700f6a23c9"
+    },
+    "release-full": {
+      "head": "2be833380efde6ad95928ab88c3f9b7c2206b34d",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "--all-features",
+        "--release"
+      ],
+      "returncode": 0,
+      "wall_seconds": 72.1007021990008,
+      "source_lock_unchanged": true,
+      "toolchain": "1.99.0",
+      "jobs": "2",
+      "target_dir": "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-idf-oct06/target",
+      "cargo_profile_overrides": {},
+      "stdout_sha256": "1d99fb63f08dbfd1ab967ea03b05832e0de4b27a96d1779ab5ee817f43701380",
+      "stderr_sha256": "b10849576142e32c06a86ab40a31b1607831efa271d6a9843bde86aabd025d07"
+    }
+  }
+}

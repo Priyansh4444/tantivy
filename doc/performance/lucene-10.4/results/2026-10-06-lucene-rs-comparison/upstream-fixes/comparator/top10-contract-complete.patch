@@ -1,0 +1,44 @@
+diff --git a/bench/scripts/compare.py b/bench/scripts/compare.py
+index 25252db..796d774 100644
+--- a/bench/scripts/compare.py
++++ b/bench/scripts/compare.py
+@@ -54,7 +54,14 @@ def load(path):
+                 for hit in encoded_hits.split():
+                     doc, score = hit.split(":")
+                     hits.append((unsigned(doc, 2**32 - 1), f32_bits(score)))
+-                rows.append(Row(kind, terms, unsigned(total, 2**64 - 1), relation, hits))
++                total = unsigned(total, 2**64 - 1)
++                if len(hits) > 10:
++                    raise ValueError("top-10 dump has more than ten hits")
++                if len({doc for doc, _ in hits}) != len(hits):
++                    raise ValueError("duplicate document ID in top-10 hits")
++                if total < len(hits):
++                    raise ValueError("reported hit value is smaller than the hit vector")
++                rows.append(Row(kind, terms, total, relation, hits))
+             except (ValueError, OverflowError, struct.error) as error:
+                 raise ValueError(f"{path}:{number}: {error}") from error
+     if not rows:
+diff --git a/bench/scripts/tests/test_compare.py b/bench/scripts/tests/test_compare.py
+index 65e6fbf..4393d8b 100644
+--- a/bench/scripts/tests/test_compare.py
++++ b/bench/scripts/tests/test_compare.py
+@@ -84,6 +84,19 @@ class CompareCliTests(unittest.TestCase):
+         self.assertNotEqual(result.returncode, 0)
+         self.assertIn("rerun", result.stderr.lower())
+ 
++    def test_invalid_top10_hit_vectors_fail(self):
++        variants = {
++            "duplicate_document": ROW.replace("1:5.000", "0:5.000"),
++            "more_than_ten_hits": "TERM\tx\t11\teq\t" + " ".join(f"{doc}:1.0" for doc in range(11)) + "\n",
++            "total_less_than_hits": ROW.replace("\t2\teq\t", "\t1\teq\t"),
++        }
++        for name, row in variants.items():
++            for optimized in (False, True):
++                with self.subTest(name=name, optimized=optimized):
++                    result = self.compare(row, row, optimized=optimized)
++                    self.assertEqual(result.returncode, 2, result.stderr)
++                    self.assertIn("error", result.stderr.lower())
++
+     def test_malformed_dumps_fail_even_when_identical(self):
+         variants = {
+             "empty": "",

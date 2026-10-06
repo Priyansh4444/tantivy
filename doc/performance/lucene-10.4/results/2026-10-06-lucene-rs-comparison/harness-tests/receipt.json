@@ -1,0 +1,26 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--bins"
+  ],
+  "returncode": 0,
+  "wall_seconds": 135.40057557499676,
+  "source_unchanged": true,
+  "compiler": "1.99.0",
+  "rustflags": "-C target-cpu=native",
+  "jobs": 2,
+  "profile": {
+    "opt_level": 3,
+    "lto": "fat",
+    "codegen_units": 1,
+    "overflow_checks": false,
+    "panic": "abort",
+    "debug": false
+  },
+  "stdout_sha256": "3d1f790fcd222826ee0202c0f2a67ebc5649277aa620cd8c9744923ac44b2902",
+  "stderr_sha256": "04657045ee34b34eaaca11fcb057b5f2c6139d1aefc047e606870166ce115163",
+  "audited_index_unchanged": true
+}

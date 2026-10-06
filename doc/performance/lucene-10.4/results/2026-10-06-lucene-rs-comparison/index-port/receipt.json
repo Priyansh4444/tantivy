@@ -1,0 +1,26 @@
+{
+  "command": [
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/target/release/port_prepare",
+    "index",
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/aligned.jsonl",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/port.idx",
+    "/home/pronsh/Coding/playground/search/bench/native-profile-aligned-oct05/lucene-physical.tsv"
+  ],
+  "returncode": 0,
+  "wall_seconds": 110.75101128000097,
+  "source_unchanged": true,
+  "compiler": "1.99.0",
+  "rustflags": "-C target-cpu=native",
+  "jobs": 2,
+  "profile": {
+    "opt_level": 3,
+    "lto": "fat",
+    "codegen_units": 1,
+    "overflow_checks": false,
+    "panic": "abort",
+    "debug": false
+  },
+  "stdout_sha256": "46f29b7ff05d60e9e077481ba0934d1026103243ca5d096472a7d9c416747d3d",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "audited_index_unchanged": true
+}

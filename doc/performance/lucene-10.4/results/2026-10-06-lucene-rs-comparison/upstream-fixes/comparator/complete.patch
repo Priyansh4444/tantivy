@@ -1,0 +1,395 @@
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index 26421ff..4aeac1a 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -29,6 +29,7 @@ jobs:
+         with:
+           python-version: '3.12'
+       - run: python3 bench/scripts/render.py --check
++      - run: python3 -m unittest discover -s bench/scripts/tests -v
+ 
+   test:
+     strategy:
+diff --git a/.gitignore b/.gitignore
+index 6c8dbad..969d24a 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -6,4 +6,5 @@ bench/src-lucene/
+ bench/java/classes/
+ bench/results-*.tsv
+ bench/bin/
++__pycache__/
+ .env.local
+diff --git a/bench/README.md b/bench/README.md
+index a3dc4f9..2b07052 100644
+--- a/bench/README.md
++++ b/bench/README.md
+@@ -24,15 +24,24 @@ first for equivalence (same top-10, same scores), then for speed.
+ 
+ ## Equivalence
+ 
+-`scripts/compare.py` diffs the top-10 dumps:
++`scripts/compare.py` gates strict equality of the top-10 dumps: query kind/text,
++document IDs in order, finite raw float32 score bits, and reported hit values/relations.
++It exits with status 1 for a mismatch and status 2 for malformed inputs. Dumps have five
++TSV columns: `KIND`, terms, hit value, hit relation (`eq` or `gte`), and `doc:score` hits.
++Rerun both dump commands to regenerate older dumps that omit the relation.
++
++The retained benchmark's reported comparisons were:
+ 
+ | query set | queries | same docs, same order | bit-identical scores | same hit count |
+ |---|---:|---:|---:|---:|
+ | term / AND / OR | 901 | 901 | 8,986 / 8,986 | 901 |
+ | exact phrase | 300 | 300 | 2,459 / 2,459 | 300 |
+ 
+-Matching hit counts mean the collector's 1,000-hit threshold and the block skipping fire at the
+-same points in both engines.
++`eq` means an exact hit count; `gte` means a lower bound after competitive pruning.
++Matching reported values/relations is an implementation equality assertion, not proof that
++the engines skipped identical blocks. Different valid lower bounds can result from different
++skipping strategies; independent exact counts are needed to verify match-count correctness.
++The retained comparisons above did not record relations and have not been rerun here.
+ 
+ ## Results
+ 
+diff --git a/bench/java/Bench.java b/bench/java/Bench.java
+index f382ad9..75b8b32 100644
+--- a/bench/java/Bench.java
++++ b/bench/java/Bench.java
+@@ -17,6 +17,7 @@ import org.apache.lucene.search.Query;
+ import org.apache.lucene.search.ScoreDoc;
+ import org.apache.lucene.search.TermQuery;
+ import org.apache.lucene.search.TopDocs;
++import org.apache.lucene.search.TotalHits;
+ import org.apache.lucene.store.MMapDirectory;
+ 
+ /** Same protocol as lucene-rs/src/bin/bench.rs. */
+@@ -73,7 +74,8 @@ public class Bench {
+             if (sb.length() > 0) sb.append(' ');
+             sb.append(ids.longValue()).append(':').append(String.format(Locale.ROOT, "%.9e", sd.score));
+           }
+-          out.println(q.line + "\t" + td.totalHits.value() + "\t" + sb);
++          String relation = td.totalHits.relation() == TotalHits.Relation.EQUAL_TO ? "eq" : "gte";
++          out.println(q.line + "\t" + td.totalHits.value() + "\t" + relation + "\t" + sb);
+         }
+       }
+       return;
+diff --git a/bench/rust/src/bin/bench.rs b/bench/rust/src/bin/bench.rs
+index 01bc93a..545f696 100644
+--- a/bench/rust/src/bin/bench.rs
++++ b/bench/rust/src/bin/bench.rs
+@@ -4,6 +4,7 @@
+ 
+ #![allow(clippy::as_conversions, clippy::cast_precision_loss)]
+ 
++use lucene_rs::search::TotalHitsRelation;
+ use lucene_rs::{DirectoryReader, IndexSearcher};
+ use lucene_rs_bench::{load_queries, summary};
+ use std::io::Write;
+@@ -26,11 +27,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
+                     .iter()
+                     .map(|h| format!("{}:{:.9e}", h.doc, h.score))
+                     .collect();
++                let relation = match top.total_hits.relation {
++                    TotalHitsRelation::EqualTo => "eq",
++                    TotalHitsRelation::GreaterThanOrEqualTo => "gte",
++                };
+                 writeln!(
+                     out,
+-                    "{}\t{}\t{}",
++                    "{}\t{}\t{}\t{}",
+                     q.line,
+                     top.total_hits.value,
++                    relation,
+                     hits.join(" ")
+                 )?;
+             }
+diff --git a/bench/scripts/compare.py b/bench/scripts/compare.py
+index 0c5e88e..796d774 100644
+--- a/bench/scripts/compare.py
++++ b/bench/scripts/compare.py
+@@ -1,29 +1,118 @@
+-"""Compare top-10 dumps from Lucene and the Rust port: doc ids, float32 scores, total hit counts."""
+-import struct, sys
++"""Gate strict top-10 dump equality: query, documents, f32 bits, and reported hits.
++
++A reported hit count may be a lower bound. Equal dumps do not prove that the
++engines skipped identical blocks or independently verify the exact match count.
++"""
++
+ from collections import Counter
++from dataclasses import dataclass
++import math
++import re
++import struct
++import sys
+ 
+-def f32(s):
+-    return struct.unpack("f", struct.pack("f", float(s)))[0]
+ 
+-def load(p):
+-    out = []
+-    for line in open(p):
+-        kind, terms, total, hits = line.rstrip("\n").split("\t")
+-        hits = [(int(d), f32(s)) for d, s in (h.split(":") for h in hits.split())] if hits else []
+-        out.append((kind, terms, int(total), hits))
+-    return out
++@dataclass(frozen=True)
++class Row:
++    kind: str
++    terms: str
++    total: int
++    relation: str
++    hits: list[tuple[int, int]]  # (document ID, raw f32 score bits)
+ 
+-a, b = load(sys.argv[1]), load(sys.argv[2])
+-assert len(a) == len(b)
+-stats = Counter()
+-for (k, t, ta, ha), (_, t2, tb, hb) in zip(a, b):
+-    assert t == t2
+-    stats["queries"] += 1
+-    stats["hits"] += len(ha)
+-    stats["same_docs_in_order"] += [d for d, _ in ha] == [d for d, _ in hb]
+-    stats["bit_identical_scores"] += sum(x[1] == y[1] for x, y in zip(ha, hb))
+-    stats["same_total_hits"] += ta == tb
+-    if [d for d, _ in ha] != [d for d, _ in hb] or ta != tb:
+-        print("DIFF", k, t, ta, tb, ha[:3], hb[:3])
+-for k, v in stats.items():
+-    print(f"{k}: {v}")
++
++def unsigned(text, maximum):
++    if re.fullmatch(r"[0-9]+", text) is None or int(text) > maximum:
++        raise ValueError(f"invalid unsigned integer: {text!r}")
++    return int(text)
++
++
++def f32_bits(text):
++    value = float(text)
++    if not math.isfinite(value):
++        raise ValueError("score must be finite")
++    encoded = struct.pack("<f", value)
++    return struct.unpack("<I", encoded)[0]
++
++
++def load(path):
++    rows = []
++    with open(path, encoding="utf-8") as source:
++        for number, line in enumerate(source, 1):
++            try:
++                columns = line.rstrip("\n").split("\t")
++                if len(columns) == 4:
++                    raise ValueError("legacy dump has no hit-count relation; rerun both dump commands")
++                if len(columns) != 5:
++                    raise ValueError("expected KIND, terms, total, relation, hits (five TSV columns)")
++                kind, terms, total, relation, encoded_hits = columns
++                if kind not in {"TERM", "AND", "OR", "PHRASE"} or not terms.strip():
++                    raise ValueError("invalid query kind or empty query text")
++                if relation not in {"eq", "gte"}:
++                    raise ValueError("hit-count relation must be eq or gte")
++                hits = []
++                for hit in encoded_hits.split():
++                    doc, score = hit.split(":")
++                    hits.append((unsigned(doc, 2**32 - 1), f32_bits(score)))
++                total = unsigned(total, 2**64 - 1)
++                if len(hits) > 10:
++                    raise ValueError("top-10 dump has more than ten hits")
++                if len({doc for doc, _ in hits}) != len(hits):
++                    raise ValueError("duplicate document ID in top-10 hits")
++                if total < len(hits):
++                    raise ValueError("reported hit value is smaller than the hit vector")
++                rows.append(Row(kind, terms, total, relation, hits))
++            except (ValueError, OverflowError, struct.error) as error:
++                raise ValueError(f"{path}:{number}: {error}") from error
++    if not rows:
++        raise ValueError(f"{path}: empty dump")
++    return rows
++
++
++def main(argv):
++    if len(argv) != 2:
++        print("usage: compare.py <lucene-dump.tsv> <rust-dump.tsv>", file=sys.stderr)
++        return 2
++    try:
++        left, right = load(argv[0]), load(argv[1])
++    except (OSError, UnicodeError, ValueError) as error:
++        print(f"error: {error}", file=sys.stderr)
++        return 2
++    stats = Counter(dict.fromkeys(
++        ["queries", "hits", "same_docs_in_order", "bit_identical_scores", "same_total_hits", "same_hit_relations"], 0
++    ))
++    different = len(left) != len(right)
++    if different:
++        print(f"DIFF row count: {len(left)} != {len(right)}")
++    for number, (a, b) in enumerate(zip(left, right), 1):
++        same_docs = [doc for doc, _ in a.hits] == [doc for doc, _ in b.hits]
++        same_scores = [bits for _, bits in a.hits] == [bits for _, bits in b.hits]
++        stats["queries"] += 1
++        stats["hits"] += len(a.hits)
++        stats["same_docs_in_order"] += same_docs
++        stats["bit_identical_scores"] += sum(x[1] == y[1] for x, y in zip(a.hits, b.hits))
++        stats["same_total_hits"] += a.total == b.total
++        stats["same_hit_relations"] += a.relation == b.relation
++        reasons = []
++        if (a.kind, a.terms) != (b.kind, b.terms):
++            reasons.append("query identity")
++        if len(a.hits) != len(b.hits):
++            reasons.append("hit length")
++        if not same_docs:
++            reasons.append("documents/order")
++        if not same_scores:
++            reasons.append("score bits")
++        if a.total != b.total:
++            reasons.append("total hit value")
++        if a.relation != b.relation:
++            reasons.append("hit-count relation")
++        if reasons:
++            different = True
++            print(f"DIFF row {number}: {', '.join(reasons)}; {a!r} != {b!r}")
++    for key, value in stats.items():
++        print(f"{key}: {value}")
++    return int(different)
++
++
++if __name__ == "__main__":
++    sys.exit(main(sys.argv[1:]))
+diff --git a/bench/scripts/tests/test_compare.py b/bench/scripts/tests/test_compare.py
+new file mode 100644
+index 0000000..4393d8b
+--- /dev/null
++++ b/bench/scripts/tests/test_compare.py
+@@ -0,0 +1,135 @@
++"""Exercise the CLI status that gates run-all.sh, including optimized Python."""
++
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++
++SCRIPT = Path(__file__).resolve().parents[1] / "compare.py"
++ROW = "TERM\tx\t2\teq\t0:1.000000000e+00 1:5.000000000e-01\n"
++
++
++class CompareCliTests(unittest.TestCase):
++    def compare(self, left=ROW, right=ROW, *, optimized=False):
++        with tempfile.TemporaryDirectory() as directory:
++            left_path = Path(directory) / "left.tsv"
++            right_path = Path(directory) / "right.tsv"
++            left_path.write_text(left, encoding="utf-8")
++            right_path.write_text(right, encoding="utf-8")
++            command = [sys.executable]
++            if optimized:
++                command.append("-O")
++            command.extend([str(SCRIPT), str(left_path), str(right_path)])
++            return subprocess.run(command, capture_output=True, text=True, check=False)
++
++    def test_identical_dumps_pass(self):
++        for optimized in (False, True):
++            with self.subTest(optimized=optimized):
++                result = self.compare(optimized=optimized)
++                self.assertEqual(result.returncode, 0, result.stderr)
++                self.assertIn("queries: 1", result.stdout)
++                self.assertIn("bit_identical_scores: 2", result.stdout)
++
++    def test_every_observable_mismatch_fails(self):
++        variants = {
++            "kind": ROW.replace("TERM", "OR"),
++            "query": ROW.replace("\tx\t", "\ty\t"),
++            "row_count": ROW + ROW.replace("\tx\t", "\ty\t"),
++            "hit_count": ROW.replace(" 1:5.000000000e-01", ""),
++            "doc_order": ROW.replace("0:1.000000000e+00 1:5.000000000e-01", "1:1.000000000e+00 0:5.000000000e-01"),
++            "doc_id": ROW.replace("0:1.000", "9:1.000"),
++            "one_ulp_score": ROW.replace("1.000000000e+00", "1.000000119e+00"),
++            "total": ROW.replace("\t2\teq\t", "\t3\teq\t"),
++            "relation": ROW.replace("\teq\t", "\tgte\t"),
++        }
++        for name, row in variants.items():
++            for optimized in (False, True):
++                with self.subTest(name=name, optimized=optimized):
++                    result = self.compare(right=row, optimized=optimized)
++                    self.assertEqual(result.returncode, 1, result.stderr)
++                    self.assertIn("DIFF", result.stdout)
++
++    def test_score_only_difference_is_diagnosed(self):
++        result = self.compare(right=ROW.replace("1.000000000e+00", "1.000000119e+00"))
++        self.assertEqual(result.returncode, 1)
++        self.assertIn("score", result.stdout.lower())
++
++    def test_signed_zero_is_a_bit_difference(self):
++        left = "TERM\tx\t1\teq\t0:0.0\n"
++        right = "TERM\tx\t1\teq\t0:-0.0\n"
++        result = self.compare(left, right)
++        self.assertEqual(result.returncode, 1, result.stderr)
++        self.assertIn("bit_identical_scores: 0", result.stdout)
++
++    def test_decimal_spellings_that_round_to_the_same_f32_pass(self):
++        result = self.compare(right=ROW.replace("1.000000000e+00", "1.00000001"))
++        self.assertEqual(result.returncode, 0, result.stderr)
++
++    def test_empty_hit_vector_passes(self):
++        row = "TERM\tabsent\t0\teq\t\n"
++        result = self.compare(row, row)
++        self.assertEqual(result.returncode, 0, result.stderr)
++
++    def test_lower_bound_values_are_strict_dump_equality(self):
++        left = ROW.replace("\t2\teq\t", "\t1001\tgte\t")
++        right = ROW.replace("\t2\teq\t", "\t1002\tgte\t")
++        result = self.compare(left, right)
++        self.assertEqual(result.returncode, 1, result.stderr)
++
++    def test_legacy_relationless_dumps_request_regeneration(self):
++        row = ROW.replace("\teq\t", "\t")
++        result = self.compare(row, row)
++        self.assertNotEqual(result.returncode, 0)
++        self.assertIn("rerun", result.stderr.lower())
++
++    def test_invalid_top10_hit_vectors_fail(self):
++        variants = {
++            "duplicate_document": ROW.replace("1:5.000", "0:5.000"),
++            "more_than_ten_hits": "TERM\tx\t11\teq\t" + " ".join(f"{doc}:1.0" for doc in range(11)) + "\n",
++            "total_less_than_hits": ROW.replace("\t2\teq\t", "\t1\teq\t"),
++        }
++        for name, row in variants.items():
++            for optimized in (False, True):
++                with self.subTest(name=name, optimized=optimized):
++                    result = self.compare(row, row, optimized=optimized)
++                    self.assertEqual(result.returncode, 2, result.stderr)
++                    self.assertIn("error", result.stderr.lower())
++
++    def test_malformed_dumps_fail_even_when_identical(self):
++        variants = {
++            "empty": "",
++            "blank_row": "\n",
++            "missing_column": "TERM\tx\t2\n",
++            "extra_column": ROW.rstrip("\n") + "\textra\n",
++            "unknown_kind": ROW.replace("TERM", "UNKNOWN"),
++            "empty_query": ROW.replace("\tx\t", "\t\t"),
++            "negative_total": ROW.replace("\t2\t", "\t-1\t"),
++            "bad_total": ROW.replace("\t2\t", "\ttwo\t"),
++            "overflow_total": ROW.replace("\t2\t", "\t18446744073709551616\t"),
++            "unknown_relation": ROW.replace("\teq\t", "\tunknown\t"),
++            "negative_doc": ROW.replace("0:1.000", "-1:1.000"),
++            "bad_doc": ROW.replace("0:1.000", "bad:1.000"),
++            "overflow_doc": ROW.replace("0:1.000", "4294967296:1.000"),
++            "missing_score": ROW.replace("0:1.000000000e+00", "0"),
++            "bad_score": ROW.replace("1.000000000e+00", "bad"),
++            "nan": ROW.replace("1.000000000e+00", "nan"),
++            "positive_inf": ROW.replace("1.000000000e+00", "inf"),
++            "negative_inf": ROW.replace("1.000000000e+00", "-inf"),
++            "overflow_f32": ROW.replace("1.000000000e+00", "1e100"),
++        }
++        for name, row in variants.items():
++            with self.subTest(name=name):
++                result = self.compare(row, row)
++                self.assertNotEqual(result.returncode, 0)
++                self.assertIn("error", result.stderr.lower())
++
++    def test_usage_is_nonzero(self):
++        result = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True, check=False)
++        self.assertNotEqual(result.returncode, 0)
++        self.assertIn("usage", result.stderr.lower())
++
++
++if __name__ == "__main__":
++    unittest.main()

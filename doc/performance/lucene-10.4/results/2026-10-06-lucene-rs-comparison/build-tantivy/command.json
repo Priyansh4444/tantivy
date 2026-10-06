@@ -1,0 +1,8 @@
+[
+  "cargo",
+  "build",
+  "--locked",
+  "--release",
+  "--bin",
+  "tantivy_worker"
+]

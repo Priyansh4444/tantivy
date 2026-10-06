@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python3",
+    "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/bench/scripts/compare.py",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/baseline-a.tsv",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/baseline-b.tsv"
+  ],
+  "returncode": 0,
+  "stdout": "DIFF TERM x 2 99 [(0, 1.0), (1, 0.5)] [(9, 0.75), (1, 0.25)]\nqueries: 1\nhits: 2\nsame_docs_in_order: 0\nbit_identical_scores: 0\nsame_total_hits: 0\n",
+  "stderr": "",
+  "comparator_sha256": "19618f9e43436580326a421df69359a9b2eee2f84bdd5297fed575f6710cc91d"
+}

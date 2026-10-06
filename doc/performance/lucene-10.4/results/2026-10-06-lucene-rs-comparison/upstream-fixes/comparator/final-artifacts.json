@@ -1,0 +1,9 @@
+{
+  "/home/pronsh/Coding/playground/search/lucene-rs-comparator-fix-oct06/Cargo.lock": "fe7c68f0929950fb6d6f2ff7d0d023e4fca516ab63f2e3b56278d9d2b859a662",
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/target/debug/bench": "f254a9dd95f08b914838833af15ecc9a5eb290ec3995a2c73a4d10265656d331",
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/target/debug/index": "8b90a781c7d20d4e83d66c201feb4b2520d3af1abbb6ecd342cf3c2ef3eec2ed",
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-review-oct06/lucene-core-10.5.2.jar": "39210e1024da5c31d1ad7571d622ebb122a8c4e23ff42e9bc380124973d8c635",
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-review-oct06/lucene-analysis-common-10.5.2.jar": "b1ee60ca6cd5951cc22dee71f8a0434e4f44e61e19495918c8ed7b5992c6cbea",
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/java.tsv": "2a0e81f9f609b907bddb020693729f752a487480e601d35e0647730e83ae86d8",
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-upstream-comparator-oct06/fixture/rust.tsv": "ba3b7a1a2d86acd72f988f41823639da3a4a35987366299bbb1fed9ff9f4fcc7"
+}

@@ -1,0 +1,8 @@
+[
+  "cargo",
+  "test",
+  "--locked",
+  "--workspace",
+  "--all-features",
+  "--release"
+]

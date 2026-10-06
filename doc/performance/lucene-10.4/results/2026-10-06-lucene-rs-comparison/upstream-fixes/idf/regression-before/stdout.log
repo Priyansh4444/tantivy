@@ -1,0 +1,29 @@
+
+running 2 tests
+test sim::tests::score_matches_lucene_rounding ... FAILED
+test sim::tests::idf_matches_lucene_rounding ... FAILED
+
+failures:
+
+---- sim::tests::score_matches_lucene_rounding stdout ----
+
+thread 'sim::tests::score_matches_lucene_rounding' (2504314) panicked at src/sim.rs:158:9:
+assertion `left == right` failed
+  left: 915138935
+ right: 915138934
+
+---- sim::tests::idf_matches_lucene_rounding stdout ----
+
+thread 'sim::tests::idf_matches_lucene_rounding' (2504313) panicked at src/sim.rs:150:9:
+assertion `left == right` failed
+  left: 924444471
+ right: 924444470
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    sim::tests::idf_matches_lucene_rounding
+    sim::tests::score_matches_lucene_rounding
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.00s
+

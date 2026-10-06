@@ -1,0 +1,78 @@
+
+running 22 tests
+test analysis::tests::long_tokens_are_split ... ok
+test analysis::tests::whitespace_is_java_whitespace ... ok
+test analysis::tests::standard_uax29 ... ok
+test analysis::tests::simple_and_keyword ... ok
+test analysis::tests::stop_words_leave_position_gaps ... ok
+test codec::postings_reader::tests::prefix_sum_matches_scalar ... ok
+test codec::store::tests::roundtrip ... ok
+test codec::forutil::tests::pfor_roundtrip_with_exceptions ... ok
+test index::merge::tests::big_segment_is_its_own_level ... ok
+test index::merge::tests::merges_ten_small_segments ... ok
+test queryparser::tests::modifiers_and_operators ... ok
+test queryparser::tests::single_term_and_fields ... ok
+test queryparser::tests::stop_words_keep_phrase_gaps ... ok
+test queryparser::tests::phrases_groups_boosts ... ok
+test queryparser::tests::unsupported_syntax_errors ... ok
+test search::query::tests::duplicate_shoulds_sum_boosts ... ok
+test search::query::tests::nested_boosts_multiply_and_phrases_shrink ... ok
+test sim::tests::idf_matches_lucene_rounding ... ok
+test sim::tests::score_matches_lucene_rounding ... ok
+test search::query::tests::single_clause_unwraps ... ok
+test codec::forutil::tests::for_roundtrip_all_widths ... ok
+test sim::tests::smallfloat_matches_lucene_contract ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 8 tests
+test analyzers_apply_at_index_and_query_time ... ok
+test inconsistent_fields_and_phrases_without_positions_are_errors ... ok
+test stored_fields_round_trip ... ok
+test commits_are_atomic_and_reopen_reuses_segments ... ok
+test query_parser_end_to_end ... ok
+test write_lock_rollback_and_create_mode ... ok
+test corruption_is_detected ... ok
+test updates_and_deletes_respect_order_across_flushes_and_merges ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+
+running 1 test
+test random_queries_match_brute_force_reference ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.88s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test src/lib.rs - (line 10) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+all doctests ran in 0.37s; merged doctests compilation took 0.36s
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
