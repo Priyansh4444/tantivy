@@ -9,7 +9,7 @@ The requested target remains all Lucene 10.4 public APIs and feature modules.
 | --- | --- | --- |
 | Native field statistics | Exact physical field population and token totals; missing/empty fields, pending deletes, Basic terms and deletion merges | Broader field types and all public statistics/error contracts remain open |
 | Native default BM25 | Raw scale 1, default 1.2/.75 term/boost/fractional phrase checks, frozen 330 and Wiki 20 green | Arbitrary Similarity subclasses and full scoring/API contracts remain open |
-| Deferred BM25 explanations | 42 frozen full trees, provider/error order and owned output independence; 1381 library tests; native weight112→56 bytes, tested clones/boosts allocate nothing; frozen330/all three Wiki20 gates pass | Query latency broadly holds within loaded-machine controls; no significant incremental speed claim. On-demand explanation requested bytes rise 11.1% for single and 28% for three-term native phrase; separate exact-capacity experiment pending |
+| Deferred BM25 explanations | P021:42 frozen full trees, provider/error order and owned output independence,1381 library tests, native weight112→56 bytes, zero-allocation tested clones/boosts, frozen330/all three Wiki20 gates. P022:exact-size owned vectors;27 debug/native BM25 tests and unchanged23-operation allocation probe | P021 query latency broadly holds within loaded-machine controls; no significant incremental speed claim. P022 restores original eager per-explain requested bytes1440/2000 with unchanged calls, retaining setup savings; no new broad query or Lucene timings attributed to P022 |
 | BM25 query parameters | Validated immutable global/per-field Searcher parameters; native/classic coherent snapshots; pinned Java queries and 30 scalar digests; conservative complete-block/tail bounds | Finite-profile pre-decode bounds improve 0.9/0.4 TOP_10 by 29.5% versus accepted e133, but fresh T/L 1.001–1.034 remains near parity; 2.5/1 stays 25.8–36.9% slower; broader profiles/workloads and NaN collector ordering remain open |
 | Overlap norm policy | Native DiscountOverlaps default; persisted explicit CountAll; old Boolean append policy; actual empty-index old-reader rejection; multi-value, Basic, reopen/delete/merge and pruning fixtures | Existing norms require reindexing to change policy; arbitrary token graphs/position/error contracts remain open |
 | Overlap/query configuration independence | Eight pinned native Java combinations, both policies/four profiles; exact norm/statistics/raw score/order/COUNT/explanation checks | This is a bounded matrix, not arbitrary Similarity/token-graph certification |
@@ -28,6 +28,10 @@ The [October 6 deferred-explanation report](../results/2026-10-06-explanation/RE
 records the allocation/size efficiency keep at 176410bb5, all 16 paired/control
 runs and the explicit on-demand explanation cost. It makes no fresh Lucene
 timing or full-parity claim.
+The separate [exact-size explanation follow-up](../results/2026-10-06-explanation-capacity/README.md)
+at1ac1c323a removes that requested-byte cost with unchanged trees and allocation
+calls. Its renderer-only allocation metric and targeted validation remain separate
+from P021's broader historical query tests and timings.
 
 The [October 5 finite-profile report](../results/2026-10-05-native-pruning-finite/README.md)
 records b50e2aef3a, its 29.5% configured ranked improvement and explicit DEFAULT/

@@ -1,0 +1,238 @@
+{
+  "attempt": "P022",
+  "verdict": "kept",
+  "tested_commit": "cefcd1edec930d3983fcea39d3b266cbf77c0fe9",
+  "integrated_commit": "1ac1c323a4e1ef872dfc6a917e962d54f18fb0ea",
+  "metric": "Caller-thread owned explanation allocation calls and requested-byte totals only",
+  "archive_sha256": "9030bef0d5c692e8a746545350e5850f20c546beb98e8268c83950cc7b1a7c71",
+  "members": {
+    "integrated-source/src/query/bm25.rs": {
+      "bytes": 41675,
+      "sha256": "a2a22c018621a8bfb73dbfcf7663734a4759a68d7b522937c75de8d018b840ad"
+    },
+    "integrated-source/src/query/bm25_explanation_baseline.json": {
+      "bytes": 340941,
+      "sha256": "3ba164f56afcf642adddc6df85a26aca669f9313835985d186678966100322ec"
+    },
+    "integrated-source/src/query/bm25_explanation_tests.rs": {
+      "bytes": 16844,
+      "sha256": "26ddb6798836c48ebc3232fb21c19217a268d92c26cc3fbdc1178d494e53b0ef"
+    },
+    "integrated-source/src/query/explanation.rs": {
+      "bytes": 3714,
+      "sha256": "c23a632839acb0363efa57ed9dbda877f15c116b67d3ae5a94e957456503c85f"
+    },
+    "native-explanation-capacity-oct06/allocation-pair-comparison.json": {
+      "bytes": 71737,
+      "sha256": "ad41cbe2674f5cd1bc0ab3426ed32d6c59bfa48f6eecd7a9f5dcae309433ab2f"
+    },
+    "native-explanation-capacity-oct06/allocation-v2-candidate-06-compiler.json": {
+      "bytes": 298,
+      "sha256": "cc0657852c0fe36cc2c3687ca414dc01da096bc6ec4a0c7cbe9e35a287a4aebe"
+    },
+    "native-explanation-capacity-oct06/allocation-v2-candidate-06-guards-after.json": {
+      "bytes": 59965,
+      "sha256": "8ab78b187b1aaa4000e4c461985038a2dc9dd2d4e77b924e90a07f5c64802ae0"
+    },
+    "native-explanation-capacity-oct06/allocation-v2-candidate-06-guards-before.json": {
+      "bytes": 59965,
+      "sha256": "8ab78b187b1aaa4000e4c461985038a2dc9dd2d4e77b924e90a07f5c64802ae0"
+    },
+    "native-explanation-capacity-oct06/allocation-v2-candidate-06-receipt.json": {
+      "bytes": 61508,
+      "sha256": "d08e7bcabad4512273bdec29287a4cee4bf067ea1c0d75ebae9e0e03ab0e3765"
+    },
+    "native-explanation-capacity-oct06/allocation-v2-candidate-06.csv": {
+      "bytes": 952,
+      "sha256": "9aafe67a932f0d6ca15ac2599c1ca03f6b40909f727d89142f39304da3cee56d"
+    },
+    "native-explanation-capacity-oct06/allocation-v2-candidate-06.log": {
+      "bytes": 2016,
+      "sha256": "ebd99fa2450d7314fe0e0edb58c0fcd50a28000d68fd1492bb490daad6a9243c"
+    },
+    "native-explanation-capacity-oct06/allocation-v2-candidate/Cargo.lock": {
+      "bytes": 31113,
+      "sha256": "b38503982c34dfe53bce9901f729d87921accb96124e49b6dd216459235cc482"
+    },
+    "native-explanation-capacity-oct06/allocation-v2-candidate/Cargo.toml": {
+      "bytes": 277,
+      "sha256": "351742ad417fc3f7399c056abe5594a8db9007ca3421bc58bbb591b4e536ce89"
+    },
+    "native-explanation-capacity-oct06/allocation-v2-candidate/src/main.rs": {
+      "bytes": 4128,
+      "sha256": "5a5af7706bc1c5825258f5bb0f5a12beeef790faf62ef6be35df0567e27da824"
+    },
+    "native-explanation-capacity-oct06/baseline-source/src/query/bm25.rs": {
+      "bytes": 41548,
+      "sha256": "624014dffa5e47e5ae0ed2b87d2e014e25b0b3d0526b95157dd7cd61599f43e5"
+    },
+    "native-explanation-capacity-oct06/baseline-source/src/query/bm25_explanation_baseline.json": {
+      "bytes": 340941,
+      "sha256": "3ba164f56afcf642adddc6df85a26aca669f9313835985d186678966100322ec"
+    },
+    "native-explanation-capacity-oct06/baseline-source/src/query/bm25_explanation_tests.rs": {
+      "bytes": 16844,
+      "sha256": "26ddb6798836c48ebc3232fb21c19217a268d92c26cc3fbdc1178d494e53b0ef"
+    },
+    "native-explanation-capacity-oct06/baseline-source/src/query/explanation.rs": {
+      "bytes": 3300,
+      "sha256": "6546a6a37c561d86b015c028e966f67b11142337757037e8f71ea388e476d00f"
+    },
+    "native-explanation-capacity-oct06/candidate-source/src/query/bm25.rs": {
+      "bytes": 41675,
+      "sha256": "a2a22c018621a8bfb73dbfcf7663734a4759a68d7b522937c75de8d018b840ad"
+    },
+    "native-explanation-capacity-oct06/candidate-source/src/query/explanation.rs": {
+      "bytes": 3714,
+      "sha256": "c23a632839acb0363efa57ed9dbda877f15c116b67d3ae5a94e957456503c85f"
+    },
+    "native-explanation-capacity-oct06/candidate.diff": {
+      "bytes": 3303,
+      "sha256": "9fcde541274093df1690379e783b35f01dd71fb49eaa9cbd9b86fb4a1bc9e253"
+    },
+    "native-explanation-capacity-oct06/debug-bm25-01-compiler.json": {
+      "bytes": 298,
+      "sha256": "cc0657852c0fe36cc2c3687ca414dc01da096bc6ec4a0c7cbe9e35a287a4aebe"
+    },
+    "native-explanation-capacity-oct06/debug-bm25-01-guards-before.json": {
+      "bytes": 59781,
+      "sha256": "93e01bdb946a6491542492d6c80d35d21e08763463defba75e1550467b6dd27b"
+    },
+    "native-explanation-capacity-oct06/debug-bm25-01-receipt.json": {
+      "bytes": 60732,
+      "sha256": "56df5eaa60aa627cd74f048d4407c5238337464f6901c9e1d12b27b2aba6b51b"
+    },
+    "native-explanation-capacity-oct06/debug-bm25-01.log": {
+      "bytes": 5376,
+      "sha256": "0024a357a81aaf48338dfe50da4694ef690b03bf1c20ccfc99f7d321798339cf"
+    },
+    "native-explanation-capacity-oct06/debug-bm25-04-compiler.json": {
+      "bytes": 298,
+      "sha256": "cc0657852c0fe36cc2c3687ca414dc01da096bc6ec4a0c7cbe9e35a287a4aebe"
+    },
+    "native-explanation-capacity-oct06/debug-bm25-04-guards-after.json": {
+      "bytes": 59965,
+      "sha256": "8ab78b187b1aaa4000e4c461985038a2dc9dd2d4e77b924e90a07f5c64802ae0"
+    },
+    "native-explanation-capacity-oct06/debug-bm25-04-guards-before.json": {
+      "bytes": 59965,
+      "sha256": "8ab78b187b1aaa4000e4c461985038a2dc9dd2d4e77b924e90a07f5c64802ae0"
+    },
+    "native-explanation-capacity-oct06/debug-bm25-04-receipt.json": {
+      "bytes": 60993,
+      "sha256": "01319467c9024d8c14474781b0222ef706b594e6099f16271b6754c22ba3d7ee"
+    },
+    "native-explanation-capacity-oct06/debug-bm25-04.log": {
+      "bytes": 10113,
+      "sha256": "1001299295e1474943294238509b4dd6514ea4a5a9a748174b24a1b049021534"
+    },
+    "native-explanation-capacity-oct06/design.md": {
+      "bytes": 3945,
+      "sha256": "faadc6af0dab343ca94c9ef15aa10d1d0bc01bfaae5dca94562042e66385c8ef"
+    },
+    "native-explanation-capacity-oct06/keep-integration-receipt.json": {
+      "bytes": 1617,
+      "sha256": "c4121fe8b1cc99d3eef39d96200feaec63e91536ef14888cb94dee1bcfe9eeaa"
+    },
+    "native-explanation-capacity-oct06/preparation-count-clarification.json": {
+      "bytes": 319,
+      "sha256": "46792cfe13ec3889b25afe2955cb5ed06a8512e7a1fcae2f5a2aba58bfb2cc52"
+    },
+    "native-explanation-capacity-oct06/prepare-test-lock.py": {
+      "bytes": 1225,
+      "sha256": "a092946fa403910fb452b889a64bfa4808511a592ebc89ebff440e82c82ed22d"
+    },
+    "native-explanation-capacity-oct06/release-bm25-05-compiler.json": {
+      "bytes": 298,
+      "sha256": "cc0657852c0fe36cc2c3687ca414dc01da096bc6ec4a0c7cbe9e35a287a4aebe"
+    },
+    "native-explanation-capacity-oct06/release-bm25-05-guards-after.json": {
+      "bytes": 59965,
+      "sha256": "8ab78b187b1aaa4000e4c461985038a2dc9dd2d4e77b924e90a07f5c64802ae0"
+    },
+    "native-explanation-capacity-oct06/release-bm25-05-guards-before.json": {
+      "bytes": 59965,
+      "sha256": "8ab78b187b1aaa4000e4c461985038a2dc9dd2d4e77b924e90a07f5c64802ae0"
+    },
+    "native-explanation-capacity-oct06/release-bm25-05-receipt.json": {
+      "bytes": 60970,
+      "sha256": "48c455b5082e85a111f40f8832f7cb070540fcded30cfdd054bd919dc13af75f"
+    },
+    "native-explanation-capacity-oct06/release-bm25-05.log": {
+      "bytes": 10104,
+      "sha256": "6040aba3089f0ed9486087cd5d88ababa7c91945306ae9ebed2d8f0993fc6320"
+    },
+    "native-explanation-capacity-oct06/retained-test-Cargo.lock": {
+      "bytes": 68699,
+      "sha256": "b71c92f2d72b65c9600602cd05e2938d087cf4fee686f22e46a671e534e15d1d"
+    },
+    "native-explanation-capacity-oct06/root-allocation-test-audit-oct06.json": {
+      "bytes": 1404,
+      "sha256": "81a052da72f3fff4ca3922a16f66e3aeb63d0743c75715be8dd5ab01f06e62f1"
+    },
+    "native-explanation-capacity-oct06/root-source-review-oct06.json": {
+      "bytes": 975,
+      "sha256": "c46d8422579a52dd93d0af7c2f700c020b6868e5a66e99078c9aa341586c734a"
+    },
+    "native-explanation-capacity-oct06/run-all-stage2-before-test-lock-guard.py": {
+      "bytes": 263,
+      "sha256": "d64f217278ea0f28f31d7d4642bdfe857b0e48d361e2b82beb17918053e91562"
+    },
+    "native-explanation-capacity-oct06/run-all-stage2-test-lock-guard.diff": {
+      "bytes": 400,
+      "sha256": "251a2ac424517dbcdb5131844f48ea4f47f27f14a9a7a98738ed6714b54e954d"
+    },
+    "native-explanation-capacity-oct06/run-all-stage2.py": {
+      "bytes": 263,
+      "sha256": "42e206bbde7060b2a24b9bce6be600613b31b1c7a583b1afc5783c021180f866"
+    },
+    "native-explanation-capacity-oct06/run-stage2-before-test-lock-guard.py": {
+      "bytes": 4896,
+      "sha256": "1cc027e3743ae8169b99962c7e60c82fdcec4027387a10e406cc1cf4210c14a3"
+    },
+    "native-explanation-capacity-oct06/run-stage2-test-lock-guard.diff": {
+      "bytes": 1045,
+      "sha256": "e3cda2bdca967438686ef7065d4fff68764fd0e320be1f8477a0d4510f1a03de"
+    },
+    "native-explanation-capacity-oct06/run-stage2.py": {
+      "bytes": 5006,
+      "sha256": "7a082c3a26fd257e6f8875e2f72b8db65e4558b02eeb879d0de80154a98b035a"
+    },
+    "native-explanation-capacity-oct06/runner-test-lock-amendment-receipt.json": {
+      "bytes": 1074,
+      "sha256": "f210830ebcfdc268a5c4fae934159514d8122a643d2167d9a3b7c18181574b9a"
+    },
+    "native-explanation-capacity-oct06/source-ready-receipt.json": {
+      "bytes": 1474,
+      "sha256": "6ab12a8a2618e3ea53448f89d6106714a256014138e96d988b6fe4e23edd966f"
+    },
+    "native-explanation-capacity-oct06/source-review-package.json": {
+      "bytes": 840,
+      "sha256": "56ffee73d3309d4a84ac1902e8016f7081f0959dd046845d2d144fb700a3de0e"
+    },
+    "native-explanation-capacity-oct06/stage2-common-before-test-lock-guard.py": {
+      "bytes": 2789,
+      "sha256": "0ff898696c5bfe9bc300a034c4ff521c84ef6136b3a4b161e6abd80262b806cc"
+    },
+    "native-explanation-capacity-oct06/stage2-common-test-lock-guard.diff": {
+      "bytes": 2444,
+      "sha256": "5c849cac008f060572a7340559f230fd799c5315a8be65e8842a5be0d08586f3"
+    },
+    "native-explanation-capacity-oct06/stage2-common.py": {
+      "bytes": 3289,
+      "sha256": "c18205de8d8c3f3f7e2d057fbb96c8c09d1bc7c1ed112d5938b985ea9696d53d"
+    },
+    "native-explanation-capacity-oct06/stage2-prepared-receipt.json": {
+      "bytes": 181230,
+      "sha256": "55c4e5b0a475cb5c535ab711d716dee0acb56457a174995132d2b5bd97428638"
+    },
+    "native-explanation-capacity-oct06/test-lock-adoption-receipt.json": {
+      "bytes": 635,
+      "sha256": "30cbd5a96fb9a53e6ad586adcdb5d9a41c0c33ccf92b9bb9ab87d13137ca68f5"
+    },
+    "publisher.py": {
+      "bytes": 6921,
+      "sha256": "ac6ca6b9f465a9f8817b1ff26a96f4e9f1ab1c2b02fc971d133ddf9cdf543298"
+    }
+  }
+}

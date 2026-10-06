@@ -27,8 +27,10 @@ Classic phrase and no-explanation construction/clone paths remain unchanged.
 On-demand explanation allocation counts are unchanged, but requested bytes rise:
 single native/classic 1440→1600 (+11.1%); three-term native phrase 2000→2560
 (+28%). New child vectors grow to capacity four instead of the original cloned
-length. This cost is retained in the accepted evidence; exact-capacity construction
-is the next separate experiment. Explicit-constructor allocation was not measured.
+length. This cost is retained in the historical P021 evidence. The separately
+verified [exact-size follow-up](../2026-10-06-explanation-capacity/README.md)
+restores the original eager per-explain byte totals while retaining setup savings.
+Explicit-constructor allocation was not measured.
 
 ## Query latency and limits
 
