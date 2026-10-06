@@ -26,7 +26,10 @@ The requested target remains all Lucene 10.4 public APIs and feature modules.
 The [October 5 finite-profile report](../results/2026-10-05-native-pruning-finite/README.md)
 records b50e2aef3a, its 29.5% configured ranked improvement and explicit DEFAULT/
 small-query costs, complete sampled/correctness evidence and remaining losses.
-The next b=1 production policy awaits actual strict-exclusion/competitive reach.
+The [observational b=1 reach proof](../results/2026-10-05-pruning-reach/README.md)
+finds only 35/20,864 eligible unloaded full blocks and zero eligibility on the three
+densest single terms; the proposed same-format production policies are deferred.
+This is no new pruning or performance result.
 
 The [October 5 cache ownership proof](../results/2026-10-05-pruning-cache/README.md)
 records a separate safety prerequisite at e13303b3a; no speed claim.
