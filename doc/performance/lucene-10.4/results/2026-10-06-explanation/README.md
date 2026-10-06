@@ -5,7 +5,7 @@ an owned explanation tree only when requested. Single-term statistics stay inlin
 multi-term and explicit metadata are immutable and shared when cloned or boosted.
 This removes eager tree construction and deep cloning from ordinary search setup.
 Accepted source is `176410bb56a4d711b403a959fbafddf5b8d04847`, identical across
-all source/Cargo/lock/config files to tested candidate `7322109659d1f163fbd24f804b2cff906bbdaa1b`.
+all tracked source/Cargo/config files to tested candidate `7322109659d1f163fbd24f804b2cff906bbdaa1b`.
 
 ## Measured efficiency
 
@@ -71,7 +71,8 @@ order, signed zero, nonfinite bits, duplicate terms and ordered native f64 phras
 accumulation. The full normal library suite passes 1,381 tests (seven ignored;
 one format-writing fixture filtered). The BM25 target passes 27 tests in debug
 and native release. All eight unchanged native adapters build with opt3/LTO/native
-CPU and retained locks. Root independently passes the frozen 330-query/16-case
+CPU and retained adapter locks. The ignored root test lock is separately retained
+in test provenance; worktree creation does not copy it. Root independently passes the frozen 330-query/16-case
 matrix and all three strict Wiki20 gates, including 1,913 exact f32 score comparisons
 per profile and unchanged source/binary/index guards.
 
