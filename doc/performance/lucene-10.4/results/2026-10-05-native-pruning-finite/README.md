@@ -21,7 +21,8 @@ an eligible nondefault native query cache, so later complete blocks can be
 rejected before decoding postings. It retains actual reader selection-average
 provenance, selected-only TF255 expansion to u32MAX, immutable fixed-owner
 policy, outward binary32/binary64 rounding, and the literal native score formula.
-DEFAULT stays the first branch; no bound request builds an envelope. Unsupported
+DEFAULT stays the first branch. Scorers that receive no bound requests do not
+build an envelope. Unsupported
 or unsafe domains, including b=1's infinite inverse, retain global bounds and
 the existing loaded/unloaded tail policy. Scores and index bytes do not change.
 The public different-weight/reader cache ownership fix remains separate.
