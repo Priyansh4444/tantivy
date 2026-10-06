@@ -157,6 +157,8 @@ fn native_idf(doc_freq: u64, doc_count: u64) -> Score {
     (1.0 + x).ln() as Score
 }
 
+// Kept only as the original eager oracle for existing parameter/reference tests.
+#[cfg(test)]
 fn native_idf_explanation(doc_freq: u64, doc_count: u64) -> Explanation {
     let mut explanation = Explanation::new(
         "idf, computed as log(1 + (N - n + 0.5) / (n + 0.5))",
@@ -164,6 +166,66 @@ fn native_idf_explanation(doc_freq: u64, doc_count: u64) -> Explanation {
     );
     explanation.add_const("n, number of docs containing this term", doc_freq as Score);
     explanation.add_const("N, number of docs with this field", doc_count as Score);
+    explanation
+}
+
+/// Rounded IDF and display statistics, captured before any query boost.
+#[derive(Clone, Copy)]
+struct IdfTermStatistics {
+    value: Score,
+    doc_freq: Score,
+    doc_count: Score,
+}
+
+#[derive(Clone)]
+enum IdfExplanation {
+    None,
+    Single(IdfTermStatistics),
+    NativeSum {
+        value: Score,
+        terms: Arc<[IdfTermStatistics]>,
+    },
+    ClassicScalar(Score),
+    Explicit(Arc<Explanation>),
+}
+
+impl IdfExplanation {
+    fn materialize(&self, scoring: Bm25Scoring) -> Option<Explanation> {
+        match self {
+            Self::None => None,
+            Self::Single(statistics) => Some(single_idf_explanation(*statistics, scoring)),
+            Self::NativeSum { value, terms } => {
+                let mut explanation = Explanation::new("idf, sum of:", *value);
+                for statistics in terms.iter() {
+                    explanation.add_detail(single_idf_explanation(
+                        *statistics,
+                        Bm25Scoring::NativeLucene,
+                    ));
+                }
+                Some(explanation)
+            }
+            Self::ClassicScalar(value) => Some(Explanation::new("idf", *value)),
+            Self::Explicit(explanation) => Some((**explanation).clone()),
+        }
+    }
+}
+
+fn single_idf_explanation(statistics: IdfTermStatistics, scoring: Bm25Scoring) -> Explanation {
+    let mut explanation = Explanation::new(
+        "idf, computed as log(1 + (N - n + 0.5) / (n + 0.5))",
+        statistics.value,
+    );
+    explanation.add_const(
+        "n, number of docs containing this term",
+        statistics.doc_freq,
+    );
+    explanation.add_const(
+        match scoring {
+            Bm25Scoring::LegacyClassic => "N, total number of docs",
+            Bm25Scoring::NativeLucene => "N, number of docs with this field",
+        },
+        statistics.doc_count,
+    );
     explanation
 }
 
@@ -222,7 +284,7 @@ fn compute_tf_cache_impl<const CLASSIFY: bool>(
 /// A struct used for computing BM25 scores.
 #[derive(Clone)]
 pub struct Bm25Weight {
-    idf_explain: Option<Explanation>,
+    idf_explain: IdfExplanation,
     weight: Score,
     cache: Arc<[Score; 256]>,
     average_fieldnorm: Score,
@@ -308,26 +370,42 @@ impl Bm25Weight {
         let parameters = collection.parameters;
 
         if collection.scoring == Bm25Scoring::NativeLucene {
-            let explanation = if terms.len() == 1 {
-                native_idf_explanation(statistics.doc_freq(&terms[0])?, total_num_docs)
+            let (idf, idf_explain) = if terms.len() == 1 {
+                let doc_freq = statistics.doc_freq(&terms[0])?;
+                let detail = IdfTermStatistics {
+                    value: native_idf(doc_freq, total_num_docs),
+                    doc_freq: doc_freq as Score,
+                    doc_count: total_num_docs as Score,
+                };
+                (detail.value, IdfExplanation::Single(detail))
             } else {
                 // Lucene rounds each individual IDF to f32, sums in f64, then rounds once.
                 let mut sum = 0.0f64;
                 let mut details = Vec::with_capacity(terms.len());
                 for term in terms {
-                    let detail = native_idf_explanation(statistics.doc_freq(term)?, total_num_docs);
-                    sum += f64::from(detail.value());
+                    let doc_freq = statistics.doc_freq(term)?;
+                    let detail = IdfTermStatistics {
+                        value: native_idf(doc_freq, total_num_docs),
+                        doc_freq: doc_freq as Score,
+                        doc_count: total_num_docs as Score,
+                    };
+                    sum += f64::from(detail.value);
                     details.push(detail);
                 }
-                let mut explanation = Explanation::new("idf, sum of:", sum as Score);
-                for detail in details {
-                    explanation.add_detail(detail);
-                }
-                explanation
+                let value = sum as Score;
+                (
+                    value,
+                    IdfExplanation::NativeSum {
+                        value,
+                        terms: details.into(),
+                    },
+                )
             };
-            return Ok(Bm25Weight::new_native_with_parameters(
-                explanation,
+            return Ok(Bm25Weight::build(
+                idf,
+                idf_explain,
                 average_fieldnorm,
+                Bm25Scoring::NativeLucene,
                 parameters,
             ));
         }
@@ -346,10 +424,11 @@ impl Bm25Weight {
                 let term_doc_freq = statistics.doc_freq(term)?;
                 idf_sum += idf(term_doc_freq, total_num_docs);
             }
-            let idf_explain = Explanation::new("idf", idf_sum);
-            Ok(Bm25Weight::new_with_parameters(
-                idf_explain,
+            Ok(Bm25Weight::build(
+                idf_sum,
+                IdfExplanation::ClassicScalar(idf_sum),
                 average_fieldnorm,
+                Bm25Scoring::LegacyClassic,
                 parameters,
             ))
         }
@@ -376,14 +455,18 @@ impl Bm25Weight {
         parameters: Bm25Parameters,
     ) -> Self {
         let idf = idf(term_doc_freq, total_num_docs);
-        let mut idf_explain =
-            Explanation::new("idf, computed as log(1 + (N - n + 0.5) / (n + 0.5))", idf);
-        idf_explain.add_const(
-            "n, number of docs containing this term",
-            term_doc_freq as Score,
-        );
-        idf_explain.add_const("N, total number of docs", total_num_docs as Score);
-        Bm25Weight::new_with_parameters(idf_explain, avg_fieldnorm, parameters)
+        let idf_explain = IdfExplanation::Single(IdfTermStatistics {
+            value: idf,
+            doc_freq: term_doc_freq as Score,
+            doc_count: total_num_docs as Score,
+        });
+        Bm25Weight::build(
+            idf,
+            idf_explain,
+            avg_fieldnorm,
+            Bm25Scoring::LegacyClassic,
+            parameters,
+        )
     }
     /// Construct a [Bm25Weight] for a single term.
     /// This method does not carry the [Explanation] for the idf.
@@ -407,7 +490,7 @@ impl Bm25Weight {
     ) -> Self {
         Self::build(
             idf_explain.value(),
-            Some(idf_explain),
+            IdfExplanation::Explicit(Arc::new(idf_explain)),
             average_fieldnorm,
             Bm25Scoring::LegacyClassic,
             parameters,
@@ -416,7 +499,7 @@ impl Bm25Weight {
     pub(crate) fn new_without_explain(idf: f32, average_fieldnorm: Score) -> Bm25Weight {
         Self::build(
             idf,
-            None,
+            IdfExplanation::None,
             average_fieldnorm,
             Bm25Scoring::LegacyClassic,
             Bm25Parameters::DEFAULT,
@@ -428,6 +511,7 @@ impl Bm25Weight {
         Self::new_native_with_parameters(idf_explain, average_fieldnorm, Bm25Parameters::DEFAULT)
     }
 
+    #[cfg(test)]
     fn new_native_with_parameters(
         idf_explain: Explanation,
         average_fieldnorm: Score,
@@ -435,7 +519,7 @@ impl Bm25Weight {
     ) -> Self {
         Self::build(
             idf_explain.value(),
-            Some(idf_explain),
+            IdfExplanation::Explicit(Arc::new(idf_explain)),
             average_fieldnorm,
             Bm25Scoring::NativeLucene,
             parameters,
@@ -444,7 +528,7 @@ impl Bm25Weight {
 
     fn build(
         idf: Score,
-        idf_explain: Option<Explanation>,
+        idf_explain: IdfExplanation,
         average_fieldnorm: Score,
         scoring: Bm25Scoring,
         parameters: Bm25Parameters,
@@ -469,7 +553,7 @@ impl Bm25Weight {
     pub(crate) fn for_native_block_bounds(average_fieldnorm: Score) -> Self {
         Self::build(
             1.0,
-            None,
+            IdfExplanation::None,
             average_fieldnorm,
             Bm25Scoring::NativeLucene,
             Bm25Parameters::DEFAULT,
@@ -714,8 +798,8 @@ impl Bm25Weight {
         if self.scoring == Bm25Scoring::LegacyClassic {
             explanation.add_detail(Explanation::new("(K1+1)", self.parameters.k1() + 1.0));
         }
-        if let Some(idf_explain) = &self.idf_explain {
-            explanation.add_detail(idf_explain.clone());
+        if let Some(idf_explain) = self.idf_explain.materialize(self.scoring) {
+            explanation.add_detail(idf_explain);
         }
         explanation.add_detail(tf_explanation);
         explanation
@@ -1009,3 +1093,7 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "bm25_explanation_tests.rs"]
+mod explanation_tests;

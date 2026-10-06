@@ -80,3 +80,24 @@ impl Explanation {
         serde_json::to_string_pretty(self).unwrap()
     }
 }
+
+#[cfg(test)]
+impl Explanation {
+    /// Lossless test snapshot: preserve nonfinite/signed-zero bits and optional fields.
+    pub(crate) fn bit_snapshot(&self) -> serde_json::Value {
+        serde_json::json!({
+            "value_bits": format!("{:08x}", self.value.to_bits()),
+            "description": self.description,
+            "details": self.details.as_ref().map(|details| details.iter().map(Self::bit_snapshot).collect::<Vec<_>>()),
+            "context": self.context,
+        })
+    }
+
+    pub(crate) fn is_finite_tree(&self) -> bool {
+        self.value.is_finite()
+            && self
+                .details
+                .as_ref()
+                .is_none_or(|details| details.iter().all(Self::is_finite_tree))
+    }
+}
