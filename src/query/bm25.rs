@@ -195,14 +195,17 @@ impl IdfExplanation {
             Self::None => None,
             Self::Single(statistics) => Some(single_idf_explanation(*statistics, scoring)),
             Self::NativeSum { value, terms } => {
-                let mut explanation = Explanation::new("idf, sum of:", *value);
-                for statistics in terms.iter() {
-                    explanation.add_detail(single_idf_explanation(
-                        *statistics,
-                        Bm25Scoring::NativeLucene,
-                    ));
-                }
-                Some(explanation)
+                let details = terms
+                    .iter()
+                    .map(|statistics| {
+                        single_idf_explanation(*statistics, Bm25Scoring::NativeLucene)
+                    })
+                    .collect();
+                Some(Explanation::new_with_details(
+                    "idf, sum of:",
+                    *value,
+                    details,
+                ))
             }
             Self::ClassicScalar(value) => Some(Explanation::new("idf", *value)),
             Self::Explicit(explanation) => Some((**explanation).clone()),
@@ -211,22 +214,23 @@ impl IdfExplanation {
 }
 
 fn single_idf_explanation(statistics: IdfTermStatistics, scoring: Bm25Scoring) -> Explanation {
-    let mut explanation = Explanation::new(
+    Explanation::new_with_details(
         "idf, computed as log(1 + (N - n + 0.5) / (n + 0.5))",
         statistics.value,
-    );
-    explanation.add_const(
-        "n, number of docs containing this term",
-        statistics.doc_freq,
-    );
-    explanation.add_const(
-        match scoring {
-            Bm25Scoring::LegacyClassic => "N, total number of docs",
-            Bm25Scoring::NativeLucene => "N, number of docs with this field",
-        },
-        statistics.doc_count,
-    );
-    explanation
+        vec![
+            Explanation::new(
+                "n, number of docs containing this term",
+                statistics.doc_freq,
+            ),
+            Explanation::new(
+                match scoring {
+                    Bm25Scoring::LegacyClassic => "N, total number of docs",
+                    Bm25Scoring::NativeLucene => "N, number of docs with this field",
+                },
+                statistics.doc_count,
+            ),
+        ],
+    )
 }
 
 fn cached_tf_component(

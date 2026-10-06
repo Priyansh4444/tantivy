@@ -49,6 +49,19 @@ impl Explanation {
         }
     }
 
+    /// Builds an owned tree from existing children, keeping empty details absent.
+    pub(crate) fn new_with_details(
+        description: &'static str,
+        value: Score,
+        details: Vec<Explanation>,
+    ) -> Explanation {
+        let mut explanation = Self::new(description, value);
+        if !details.is_empty() {
+            explanation.details = Some(details);
+        }
+        explanation
+    }
+
     /// Returns the value associated with the current node.
     pub fn value(&self) -> Score {
         self.value
