@@ -1,9 +1,10 @@
 use std::ops::{Deref, DerefMut};
 
 use super::block_wand_intersection;
-use crate::query::score_combiner::ScoreSumUpperBound;
+use crate::query::score_combiner::{ScoreSumUpperBound, SumCombiner};
 use crate::query::term_query::TermScorer;
-use crate::query::Scorer;
+use crate::query::weight::for_each_pruning_scorer;
+use crate::query::{BufferedUnionScorer, Scorer};
 use crate::{DocId, DocSet, Score, TERMINATED};
 
 /// Score the first candidates without WAND bookkeeping. Once the threshold
@@ -11,11 +12,23 @@ use crate::{DocId, DocSet, Score, TERMINATED};
 /// or intersect when neither term can win alone.
 pub(crate) fn two_term_or_maxscore(
     mut scorers: Vec<TermScorer>,
+    max_doc: DocId,
     mut threshold: Score,
     callback: &mut dyn FnMut(DocId, Score) -> Score,
 ) {
     debug_assert_eq!(scorers.len(), 2);
     let max_scores = [scorers[0].max_score(), scorers[1].max_score()];
+    // Establish the region kernel's numeric domain before any cursor moves.
+    // Signed and exceptional leaves retain canonical SumCombiner arithmetic.
+    if threshold.is_nan()
+        || scorers.iter().zip(max_scores).any(|(scorer, maximum)| {
+            !scorer.bm25_weight().has_safe_score_bounds() || !maximum.is_finite() || maximum <= 0.0
+        })
+    {
+        let mut union = BufferedUnionScorer::build(scorers, SumCombiner::default, max_doc);
+        for_each_pruning_scorer(&mut union, threshold, callback);
+        return;
+    }
 
     for _ in 0..128 {
         let doc = scorers[0].doc().min(scorers[1].doc());
@@ -70,7 +83,225 @@ pub(crate) fn two_term_or_maxscore(
         return;
     }
 
-    block_wand(scorers, threshold, callback);
+    two_term_regions(scorers, max_doc, threshold, callback);
+}
+
+// Keep hot metadata separate from the large incoming-order TermScorers. Actual
+// cursor mutations own the decoded-document mirror; shallow selection does not.
+struct TwoTermState {
+    doc: DocId,
+    global_max: Score,
+    cost: u32,
+}
+
+impl TwoTermState {
+    #[inline]
+    fn assert_coherent(&self, scorer: &TermScorer) {
+        debug_assert_eq!(self.doc, scorer.doc());
+    }
+
+    #[inline]
+    fn seek(&mut self, scorer: &mut TermScorer, target: DocId) {
+        self.assert_coherent(scorer);
+        self.doc = scorer.seek(target);
+        self.assert_coherent(scorer);
+    }
+
+    #[inline]
+    fn advance(&mut self, scorer: &mut TermScorer) {
+        self.assert_coherent(scorer);
+        self.doc = scorer.advance();
+        self.assert_coherent(scorer);
+    }
+}
+
+enum TwoTermMode {
+    Union,
+    Essential { ordinal: usize, required: bool },
+}
+
+#[cfg(test)]
+type TwoTermRegionChoice = (DocId, DocId, u8);
+
+#[cfg(test)]
+thread_local! {
+    // Opt-in evidence for mode-transition fixtures; absent from release builds.
+    static TWO_TERM_REGIONS: std::cell::RefCell<Option<Vec<TwoTermRegionChoice>>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+/// The post-warm two-term fallback: establish one local certificate, then use
+/// a fixed merge or one essential stream until its physical half-open end.
+/// Local required/optional roles expire at that end; this remains an OR query.
+fn two_term_regions(
+    mut scorers: Vec<TermScorer>,
+    max_doc: DocId,
+    mut threshold: Score,
+    callback: &mut dyn FnMut(DocId, Score) -> Score,
+) {
+    let mut states: [TwoTermState; 2] = std::array::from_fn(|ordinal| TwoTermState {
+        doc: scorers[ordinal].doc(),
+        global_max: scorers[ordinal].max_score(),
+        cost: scorers[ordinal].size_hint(),
+    });
+    let upper_bound = ScoreSumUpperBound::new(2);
+    let mut lo = states[0].doc.min(states[1].doc);
+    while lo < max_doc {
+        for ordinal in 0..2 {
+            states[ordinal].assert_coherent(&scorers[ordinal]);
+        }
+        let globally_optional = [
+            states[0].global_max <= threshold,
+            states[1].global_max <= threshold,
+        ];
+        // Preserve the established globally single-essential policy: an
+        // optional global certificate need not cap its sparse driver's block.
+        // When both terms need each other, use both local block certificates.
+        let ignore_optional_cap = globally_optional[0] != globally_optional[1];
+        let mut maxima = [0.0; 2];
+        let mut hi = max_doc;
+        for ordinal in 0..2 {
+            let state = &mut states[ordinal];
+            if state.doc == TERMINATED {
+                continue;
+            }
+            if ignore_optional_cap && globally_optional[ordinal] {
+                maxima[ordinal] = state.global_max;
+                continue;
+            }
+            state.assert_coherent(&scorers[ordinal]);
+            scorers[ordinal].seek_block(lo.max(state.doc));
+            state.assert_coherent(&scorers[ordinal]);
+            let last_doc = scorers[ordinal].last_doc_in_block();
+            // A selected tail can leave an old decoded document below lo.
+            // Only an actual seek proves whether there is a remaining tail doc.
+            if last_doc == TERMINATED && state.doc < lo {
+                state.seek(&mut scorers[ordinal], lo);
+            }
+            if state.doc == TERMINATED {
+                continue;
+            }
+            // Keep the originally selected cap across tail reconciliation.
+            hi = hi.min(last_doc.min(max_doc - 1) + 1);
+            let bound = scorers[ordinal].block_max_score();
+            state.assert_coherent(&scorers[ordinal]);
+            maxima[ordinal] = if bound.is_finite() && bound >= 0.0 {
+                bound
+            } else {
+                state.global_max
+            };
+        }
+        debug_assert!(hi > lo);
+        for ordinal in 0..2 {
+            if states[ordinal].doc >= hi {
+                maxima[ordinal] = 0.0;
+            }
+        }
+        if upper_bound.score(f64::from(maxima[0]) + f64::from(maxima[1])) <= threshold {
+            lo = hi;
+            continue;
+        }
+        let mode = match (maxima[0] > threshold, maxima[1] > threshold) {
+            (true, true) => TwoTermMode::Union,
+            (true, false) => TwoTermMode::Essential {
+                ordinal: 0,
+                required: false,
+            },
+            (false, true) => TwoTermMode::Essential {
+                ordinal: 1,
+                required: false,
+            },
+            (false, false) => TwoTermMode::Essential {
+                ordinal: usize::from(states[1].cost < states[0].cost),
+                required: true,
+            },
+        };
+        #[cfg(test)]
+        TWO_TERM_REGIONS.with(|regions| {
+            if let Some(regions) = regions.borrow_mut().as_mut() {
+                let kind = match &mode {
+                    TwoTermMode::Union => 0,
+                    TwoTermMode::Essential { ordinal, required } => {
+                        1 + *ordinal as u8 + 2 * u8::from(*required)
+                    }
+                };
+                regions.push((lo, hi, kind));
+            }
+        });
+        match mode {
+            TwoTermMode::Union => {
+                for ordinal in 0..2 {
+                    if states[ordinal].doc < lo {
+                        states[ordinal].seek(&mut scorers[ordinal], lo);
+                    }
+                }
+                loop {
+                    let doc = states[0].doc.min(states[1].doc);
+                    if doc >= hi {
+                        break;
+                    }
+                    let mut leaves = [0.0; 2];
+                    for ordinal in 0..2 {
+                        if states[ordinal].doc == doc {
+                            states[ordinal].assert_coherent(&scorers[ordinal]);
+                            leaves[ordinal] = scorers[ordinal].score();
+                            states[ordinal].assert_coherent(&scorers[ordinal]);
+                        }
+                    }
+                    let score = (f64::from(leaves[0]) + f64::from(leaves[1])) as Score;
+                    if score > threshold {
+                        let next_threshold = callback(doc, score);
+                        debug_assert!(next_threshold >= threshold);
+                        threshold = next_threshold;
+                    }
+                    for ordinal in 0..2 {
+                        if states[ordinal].doc == doc {
+                            states[ordinal].advance(&mut scorers[ordinal]);
+                        }
+                    }
+                }
+            }
+            TwoTermMode::Essential { ordinal, required } => {
+                let optional = 1 - ordinal;
+                if states[ordinal].doc < lo {
+                    states[ordinal].seek(&mut scorers[ordinal], lo);
+                }
+                while states[ordinal].doc < hi {
+                    let doc = states[ordinal].doc;
+                    states[ordinal].assert_coherent(&scorers[ordinal]);
+                    let leaf = scorers[ordinal].score();
+                    states[ordinal].assert_coherent(&scorers[ordinal]);
+                    // Forward rounded bounds preserve winners at float midpoints.
+                    if upper_bound.score(f64::from(leaf) + f64::from(maxima[optional])) > threshold
+                    {
+                        if states[optional].doc < doc {
+                            states[optional].seek(&mut scorers[optional], doc);
+                        }
+                        let matched = states[optional].doc == doc;
+                        if matched || !required {
+                            let mut leaves = [0.0; 2];
+                            leaves[ordinal] = leaf;
+                            if matched {
+                                states[optional].assert_coherent(&scorers[optional]);
+                                leaves[optional] = scorers[optional].score();
+                                states[optional].assert_coherent(&scorers[optional]);
+                            }
+                            let score = (f64::from(leaves[0]) + f64::from(leaves[1])) as Score;
+                            if score > threshold {
+                                let next_threshold = callback(doc, score);
+                                debug_assert!(next_threshold >= threshold);
+                                threshold = next_threshold;
+                            }
+                        }
+                    }
+                    states[ordinal].advance(&mut scorers[ordinal]);
+                }
+            }
+        }
+        // Rising thresholds only make the old local mode more conservative.
+        // Do not hand stale optional cursors into the intersection batch path.
+        lo = hi;
+    }
 }
 
 /// Takes a term_scorers sorted by their current doc() and a threshold and returns
@@ -402,6 +633,7 @@ mod tests {
     fn compute_checkpoints_for_each_pruning(
         mut term_scorers: Vec<TermScorer>,
         n: usize,
+        max_doc: DocId,
     ) -> Vec<(DocId, Score)> {
         let mut heap: BinaryHeap<Float> = BinaryHeap::with_capacity(n);
         let mut checkpoints: Vec<(DocId, Score)> = Vec::new();
@@ -425,7 +657,7 @@ mod tests {
             let scorer = term_scorers.pop().unwrap();
             super::block_wand_single_scorer(scorer, Score::MIN, callback);
         } else if term_scorers.len() == 2 {
-            super::two_term_or_maxscore(term_scorers, Score::MIN, callback);
+            super::two_term_or_maxscore(term_scorers, max_doc, Score::MIN, callback);
         } else {
             super::block_wand(term_scorers, Score::MIN, callback);
         }
@@ -466,6 +698,332 @@ mod tests {
     }
 
     const MAX_TERM_FREQ: u32 = 100u32;
+
+    fn two_term_fixture(postings: &[(DocId, u32)], norms: &[u32], boost: Score) -> TermScorer {
+        let average =
+            norms.iter().map(|&norm| u64::from(norm)).sum::<u64>() as Score / norms.len() as Score;
+        let weight = Bm25Weight::new_without_explain(1.0, average).boost_by(boost);
+        TermScorer::create_for_test(postings, norms, weight)
+    }
+
+    // Unlike the older near-equality checks, retain every callback and its raw
+    // score bits. Collector rejection leaves the competitive threshold intact.
+    fn exact_two_trace(
+        initial: Score,
+        limit: usize,
+        deleted: &[DocId],
+        run: impl FnOnce(&mut dyn FnMut(DocId, Score) -> Score),
+    ) -> Vec<(DocId, u32)> {
+        let mut accepted = Vec::new();
+        let mut best = Vec::new();
+        let mut threshold = initial;
+        run(&mut |doc, score| {
+            accepted.push((doc, score.to_bits()));
+            if limit == 0 || deleted.contains(&doc) {
+                return threshold;
+            }
+            best.push((score, doc));
+            best.sort_unstable_by(|left, right| {
+                right
+                    .0
+                    .total_cmp(&left.0)
+                    .then_with(|| left.1.cmp(&right.1))
+            });
+            best.truncate(limit);
+            if best.len() == limit {
+                threshold = initial.max(best.last().unwrap().0);
+            }
+            threshold
+        });
+        assert!(accepted.windows(2).all(|pair| pair[0].0 < pair[1].0));
+        accepted
+    }
+
+    fn check_two_exact(
+        scorers: Vec<TermScorer>,
+        max_doc: DocId,
+        threshold: Score,
+        limit: usize,
+        direct_regions: bool,
+        deleted: &[DocId],
+    ) -> Vec<(DocId, u32)> {
+        let expected = exact_two_trace(threshold, limit, deleted, |callback| {
+            let mut union =
+                BufferedUnionScorer::build(scorers.clone(), SumCombiner::default, max_doc);
+            crate::query::weight::for_each_pruning_scorer(&mut union, threshold, callback);
+        });
+        let actual = exact_two_trace(threshold, limit, deleted, |callback| {
+            if direct_regions {
+                super::two_term_regions(scorers, max_doc, threshold, callback);
+            } else {
+                super::two_term_or_maxscore(scorers, max_doc, threshold, callback);
+            }
+        });
+        assert_eq!(actual, expected, "threshold={threshold:?} limit={limit}");
+        actual
+    }
+
+    #[test]
+    fn two_term_exact_region_roles_reverse_after_shallow_skips() {
+        let norms = vec![1; 800];
+        let changing: Vec<_> = (0..512)
+            .map(|doc| (doc, if doc < 256 { 1 } else { 1000 }))
+            .collect();
+        let sparse = [(0, 1), (700, 1)];
+        let scorers = vec![
+            two_term_fixture(&changing, &norms, 0.1),
+            two_term_fixture(&sparse, &norms, 1.0),
+        ];
+        for reverse in [false, true] {
+            let mut ordered = scorers.clone();
+            if reverse {
+                ordered.reverse();
+            }
+            super::TWO_TERM_REGIONS.with(|regions| *regions.borrow_mut() = Some(Vec::new()));
+            let accepted = check_two_exact(ordered.clone(), 800, 0.15, 0, true, &[]);
+            let choices =
+                super::TWO_TERM_REGIONS.with(|regions| regions.borrow_mut().take().unwrap());
+            let first_kind = if reverse { 1 } else { 2 };
+            let later_kind = if reverse { 2 } else { 1 };
+            let first = choices
+                .iter()
+                .position(|&(_, _, kind)| kind == first_kind)
+                .unwrap();
+            let later = choices
+                .iter()
+                .position(|&(_, _, kind)| kind == later_kind)
+                .unwrap();
+            assert!(first < later, "region choices: {choices:?}");
+            assert_eq!(accepted.len(), 258);
+            assert_eq!(accepted[0].0, 0);
+            assert_eq!(accepted[1].0, 256);
+            assert_eq!(accepted.last().unwrap().0, 700);
+            for limit in [0, 1, 10] {
+                check_two_exact(ordered.clone(), 800, 0.15, limit, false, &[]);
+            }
+        }
+    }
+
+    #[test]
+    fn two_term_exact_local_required_mode_expires_before_single_term_winner() {
+        let norms = vec![1; 800];
+        let changing: Vec<_> = (0..512)
+            .map(|doc| (doc, if doc < 256 { 1 } else { 1000 }))
+            .collect();
+        let early: Vec<_> = (0..256).map(|doc| (doc, 1)).collect();
+        let scorers = vec![
+            two_term_fixture(&changing, &norms, 0.1),
+            two_term_fixture(&early, &norms, 0.1),
+        ];
+        for reverse in [false, true] {
+            let mut ordered = scorers.clone();
+            if reverse {
+                ordered.reverse();
+            }
+            super::TWO_TERM_REGIONS.with(|regions| *regions.borrow_mut() = Some(Vec::new()));
+            let accepted = check_two_exact(ordered.clone(), 800, 0.15, 0, true, &[]);
+            let choices =
+                super::TWO_TERM_REGIONS.with(|regions| regions.borrow_mut().take().unwrap());
+            let required_kind = if reverse { 3 } else { 4 };
+            let later_kind = if reverse { 2 } else { 1 };
+            let required = choices
+                .iter()
+                .position(|&(_, _, kind)| kind == required_kind)
+                .unwrap();
+            let later = choices
+                .iter()
+                .position(|&(_, _, kind)| kind == later_kind)
+                .unwrap();
+            assert!(required < later, "region choices: {choices:?}");
+            assert_eq!(accepted.len(), 512);
+            assert_eq!(
+                accepted[256].0, 256,
+                "later hit does not contain the old required term"
+            );
+            for limit in [0, 1, 10] {
+                for direct in [false, true] {
+                    check_two_exact(ordered.clone(), 800, 0.15, limit, direct, &[]);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn two_term_exact_complete_blocks_stale_tails_and_exhaustion() {
+        let norms: Vec<_> = (0..1024).map(|doc| 1 + doc % 13).collect();
+        for length in [1, 127, 128, 129, 255, 256, 257, 600] {
+            let dense: Vec<_> = (0..length).map(|doc| (doc, 1 + doc % 5)).collect();
+            let gapped = [(0, 1), (128, 1), (256, 1), (900, 1)];
+            let scorers = vec![
+                two_term_fixture(&dense, &norms, 0.1),
+                two_term_fixture(&gapped, &norms, 0.1),
+            ];
+            for reverse in [false, true] {
+                let mut ordered = scorers.clone();
+                if reverse {
+                    ordered.reverse();
+                }
+                for threshold in [-Score::INFINITY, 0.0, 0.15, 0.4, Score::INFINITY] {
+                    for limit in [0, 1, 10] {
+                        for direct in [false, true] {
+                            check_two_exact(ordered.clone(), 1024, threshold, limit, direct, &[]);
+                        }
+                    }
+                }
+            }
+        }
+        // Dense decoder remains stale as full blocks are skipped, then the
+        // selected tail needs real reconciliation; the late sparse hit has no
+        // dense counterpart and must fail the local required-membership test.
+        let norms = vec![1; 1024];
+        let dense: Vec<_> = (0..600).map(|doc| (doc, 1)).collect();
+        let late = [(0, 1), (900, 1)];
+        let scorers = vec![
+            two_term_fixture(&dense, &norms, 0.1),
+            two_term_fixture(&late, &norms, 0.1),
+        ];
+        for direct in [false, true] {
+            let accepted = check_two_exact(scorers.clone(), 1024, 0.15, 0, direct, &[]);
+            assert_eq!(
+                accepted.iter().map(|&(doc, _)| doc).collect::<Vec<_>>(),
+                [0]
+            );
+        }
+    }
+
+    #[test]
+    fn two_term_exact_midpoints_ties_and_warm_boundary_handoffs() {
+        let norms = vec![1; 260];
+        let postings: Vec<_> = (0..260).map(|doc| (doc, 1)).collect();
+        for tiny in [2.0f32.powi(-24), 2.0f32.powi(-24).next_up()] {
+            let scorers = vec![
+                two_term_fixture(&postings, &norms, 1.0),
+                two_term_fixture(&postings, &norms, tiny),
+            ];
+            assert_eq!(scorers[0].clone().score().to_bits(), 1.0f32.to_bits());
+            assert_eq!(scorers[1].clone().score().to_bits(), tiny.to_bits());
+            let expected = (1.0f64 + f64::from(tiny)) as Score;
+            for reverse in [false, true] {
+                let mut ordered = scorers.clone();
+                if reverse {
+                    ordered.reverse();
+                }
+                for threshold in [expected.next_down(), expected, expected.next_up()] {
+                    for limit in [0, 1, 10] {
+                        for direct in [false, true] {
+                            let accepted = check_two_exact(
+                                ordered.clone(),
+                                260,
+                                threshold,
+                                limit,
+                                direct,
+                                &[],
+                            );
+                            if threshold >= expected {
+                                assert!(accepted.is_empty());
+                            } else {
+                                assert_eq!(accepted.len(), if limit == 0 { 260 } else { limit });
+                                assert!(accepted
+                                    .iter()
+                                    .all(|&(_, bits)| bits == expected.to_bits()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        let norms = vec![1; 300];
+        for winning_doc in [127, 128, 129] {
+            let first: Vec<_> = (0..270)
+                .map(|doc| (doc, if doc == winning_doc { 1000 } else { 1 }))
+                .collect();
+            let second: Vec<_> = (0..270).map(|doc| (doc, 1)).collect();
+            let scorers = vec![
+                two_term_fixture(&first, &norms, 0.1),
+                two_term_fixture(&second, &norms, 0.1),
+            ];
+            for reverse in [false, true] {
+                let mut ordered = scorers.clone();
+                if reverse {
+                    ordered.reverse();
+                }
+                for direct in [false, true] {
+                    let accepted = check_two_exact(ordered.clone(), 300, 0.15, 1, direct, &[]);
+                    assert_eq!(
+                        accepted.iter().map(|&(doc, _)| doc).collect::<Vec<_>>(),
+                        [0, winning_doc]
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn two_term_exact_signed_and_exceptional_domains_use_canonical_fallback() {
+        let norms = vec![1; 300];
+        let first: Vec<_> = (0..260).map(|doc| (doc, 1)).collect();
+        let second: Vec<_> = (0..260)
+            .filter(|doc| doc % 2 == 0)
+            .map(|doc| (doc, 1))
+            .collect();
+        for boost in [
+            0.0,
+            -0.0,
+            -1.0,
+            Score::INFINITY,
+            -Score::INFINITY,
+            Score::NAN,
+        ] {
+            let scorers = vec![
+                two_term_fixture(&first, &norms, boost),
+                two_term_fixture(&second, &norms, 1.0),
+            ];
+            for reverse in [false, true] {
+                let mut ordered = scorers.clone();
+                if reverse {
+                    ordered.reverse();
+                }
+                for threshold in [Score::MIN, 0.0, Score::NAN, Score::INFINITY] {
+                    for limit in [0, 1, 10] {
+                        check_two_exact(ordered.clone(), 300, threshold, limit, false, &[]);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn two_term_exact_collector_rejection_preserves_physical_range() {
+        let norms = vec![1; 1024];
+        let first: Vec<_> = (0..600)
+            .map(|doc| (doc, if doc == 128 || doc == 599 { 1000 } else { 1 }))
+            .collect();
+        let second: Vec<_> = (0..600).map(|doc| (doc, 1)).collect();
+        let scorers = vec![
+            two_term_fixture(&first, &norms, 0.1),
+            two_term_fixture(&second, &norms, 0.1),
+        ];
+        // Reject a warm hit, the first post-warm winner, and the last indexed
+        // physical doc; none of these may raise the collector's threshold.
+        for reverse in [false, true] {
+            let mut ordered = scorers.clone();
+            if reverse {
+                ordered.reverse();
+            }
+            for direct in [false, true] {
+                let accepted =
+                    check_two_exact(ordered.clone(), 1024, 0.15, 1, direct, &[0, 128, 599]);
+                assert_eq!(
+                    accepted.iter().map(|&(doc, _)| doc).collect::<Vec<_>>(),
+                    [0, 1, 128, 599]
+                );
+            }
+        }
+        eprintln!(
+            "TwoTermState bytes={}",
+            std::mem::size_of::<super::TwoTermState>()
+        );
+    }
 
     #[test]
     fn test_two_term_or_preserves_single_term_winner_with_sparse_quantized_field(
@@ -596,7 +1154,7 @@ mod tests {
             .collect();
         for top_k in 1..4 {
             let checkpoints_for_each_pruning =
-                compute_checkpoints_for_each_pruning(term_scorers.clone(), top_k);
+                compute_checkpoints_for_each_pruning(term_scorers.clone(), top_k, max_doc as u32);
             let checkpoints_manual =
                 compute_checkpoints_manual(term_scorers.clone(), top_k, max_doc as u32);
             assert_eq!(checkpoints_for_each_pruning.len(), checkpoints_manual.len());

@@ -690,7 +690,12 @@ impl<TScoreCombiner: ScoreCombiner + Sync> Weight for BooleanWeight<TScoreCombin
             SpecializedScorer::TermUnion(term_scorers) => {
                 if TScoreCombiner::SUPPORTS_BLOCK_WAND && TScoreCombiner::SUMS_IN_F64 {
                     match term_scorers.len() {
-                        2 => super::two_term_or_maxscore(term_scorers, threshold, callback),
+                        2 => super::two_term_or_maxscore(
+                            term_scorers,
+                            reader.max_doc(),
+                            threshold,
+                            callback,
+                        ),
                         3..=32 => {
                             super::or_maxscore(term_scorers, reader.max_doc(), threshold, callback)
                         }
