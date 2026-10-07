@@ -1,0 +1,22 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 5K of event 'cpu_core/cycles/u'
+# Event count (approx.): 24957542188
+#
+# Overhead  Symbol                                                                                                                                                               IPC   [IPC Coverage]
+# ........  ...................................................................................................................................................................  ....................
+#
+    89.12%  [.] <tantivy::query::boolean_query::boolean_weight::BooleanWeight<tantivy::query::score_combiner::SumCombiner> as tantivy::query::weight::Weight>::for_each_pruning  -      -            
+     4.34%  [.] <tantivy::query::term_query::term_scorer::TermScorer>::block_max_score                                                                                           -      -            
+     2.23%  [.] <tantivy::postings::block_segment_postings::BlockSegmentPostings>::load_block                                                                                    -      -            
+     0.98%  [.] <tantivy::postings::compression::BlockDecoder>::uncompress_term_freqs                                                                                            -      -            
+     0.79%  [.] <tantivy::postings::skip::SkipReader>::read_block_info                                                                                                           -      -            
+     0.75%  [.] bitpacking::bitpacker4x::sse3::decompress_to::<bitpacking::bitpacker4x::sse3::StrictDeltaIntegrate>                                                              -      -            
+
+
+#
+# (Tip: To count events every 1000 msec: perf stat -I 1000)
+#

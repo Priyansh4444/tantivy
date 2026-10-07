@@ -1,0 +1,11 @@
+[
+  "cargo",
+  "clippy",
+  "--locked",
+  "--manifest-path",
+  "../../../tantivy-or-maxscore-oct06/Cargo.toml",
+  "--target-dir",
+  "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/test-target",
+  "--lib",
+  "--tests"
+]

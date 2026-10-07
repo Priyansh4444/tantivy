@@ -1,0 +1,366 @@
+{
+  "seconds": 11.753779686000598,
+  "unchanged": true,
+  "summary": [
+    {
+      "set": "all",
+      "queries": 373,
+      "AB": {
+        "candidate_mean_ns": 284650.67292225204,
+        "baseline_mean_ns": 455300.3793565684,
+        "ratio_mean": 0.625193138043331,
+        "median_ratio": 0.9832221631133118
+      },
+      "BA": {
+        "candidate_mean_ns": 291109.1286863271,
+        "baseline_mean_ns": 470429.83914209116,
+        "ratio_mean": 0.6188151865902344,
+        "median_ratio": 0.9896758967206738
+      }
+    },
+    {
+      "set": "or3plus",
+      "queries": 103,
+      "AB": {
+        "candidate_mean_ns": 566728.9611650485,
+        "baseline_mean_ns": 1184165.8203883495,
+        "ratio_mean": 0.47858919030376057,
+        "median_ratio": 0.5150776821139743
+      },
+      "BA": {
+        "candidate_mean_ns": 575722.1796116505,
+        "baseline_mean_ns": 1225517.1116504855,
+        "ratio_mean": 0.46977898075718183,
+        "median_ratio": 0.5046515072329697
+      }
+    },
+    {
+      "set": "or2",
+      "queries": 202,
+      "AB": {
+        "candidate_mean_ns": 169561.97277227722,
+        "baseline_mean_ns": 170290.6707920792,
+        "ratio_mean": 0.9957208576581879,
+        "median_ratio": 0.9952892497806509
+      },
+      "BA": {
+        "candidate_mean_ns": 176161.6188118812,
+        "baseline_mean_ns": 176113.61386138614,
+        "ratio_mean": 1.0002725794414329,
+        "median_ratio": 1.004124630937941
+      }
+    }
+  ],
+  "worst_regressions": [
+    {
+      "id": 909,
+      "kind": "OR",
+      "terms": [
+        "niceville",
+        "high",
+        "school"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 6.327576399929341,
+      "BA": 5.317876633689026
+    },
+    {
+      "id": 817,
+      "kind": "OR",
+      "terms": [
+        "centerville",
+        "high",
+        "school"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 2.0621614633402503,
+      "BA": 2.2721348814123936
+    },
+    {
+      "id": 969,
+      "kind": "PHRASE",
+      "terms": [
+        "kasota",
+        "stone"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.2683407188577056,
+      "BA": 1.2094216417910448
+    },
+    {
+      "id": 693,
+      "kind": "OR",
+      "terms": [
+        "justin",
+        "timberlake"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.220612582781457,
+      "BA": 1.146784397615038
+    },
+    {
+      "id": 34,
+      "kind": "TERM",
+      "terms": [
+        "helen"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.1364041604754829,
+      "BA": 1.2273667559016792
+    },
+    {
+      "id": 3,
+      "kind": "TERM",
+      "terms": [
+        "united"
+      ],
+      "tags": [
+        "wiki20",
+        "term",
+        "med"
+      ],
+      "AB": 1.1043040857969915,
+      "BA": 1.108841141246918
+    },
+    {
+      "id": 204,
+      "kind": "TERM",
+      "terms": [
+        "hot"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.2587196001830148,
+      "BA": 1.1030917553191488
+    },
+    {
+      "id": 238,
+      "kind": "TERM",
+      "terms": [
+        "edith"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0975576004981664,
+      "BA": 1.232896992364033
+    },
+    {
+      "id": 477,
+      "kind": "OR",
+      "terms": [
+        "columbia",
+        "university"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0933315140704454,
+      "BA": 1.0941133536430565
+    },
+    {
+      "id": 363,
+      "kind": "OR",
+      "terms": [
+        "san",
+        "francisco"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0530731335659431,
+      "BA": 1.1268743090105031
+    },
+    {
+      "id": 525,
+      "kind": "OR",
+      "terms": [
+        "kenosha",
+        "wisconsin"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0505860579888957,
+      "BA": 1.0626743375174337
+    },
+    {
+      "id": 14,
+      "kind": "OR",
+      "terms": [
+        "united",
+        "states"
+      ],
+      "tags": [
+        "wiki20",
+        "union",
+        "orHighHigh"
+      ],
+      "AB": 1.0449757387630692,
+      "BA": 1.0921483037404138
+    },
+    {
+      "id": 685,
+      "kind": "OR",
+      "terms": [
+        "personal",
+        "chef"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.042756280112724,
+      "BA": 1.0435931684818596
+    },
+    {
+      "id": 459,
+      "kind": "OR",
+      "terms": [
+        "belcourt",
+        "castle"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0417853873625311,
+      "BA": 1.0928545060218726
+    },
+    {
+      "id": 306,
+      "kind": "TERM",
+      "terms": [
+        "camp"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0407587617234328,
+      "BA": 1.2211677589582093
+    },
+    {
+      "id": 857,
+      "kind": "OR",
+      "terms": [
+        "human",
+        "trafficking"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0398460367025029,
+      "BA": 1.0420622353157798
+    },
+    {
+      "id": 476,
+      "kind": "AND",
+      "terms": [
+        "columbia",
+        "university"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0390572715572715,
+      "BA": 1.1091137234183066
+    },
+    {
+      "id": 1173,
+      "kind": "PHRASE",
+      "terms": [
+        "civil",
+        "war",
+        "battlefields"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0828827163346737,
+      "BA": 1.033763567395686
+    },
+    {
+      "id": 7,
+      "kind": "TERM",
+      "terms": [
+        "saxophone"
+      ],
+      "tags": [
+        "wiki20",
+        "term",
+        "low"
+      ],
+      "AB": 1.2547470091098671,
+      "BA": 1.0311763639659235
+    },
+    {
+      "id": 85,
+      "kind": "TERM",
+      "terms": [
+        "elbow"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.026702269692924,
+      "BA": 1.0489799289667134
+    }
+  ],
+  "loads": [
+    {
+      "at": 1791364151.403786,
+      "loadavg": [
+        4.6962890625,
+        6.30224609375,
+        5.2412109375
+      ],
+      "processes": [
+        "    PID COMMAND         %CPU",
+        "  82239 python          95.4",
+        "   2784 helium          37.0",
+        "   3322 helium          34.9",
+        "  12579 t3code          13.8",
+        "   2661 helium          12.2",
+        "  12590 t3code          10.8",
+        "   3544 vesktop          8.4",
+        "   1472 Hyprland         6.9",
+        "  13822 claude           6.9",
+        "   3675 vesktop          6.7",
+        "   3299 helium           5.1",
+        "   2786 helium           4.9"
+      ]
+    },
+    {
+      "at": 1791364160.7311208,
+      "loadavg": [
+        4.4482421875,
+        6.193359375,
+        5.216796875
+      ],
+      "processes": [
+        "    PID COMMAND         %CPU",
+        "  84150 ps               100",
+        "   2784 helium          37.0",
+        "   3322 helium          34.9",
+        "  82239 python          16.8",
+        "  12579 t3code          13.9",
+        "   2661 helium          12.2",
+        "  12590 t3code          10.7",
+        "   3544 vesktop          8.4",
+        "   1472 Hyprland         6.9",
+        "  13822 claude           6.8",
+        "   3675 vesktop          6.8",
+        "   3299 helium           5.2"
+      ]
+    }
+  ]
+}

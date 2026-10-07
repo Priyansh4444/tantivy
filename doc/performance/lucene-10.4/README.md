@@ -1,5 +1,12 @@
 # Wikipedia 1M comparison with Lucene 10.4
 
+The [October 7 OR improvement](results/2026-10-07-or-maxscore/README.md)
+roughly halves mean top-10 latency across 103 longer OR queries, with exact
+score bits and index contents unchanged. It includes direct baseline/control
+timings, a fresh comparison with the corrected `lucene-rs` port, and a standalone
+audit of every raw sample. The [October 6 port comparison](results/2026-10-06-lucene-rs-comparison/README.md)
+records the preceding gap and complete decoded payload identity.
+
 The [October 4 configuration checkpoint](results/2026-10-04-configuration/README.md)
 adds native overlap norm policy and immutable per-field BM25 parameters. It retains
 the frozen correctness gate and DEFAULT latency leads after integration.

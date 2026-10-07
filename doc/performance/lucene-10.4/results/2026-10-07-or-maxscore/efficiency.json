@@ -1,0 +1,169 @@
+{
+  "binaries": {
+    "baseline": {
+      "path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/target/release/tantivy_worker",
+      "sha256": "49aa819692bde50fe29328e96b331e9825a8ee13942402427dfa670a105e7cd1",
+      "file_bytes": 4739600,
+      "sections": {
+        ".interp": 28,
+        ".note.ABI-tag": 32,
+        ".note.gnu.build-id": 36,
+        ".dynsym": 2256,
+        ".gnu.version": 188,
+        ".gnu.version_r": 352,
+        ".gnu.hash": 28,
+        ".dynstr": 1394,
+        ".rela.dyn": 345744,
+        ".rela.plt": 216,
+        ".rodata": 457856,
+        ".gcc_except_table": 5260,
+        ".eh_frame_hdr": 30548,
+        ".eh_frame": 193276,
+        ".text": 2577778,
+        ".init": 27,
+        ".fini": 13,
+        ".plt": 160,
+        ".tdata": 48,
+        ".tbss": 192,
+        ".fini_array": 8,
+        ".init_array": 16,
+        ".data.rel.ro": 320104,
+        ".dynamic": 464,
+        ".got": 784,
+        ".got.plt": 96,
+        ".relro_padding": 2824,
+        ".tm_clone_table": 0,
+        ".data": 3040,
+        ".bss": 8928,
+        ".comment": 166
+      }
+    },
+    "candidate": {
+      "path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/target/release/tantivy_worker",
+      "sha256": "6df0b41330dfb2a0b65cff4734b2481101aa192c56e684cefd1e113eb9e181ec",
+      "file_bytes": 4762128,
+      "sections": {
+        ".interp": 28,
+        ".note.ABI-tag": 32,
+        ".note.gnu.build-id": 36,
+        ".dynsym": 2256,
+        ".gnu.version": 188,
+        ".gnu.version_r": 352,
+        ".gnu.hash": 28,
+        ".dynstr": 1394,
+        ".rela.dyn": 346176,
+        ".rela.plt": 216,
+        ".rodata": 458880,
+        ".gcc_except_table": 5260,
+        ".eh_frame_hdr": 30596,
+        ".eh_frame": 193700,
+        ".text": 2595762,
+        ".init": 27,
+        ".fini": 13,
+        ".plt": 160,
+        ".tdata": 48,
+        ".tbss": 192,
+        ".fini_array": 8,
+        ".init_array": 16,
+        ".data.rel.ro": 320536,
+        ".dynamic": 464,
+        ".got": 784,
+        ".got.plt": 96,
+        ".relro_padding": 2968,
+        ".tm_clone_table": 0,
+        ".data": 3040,
+        ".bss": 8928,
+        ".comment": 166
+      }
+    }
+  },
+  "candidate_minus_baseline_file_bytes": 22528,
+  "candidate_minus_baseline_text_bytes": 17984,
+  "scratch": {
+    "array_payload_formula_bytes": "24*n + 8",
+    "max_clauses": 32,
+    "max_array_payload_bytes": 776,
+    "vector_header_bytes_x86_64": 96,
+    "excludes": "allocator overhead and the existing incoming scorer vector; four once-per-query allocations, none per region"
+  },
+  "index_format_changed": false,
+  "all_index_file_hashes_unchanged": true,
+  "warm_rss": {
+    "candidate_baseline": [
+      {
+        "pair": 0,
+        "A": {
+          "VmSize": "620628 kB",
+          "VmHWM": "315144 kB",
+          "VmRSS": "315144 kB"
+        },
+        "B": {
+          "VmSize": "620608 kB",
+          "VmHWM": "315064 kB",
+          "VmRSS": "315064 kB"
+        }
+      },
+      {
+        "pair": 1,
+        "A": {
+          "VmSize": "620628 kB",
+          "VmHWM": "314976 kB",
+          "VmRSS": "314976 kB"
+        },
+        "B": {
+          "VmSize": "620628 kB",
+          "VmHWM": "314976 kB",
+          "VmRSS": "314976 kB"
+        }
+      },
+      {
+        "pair": 2,
+        "A": {
+          "VmSize": "620608 kB",
+          "VmHWM": "314976 kB",
+          "VmRSS": "314976 kB"
+        },
+        "B": {
+          "VmSize": "620608 kB",
+          "VmHWM": "315048 kB",
+          "VmRSS": "315048 kB"
+        }
+      }
+    ],
+    "candidate_fixed_port": [
+      {
+        "pair": 0,
+        "A": {
+          "VmSize": "620624 kB",
+          "VmHWM": "314184 kB",
+          "VmRSS": "314184 kB"
+        },
+        "B": {
+          "VmSize": "683272 kB",
+          "VmHWM": "322724 kB",
+          "VmRSS": "322724 kB"
+        }
+      },
+      {
+        "pair": 1,
+        "A": {
+          "VmSize": "683272 kB",
+          "VmHWM": "322708 kB",
+          "VmRSS": "322708 kB"
+        },
+        "B": {
+          "VmSize": "683272 kB",
+          "VmHWM": "322700 kB",
+          "VmRSS": "322700 kB"
+        }
+      }
+    ]
+  },
+  "rss_interpretation": "process snapshots after equal warmup, not incremental scratch, allocation rate, or a whole-lifecycle memory proof",
+  "source_files": {
+    "src/query/boolean_query/or_maxscore.rs": "18eecaaf70ceaa3b990047b97b36c01aeb6d0256e33c68e4f6d63eb3cc96f8af",
+    "src/query/boolean_query/boolean_weight.rs": "2a93e4dee884b9aeab303a30d5eee80bda759b673f956bf695310ab5a2c789a3",
+    "src/query/boolean_query/mod.rs": "15b635003fee9c338cd9137b1e5cb520e1372b6063da7a9803bbc29eb9d0745c",
+    "tests/query_pruning_correctness.rs": "4980e5dd3038f82da39b62d9dea533e0055541e4c169c187c9f65f6e0286e889"
+  }
+}

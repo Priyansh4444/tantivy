@@ -1,0 +1,855 @@
+{
+  "README.md": {
+    "original_bytes": 14448,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/README.md",
+    "original_sha256": "a308e61222cb9613618ad3dddd02fb6b11aef95b318cf192998e7c8fea6df311"
+  },
+  "analyze.py": {
+    "original_bytes": 6419,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/analyze.py",
+    "original_sha256": "93e7c6a5493729255fff2e858eaafd87afb74de8b64dfac19a474d3fb676a5cf"
+  },
+  "analyze_port.py": {
+    "original_bytes": 3569,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/analyze_port.py",
+    "original_sha256": "c3e92ddda333f2dd65e60ea2e7ecc7d534d9b78701b988daea52908f0b1c0bbf"
+  },
+  "attempt1-decision.md": {
+    "original_bytes": 950,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt1-decision.md",
+    "original_sha256": "7d04d005c3dcc5e952f7aa795fd6bd3adc0ad3f353e11486ebffa6939ab38aab"
+  },
+  "attempt1/build-final/receipt.json": {
+    "original_bytes": 677,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt1/build-final/receipt.json",
+    "original_sha256": "00caa236e2ce4b1db33164e61c5a0bf5ede84e6e7d22dc9fae16f5b413623a28"
+  },
+  "attempt1/candidate-perf-report.txt": {
+    "original_bytes": 2094,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt1/candidate-perf-report.txt",
+    "original_sha256": "ecb099526afe6e7956d0dac239359c5673d2b4eeba5cf3dd5976f37b81ca3436"
+  },
+  "attempt1/candidate-profile-receipt.json": {
+    "original_bytes": 1242,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt1/candidate-profile-receipt.json",
+    "original_sha256": "ecdfc4d881b880c3c2c99943114dbcd7cde5cfbd46ef2564be7addfa3e909ce6"
+  },
+  "attempt1/or_maxscore.rs": {
+    "original_bytes": 16917,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt1/or_maxscore.rs",
+    "original_sha256": "f6a8aeb3b918953eaa3b9015f72f51b63e37e911ff6448adb6ee6bc5637f6335"
+  },
+  "attempt1/verify/failures.json": {
+    "original_bytes": 3,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt1/verify/failures.json",
+    "original_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "attempt1/verify/receipt.json": {
+    "original_bytes": 112,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt1/verify/receipt.json",
+    "original_sha256": "118980f7e00e04e3e209ac042e4107362473dfd6b2335510b85cfebc832461ab"
+  },
+  "attempt2/build-final/receipt.json": {
+    "original_bytes": 670,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt2/build-final/receipt.json",
+    "original_sha256": "ffe63e8f6abe4ebf746f2ee43073c7cb71183aedcc3df4ad00b6539bbc48cacd"
+  },
+  "attempt2/decision.md": {
+    "original_bytes": 577,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt2/decision.md",
+    "original_sha256": "952edc5e7244fd6e42949ba13b1e6d8bbfcbcf8c25ee28cbd5c7d4afb2b487b1"
+  },
+  "attempt2/or_maxscore.rs": {
+    "original_bytes": 18961,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt2/or_maxscore.rs",
+    "original_sha256": "3517d30a090b1afed4528658e08e3d820c195cbe843b223c15f69d5653a05bd5"
+  },
+  "attempt2/pilot-final/receipt.json": {
+    "original_bytes": 7333,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt2/pilot-final/receipt.json",
+    "original_sha256": "41342e1c05c06193712ddf2a93758190d1168b91a7937baaf580b17d87163a9b"
+  },
+  "attempt2/verify/failures.json": {
+    "original_bytes": 3,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt2/verify/failures.json",
+    "original_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "attempt2/verify/receipt.json": {
+    "original_bytes": 113,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/attempt2/verify/receipt.json",
+    "original_sha256": "d22e2face4860d4b105e377268c8c3b687799dab8c4f3e77211c71e0a4ae82d5"
+  },
+  "balanced.py": {
+    "original_bytes": 12748,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/balanced.py",
+    "original_sha256": "425fd57e633b4bfa65dd46aeacd29cc81a7b19b3d94ad68aed76a7a677693b83"
+  },
+  "baseline-perf-report.txt": {
+    "original_bytes": 5610,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/baseline-perf-report.txt",
+    "original_sha256": "186dcc4125152ee2a32caf638f2d85fc68d375caa31dfb41cc99deba74cccfaa"
+  },
+  "baseline-perf.data.gz": {
+    "original_bytes": 554940,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/baseline-perf.data",
+    "original_sha256": "9376ce2486a9c18bd8dc9a34282b68cfe869e222a3f0a8167d0ad130885bce78"
+  },
+  "baseline-perf.stderr": {
+    "original_bytes": 203,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/baseline-perf.stderr",
+    "original_sha256": "89634c1cd28cc28fa66d428dd144d2e2911eee107957b1f8422d6a57242b8e2c"
+  },
+  "baseline-profile-receipt.json": {
+    "original_bytes": 1236,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/baseline-profile-receipt.json",
+    "original_sha256": "a3fc12e908474dd40ba2dd4c4d1b343d1396d384949a70e6d9fcdce250967a07"
+  },
+  "baseline-profile-replies.json": {
+    "original_bytes": 26033,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/baseline-profile-replies.json",
+    "original_sha256": "024f461c653f0f6d64a62301343bdd9bd96a2971c0874a3a56e3dcb04b1096ce"
+  },
+  "baseline-provenance.json": {
+    "original_bytes": 4150,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/baseline-provenance.json",
+    "original_sha256": "bb2c13a8b66e5c0bad26b795f617967d67ceaa962b6ed6410e0895de9e32b87d"
+  },
+  "build-final/after.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/build-final/after.json",
+    "original_sha256": "198092c7b93403893b36eb9de7dcb0d067faad48062666e44f5222d98e01f01b"
+  },
+  "build-final/before.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/build-final/before.json",
+    "original_sha256": "198092c7b93403893b36eb9de7dcb0d067faad48062666e44f5222d98e01f01b"
+  },
+  "build-final/command.json": {
+    "original_bytes": 119,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/build-final/command.json",
+    "original_sha256": "c9208d53f9ab646fc54dd1c66b1dbf43ddc91f3ed85333778420d88c87bf4a58"
+  },
+  "build-final/compiler.txt": {
+    "original_bytes": 196,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/build-final/compiler.txt",
+    "original_sha256": "b569b0c98ea3133c7252b4b8ea6b39b7b353813df0dd5f5c412c355691424112"
+  },
+  "build-final/receipt.json": {
+    "original_bytes": 677,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/build-final/receipt.json",
+    "original_sha256": "5214a460df0aa1671c8bb36d46378dad577bdb1cd37300d24f9640e435f976c7"
+  },
+  "build-final/stderr.log": {
+    "original_bytes": 799,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/build-final/stderr.log",
+    "original_sha256": "48f34f31fa229da5d288a5e9f55cdf618f81e250ba7168800735d037b4f9bee6"
+  },
+  "build-final/stdout.log": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/build-final/stdout.log",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "candidate-perf-report.txt": {
+    "original_bytes": 1847,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/candidate-perf-report.txt",
+    "original_sha256": "f201b3df9a2c62e29e793eb96b44f4d32c888b4e2a3c50a1e1e093e851a1433e"
+  },
+  "candidate-perf.data.gz": {
+    "original_bytes": 296332,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/candidate-perf.data",
+    "original_sha256": "2991260c72c549e0a001092b225a2931b2cad5bdac6b146726c2e9b2de4b5a70"
+  },
+  "candidate-perf.stderr": {
+    "original_bytes": 204,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/candidate-perf.stderr",
+    "original_sha256": "ff0d3eca5c418110b222373c2d8a5b3aa9e717c5fdb7831064abf24a1294c869"
+  },
+  "candidate-profile-receipt.json": {
+    "original_bytes": 1243,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/candidate-profile-receipt.json",
+    "original_sha256": "4f7d42c5a678af43ff85bf4a7279317d4b0aa5c57f14bbab84fb7177a487308d"
+  },
+  "candidate-profile-replies.json": {
+    "original_bytes": 25723,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/candidate-profile-replies.json",
+    "original_sha256": "a651a6bc0dafd6a69da84031dc81b31537d932e35316651f42e33020c7b5001c"
+  },
+  "clippy/after.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/clippy/after.json",
+    "original_sha256": "198092c7b93403893b36eb9de7dcb0d067faad48062666e44f5222d98e01f01b"
+  },
+  "clippy/before.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/clippy/before.json",
+    "original_sha256": "198092c7b93403893b36eb9de7dcb0d067faad48062666e44f5222d98e01f01b"
+  },
+  "clippy/command.json": {
+    "original_bytes": 246,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/clippy/command.json",
+    "original_sha256": "9981603eb707295be4937950b7576d23bd3ef96bd07cc04eca9a8d46b1ec40f0"
+  },
+  "clippy/compiler.txt": {
+    "original_bytes": 196,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/clippy/compiler.txt",
+    "original_sha256": "b569b0c98ea3133c7252b4b8ea6b39b7b353813df0dd5f5c412c355691424112"
+  },
+  "clippy/receipt.json": {
+    "original_bytes": 814,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/clippy/receipt.json",
+    "original_sha256": "8cb4e3d8af7c055265f33e34688600fb80cc9f1744f1884747d13a0c9df22328"
+  },
+  "clippy/stderr.log": {
+    "original_bytes": 13702,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/clippy/stderr.log",
+    "original_sha256": "48c7878a688434c648ad7f4e84b96fb5532a093e276b3f974785c32009ef8a89"
+  },
+  "clippy/stdout.log": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/clippy/stdout.log",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "compiled-source/src/query/boolean_query/boolean_weight.rs": {
+    "original_bytes": 35148,
+    "original_path": "/home/pronsh/Coding/playground/search/tantivy-or-maxscore-oct06/src/query/boolean_query/boolean_weight.rs",
+    "original_sha256": "2a93e4dee884b9aeab303a30d5eee80bda759b673f956bf695310ab5a2c789a3"
+  },
+  "compiled-source/src/query/boolean_query/mod.rs": {
+    "original_bytes": 35748,
+    "original_path": "/home/pronsh/Coding/playground/search/tantivy-or-maxscore-oct06/src/query/boolean_query/mod.rs",
+    "original_sha256": "15b635003fee9c338cd9137b1e5cb520e1372b6063da7a9803bbc29eb9d0745c"
+  },
+  "compiled-source/src/query/boolean_query/or_maxscore.rs": {
+    "original_bytes": 20848,
+    "original_path": "/home/pronsh/Coding/playground/search/tantivy-or-maxscore-oct06/src/query/boolean_query/or_maxscore.rs",
+    "original_sha256": "18eecaaf70ceaa3b990047b97b36c01aeb6d0256e33c68e4f6d63eb3cc96f8af"
+  },
+  "compiled-source/tests/query_pruning_correctness.rs": {
+    "original_bytes": 15658,
+    "original_path": "/home/pronsh/Coding/playground/search/tantivy-or-maxscore-oct06/tests/query_pruning_correctness.rs",
+    "original_sha256": "4980e5dd3038f82da39b62d9dea533e0055541e4c169c187c9f65f6e0286e889"
+  },
+  "configured-k0.9-b0.4/after.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k0.9-b0.4/after.json",
+    "original_sha256": "ee01124dc88e4442c92d2064052597691e9fbb5c110c01294d6f73a36efebfce"
+  },
+  "configured-k0.9-b0.4/before.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k0.9-b0.4/before.json",
+    "original_sha256": "ee01124dc88e4442c92d2064052597691e9fbb5c110c01294d6f73a36efebfce"
+  },
+  "configured-k0.9-b0.4/candidate.protocol.jsonl.gz": {
+    "original_bytes": 616404,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k0.9-b0.4/candidate.protocol.jsonl",
+    "original_sha256": "d59479399fc95d70d1a0e71a9d168d9726a1ccf826e94ae2ad77ebdceec24f69"
+  },
+  "configured-k0.9-b0.4/candidate.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k0.9-b0.4/candidate.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "configured-k0.9-b0.4/dumps.json.gz": {
+    "original_bytes": 1913279,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k0.9-b0.4/dumps.json",
+    "original_sha256": "7245fcf2ebcd9ebd374dad8ba7dd604840995308302984dc7fb82bb6a4dd5c55"
+  },
+  "configured-k0.9-b0.4/failures.json": {
+    "original_bytes": 3,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k0.9-b0.4/failures.json",
+    "original_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "configured-k0.9-b0.4/receipt.json": {
+    "original_bytes": 421,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k0.9-b0.4/receipt.json",
+    "original_sha256": "40d39b767e8c6f7990a3da8d63fdb530040b199a2dfe3c4b491ef0741ba77892"
+  },
+  "configured-k2-b1/after.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k2-b1/after.json",
+    "original_sha256": "ee01124dc88e4442c92d2064052597691e9fbb5c110c01294d6f73a36efebfce"
+  },
+  "configured-k2-b1/before.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k2-b1/before.json",
+    "original_sha256": "ee01124dc88e4442c92d2064052597691e9fbb5c110c01294d6f73a36efebfce"
+  },
+  "configured-k2-b1/candidate.protocol.jsonl.gz": {
+    "original_bytes": 616166,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k2-b1/candidate.protocol.jsonl",
+    "original_sha256": "2bf44d892c63c430eeabff4ae97f3b6866446b99f87104ae9c3ad9efe02be9e5"
+  },
+  "configured-k2-b1/candidate.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k2-b1/candidate.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "configured-k2-b1/dumps.json.gz": {
+    "original_bytes": 1913041,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k2-b1/dumps.json",
+    "original_sha256": "0bb1ed086e5fb545d91113a4d800ec97be17851ea75d379f6005fe344c64cfdb"
+  },
+  "configured-k2-b1/failures.json": {
+    "original_bytes": 3,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k2-b1/failures.json",
+    "original_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "configured-k2-b1/receipt.json": {
+    "original_bytes": 422,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured-k2-b1/receipt.json",
+    "original_sha256": "c74ad2458a8a2958a806621e88634ce16d0cb8b4e0384c98c33a841ba1b01645"
+  },
+  "configured_gate.py": {
+    "original_bytes": 1637,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/configured_gate.py",
+    "original_sha256": "b98088b6c39dafd80d57042f582629f52acd63ae3d431db6eab0f58c3f03a5d6"
+  },
+  "design-essential.md": {
+    "original_bytes": 19352,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/design-essential.md",
+    "original_sha256": "0cbd1f66e62cf23aac71a3041b9c6e7d6cf892a90734bd47299d110014ecda7f"
+  },
+  "design-windows.md": {
+    "original_bytes": 20654,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/design-windows.md",
+    "original_sha256": "20da4a2fa0f04d625ec83ab7ad9f0a0e530f73bb13ab3731e58aea19296cbf1e"
+  },
+  "efficiency.json": {
+    "original_bytes": 4790,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/efficiency.json",
+    "original_sha256": "167f9dac7b2f74019ab39d2235d7b79cfeac749f5c7216ae21329dbac5de2e70"
+  },
+  "efficiency_capture.py": {
+    "original_bytes": 1997,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/efficiency_capture.py",
+    "original_sha256": "983f0cabf37650cfe91d3f5d0ff924f9ff69d7ee5a0e68e16c001181ea36d831"
+  },
+  "formatting/after.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/formatting/after.json",
+    "original_sha256": "198092c7b93403893b36eb9de7dcb0d067faad48062666e44f5222d98e01f01b"
+  },
+  "formatting/before.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/formatting/before.json",
+    "original_sha256": "198092c7b93403893b36eb9de7dcb0d067faad48062666e44f5222d98e01f01b"
+  },
+  "formatting/command.json": {
+    "original_bytes": 399,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/formatting/command.json",
+    "original_sha256": "3385f2122bfdf658cfbf05a003d612c1d5ca8f9e73475d7490d04864cb0a2cd0"
+  },
+  "formatting/compiler.txt": {
+    "original_bytes": 196,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/formatting/compiler.txt",
+    "original_sha256": "b569b0c98ea3133c7252b4b8ea6b39b7b353813df0dd5f5c412c355691424112"
+  },
+  "formatting/receipt.json": {
+    "original_bytes": 970,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/formatting/receipt.json",
+    "original_sha256": "0b6585b12982f4095959266ffb23292c38680c705ce70dd551e1debf7d547145"
+  },
+  "formatting/stderr.log": {
+    "original_bytes": 2916,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/formatting/stderr.log",
+    "original_sha256": "22ef6c1c5c027b7d42a28acf5a5168daecdde796d1337317bd160d4ce0b7b69b"
+  },
+  "formatting/stdout.log": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/formatting/stdout.log",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "grounding.md": {
+    "original_bytes": 3994,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/grounding.md",
+    "original_sha256": "368ab07e3a0dfa811cf3834f7aad06d4f436163cb8a753e6b047e2efbb911af0"
+  },
+  "guard-regression/after.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/guard-regression/after.json",
+    "original_sha256": "198092c7b93403893b36eb9de7dcb0d067faad48062666e44f5222d98e01f01b"
+  },
+  "guard-regression/before.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/guard-regression/before.json",
+    "original_sha256": "198092c7b93403893b36eb9de7dcb0d067faad48062666e44f5222d98e01f01b"
+  },
+  "guard-regression/command.json": {
+    "original_bytes": 285,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/guard-regression/command.json",
+    "original_sha256": "f37db72fc7e85683df93ebad076ff300f53e5d19cde1e232aee2a15ed0aad8df"
+  },
+  "guard-regression/compiler.txt": {
+    "original_bytes": 196,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/guard-regression/compiler.txt",
+    "original_sha256": "b569b0c98ea3133c7252b4b8ea6b39b7b353813df0dd5f5c412c355691424112"
+  },
+  "guard-regression/receipt.json": {
+    "original_bytes": 857,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/guard-regression/receipt.json",
+    "original_sha256": "d5d2cd61a4bacf8b6d7728609d2224f61ed41a7b5df30b8589523e4a624def26"
+  },
+  "guard-regression/stderr.log": {
+    "original_bytes": 585,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/guard-regression/stderr.log",
+    "original_sha256": "12be5af5548976f50dd124de7b1966f1427df1949f82caae12fd7fa98e18caaf"
+  },
+  "guard-regression/stdout.log": {
+    "original_bytes": 155,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/guard-regression/stdout.log",
+    "original_sha256": "53aa490717596714fb0d9d88e01832cd87e1931f686cbb3d5eea852f2ef720d1"
+  },
+  "harness/Cargo.lock": {
+    "original_bytes": 33303,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/harness/Cargo.lock",
+    "original_sha256": "21dfbb56abf6714579bdde51f28e1d708a0c82a3f61b3acd3853ec4835116e0c"
+  },
+  "harness/Cargo.toml": {
+    "original_bytes": 429,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/harness/Cargo.toml",
+    "original_sha256": "e4af0814bb69e5b07c184c8c851193a9d53d0c2ba196c0b7b46efe073409d5de"
+  },
+  "harness/src/bin/configured_worker.rs": {
+    "original_bytes": 6327,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/harness/src/bin/configured_worker.rs",
+    "original_sha256": "d63a488d294a42a238284eb4bf3936bb835d1fc8bc9a228997545c9561e91664"
+  },
+  "harness/src/bin/tantivy_worker.rs": {
+    "original_bytes": 6154,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/harness/src/bin/tantivy_worker.rs",
+    "original_sha256": "b502c978356e02f02171b68f5143ea1d05fb76beba5354c26e008ef16d45e562"
+  },
+  "harness/src/lib.rs": {
+    "original_bytes": 2454,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/harness/src/lib.rs",
+    "original_sha256": "63aee1908ba57563748428a1bb42c2cbd079a3284907043f59744277a08359b0"
+  },
+  "judge.md": {
+    "original_bytes": 8375,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/judge.md",
+    "original_sha256": "b78c1702554ee16587bdd5fcbffd36d9f6eb81e33d2b1cb957f8ed292b6e1bde"
+  },
+  "measure/after.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/after.json",
+    "original_sha256": "e558d6bc66480709a6fee2aa42435f816552160f6330e6b5b9561f039a43f407"
+  },
+  "measure/before.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/before.json",
+    "original_sha256": "e558d6bc66480709a6fee2aa42435f816552160f6330e6b5b9561f039a43f407"
+  },
+  "measure/pair0-A.protocol.jsonl.gz": {
+    "original_bytes": 3815034,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair0-A.protocol.jsonl",
+    "original_sha256": "e835a8936b6a65e8e5624928dbd2e17f24c23ef4f64dc2e5425a8c90bbc23397"
+  },
+  "measure/pair0-A.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair0-A.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "measure/pair0-B.protocol.jsonl.gz": {
+    "original_bytes": 3817387,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair0-B.protocol.jsonl",
+    "original_sha256": "7e3a96143881d8ef3d49d033ecaedbd6d821e3793ff8b7c5cae8d91814f194a8"
+  },
+  "measure/pair0-B.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair0-B.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "measure/pair1-A.protocol.jsonl.gz": {
+    "original_bytes": 3814146,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair1-A.protocol.jsonl",
+    "original_sha256": "6ccb7ae1e617ac7ade6d2660173a256fe1be41499b1352f3ed7bd611b51b3f5d"
+  },
+  "measure/pair1-A.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair1-A.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "measure/pair1-B.protocol.jsonl.gz": {
+    "original_bytes": 3813240,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair1-B.protocol.jsonl",
+    "original_sha256": "91a464f69539255438b0124f0026eff6cacc94fe5fe4dad586acd2429a30ca11"
+  },
+  "measure/pair1-B.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair1-B.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "measure/pair2-A.protocol.jsonl.gz": {
+    "original_bytes": 3816945,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair2-A.protocol.jsonl",
+    "original_sha256": "bfce44bd2d99564e0349d39db1f6a553f31e150072d2b0a7745c4d050add8428"
+  },
+  "measure/pair2-A.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair2-A.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "measure/pair2-B.protocol.jsonl.gz": {
+    "original_bytes": 3816336,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair2-B.protocol.jsonl",
+    "original_sha256": "b14714618a38ca60b7e42bfc3f12d98d5134f02eae3530df60c2136134c5e1b4"
+  },
+  "measure/pair2-B.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/pair2-B.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "measure/receipt.json": {
+    "original_bytes": 185,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/receipt.json",
+    "original_sha256": "50893ffed95a04fb314ac25bbc2f9a0c317807188c69cbff4202166d127cabfb"
+  },
+  "measure/rss.json": {
+    "original_bytes": 684,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/rss.json",
+    "original_sha256": "641522882688ea6d35e1d98a47ee7ecb50558b3893a6faacc428b9573465c2e8"
+  },
+  "measure/samples.jsonl.gz": {
+    "original_bytes": 18529166,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/samples.jsonl",
+    "original_sha256": "b8322cf6277b625ed97244f778c882befe762c2aec5a8efb3ae0b84dba0bc3e1"
+  },
+  "measure/schedule.json": {
+    "original_bytes": 11539,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/measure/schedule.json",
+    "original_sha256": "8c03f0abe0b59aa905c653ada0419f9308d332675755107f8a288b971dd90345"
+  },
+  "measure/telemetry-summary.json": {
+    "derived_from_sha256": "06e94f23c80807fc245826da09cd5bd582ae30072457b19a050e17338e94ffe7",
+    "omitted": "process inventory retained locally"
+  },
+  "pack.py": {
+    "original_bytes": 4352,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pack.py",
+    "original_sha256": "fe8a746264d51d266f5dc348a41b4b05807a021faa629112b29d3895b2b75360"
+  },
+  "per-query.csv.gz": {
+    "original_bytes": 570920,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/per-query.csv",
+    "original_sha256": "76aab5772ee38f947344758a1401f98cda2057460110749667a16515cbdad435"
+  },
+  "pilot-final/after.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pilot-final/after.json",
+    "original_sha256": "e558d6bc66480709a6fee2aa42435f816552160f6330e6b5b9561f039a43f407"
+  },
+  "pilot-final/before.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pilot-final/before.json",
+    "original_sha256": "e558d6bc66480709a6fee2aa42435f816552160f6330e6b5b9561f039a43f407"
+  },
+  "pilot-final/port.protocol.jsonl.gz": {
+    "original_bytes": 220506,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pilot-final/port.protocol.jsonl",
+    "original_sha256": "086b331e8a69691c297f02eff55a67c62654f147dda407f81f9f336062da6d4d"
+  },
+  "pilot-final/port.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pilot-final/port.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "pilot-final/receipt.json": {
+    "original_bytes": 7334,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pilot-final/receipt.json",
+    "original_sha256": "b710c4893f8e7c188f8124ca6d54a2b59ccd454b735b494091a834ed493b3213"
+  },
+  "pilot-final/samples.json.gz": {
+    "original_bytes": 303434,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pilot-final/samples.json",
+    "original_sha256": "ef85813c9b106fd41f8ceba90bb6f45ac72a8feb83ebb8f336db31ce8a470569"
+  },
+  "pilot-final/tantivy.protocol.jsonl.gz": {
+    "original_bytes": 219716,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pilot-final/tantivy.protocol.jsonl",
+    "original_sha256": "73a2e1869fff4d8bf61f435f14854d08c5b019c8d0c5c45afe86b092a3a7d019"
+  },
+  "pilot-final/tantivy.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pilot-final/tantivy.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "pilot.py": {
+    "original_bytes": 2447,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/pilot.py",
+    "original_sha256": "28e34a3482ccbe0dbbad943c7bdcc13c93e56ff8b7ed063609cf20d7a8a6446e"
+  },
+  "port-measure/after.json.gz": {
+    "original_bytes": 214616,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/after.json",
+    "original_sha256": "35380a7135d6e478633e3e890f9070c68e927ebf9b5afa525ee9d10a0dac9404"
+  },
+  "port-measure/before.json.gz": {
+    "original_bytes": 214616,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/before.json",
+    "original_sha256": "35380a7135d6e478633e3e890f9070c68e927ebf9b5afa525ee9d10a0dac9404"
+  },
+  "port-measure/pair0-A.protocol.jsonl.gz": {
+    "original_bytes": 1971874,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/pair0-A.protocol.jsonl",
+    "original_sha256": "54c120612c93e220ca3b75e68f292cb86d68415de8923e30ecbedb3c84d4b9b6"
+  },
+  "port-measure/pair0-A.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/pair0-A.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "port-measure/pair0-B.protocol.jsonl.gz": {
+    "original_bytes": 1972967,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/pair0-B.protocol.jsonl",
+    "original_sha256": "6fda9a7328f4bed01e409d2720cae86f6b6433dc23a571851c8813861eb52dc9"
+  },
+  "port-measure/pair0-B.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/pair0-B.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "port-measure/pair1-A.protocol.jsonl.gz": {
+    "original_bytes": 1971289,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/pair1-A.protocol.jsonl",
+    "original_sha256": "503f13ee0977930cc449dc156800a50d27609b71cc2b2ad0a228d700d62abe88"
+  },
+  "port-measure/pair1-A.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/pair1-A.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "port-measure/pair1-B.protocol.jsonl.gz": {
+    "original_bytes": 1971152,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/pair1-B.protocol.jsonl",
+    "original_sha256": "71d895016133c88eb2146540a9913e48e6117b7fbb14329df53b7a01f2b942ec"
+  },
+  "port-measure/pair1-B.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/pair1-B.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "port-measure/receipt.json": {
+    "original_bytes": 73,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/receipt.json",
+    "original_sha256": "e435da383b44029c58b856783db9169ea3d3e6dac6f778ef9c6d898a2df0a500"
+  },
+  "port-measure/rss.json": {
+    "original_bytes": 457,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/rss.json",
+    "original_sha256": "4d7d665b7a67a3c5e1f6e9cc78d9dd09da31c678ef718e4f5e6b08aade2f6465"
+  },
+  "port-measure/samples.jsonl.gz": {
+    "original_bytes": 6379924,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/samples.jsonl",
+    "original_sha256": "14ca2e10e1398f3d5f4254feb5dbe1787085f7890881f821dd823d63200ed264"
+  },
+  "port-measure/schedule.json": {
+    "original_bytes": 11455,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-measure/schedule.json",
+    "original_sha256": "615b862a913c126734865beb1c03d4e668cb44ef5e88d060a408ff8652e0ac38"
+  },
+  "port-measure/telemetry-summary.json": {
+    "derived_from_sha256": "2a03d3a571035ad10e9927e0abb1fc65529c289a90d42228797f8e2bfed92550",
+    "omitted": "process inventory retained locally"
+  },
+  "port-per-query.csv.gz": {
+    "original_bytes": 175234,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-per-query.csv",
+    "original_sha256": "924476e299e556e39869e54348ffc64ab20915c0d3088ef6ab9ff127ee72a1ad"
+  },
+  "port-summary.json": {
+    "original_bytes": 10213,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port-summary.json",
+    "original_sha256": "d1e7e319545aa05be228010e9dc90ddea8373f2811eb3097e0f3e04cf4834bf0"
+  },
+  "port_measure.py": {
+    "original_bytes": 2344,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/port_measure.py",
+    "original_sha256": "968256c21f87c428ae91806f7a54f0a4143cb9b6e8947b482129a3af92f74aee"
+  },
+  "profile-cases.json": {
+    "original_bytes": 446,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/profile-cases.json",
+    "original_sha256": "49df76d4ca7898c928c5dc859d065fbf14a850773f900c69970f079444b6cd41"
+  },
+  "profile.py": {
+    "original_bytes": 2080,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/profile.py",
+    "original_sha256": "04e4e6180b28c5e0d861582227a327b411460895385bab93cbaffa2f29ffaf21"
+  },
+  "queries.jsonl.gz": {
+    "original_bytes": 92940,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/queries.jsonl",
+    "original_sha256": "39a54b200392befbde83469841ce6eaefe7ec1850bb5b0e25c74a0eefa709a4e"
+  },
+  "recompute.py": {
+    "original_bytes": 15793,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/recompute.py",
+    "original_sha256": "471164845107732afc5ccd5f1e4380159ce5f5ea1c41850a3394d910df4aff43"
+  },
+  "references/baseline-and-port-dumps.json.gz": {
+    "original_bytes": 3671593,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/verify/dumps.json",
+    "original_sha256": "5b895cd57ae062695599576584665722b70fc113293ab3cc5828b59fa639f32d"
+  },
+  "references/port-index.json": {
+    "original_bytes": 653,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/audit-port/index-after.json",
+    "original_sha256": "dc6ced454c62d7e5cb7b4337607ff50981db85c2eacbc77d414cd03ca4aa8efd"
+  },
+  "references/port-payload-audit.json": {
+    "original_bytes": 388,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/audit-port/stdout.log",
+    "original_sha256": "e5e74c7424414754e95c0d6d1981b4526658436f53269d111298c3cd2b75f4db"
+  },
+  "references/port-payload-receipt.json": {
+    "original_bytes": 964,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/audit-port/receipt.json",
+    "original_sha256": "69fcd3dbbbeb83bcb3a4f99df369fb75f8887d6e3b3fa61592fe371a63732559"
+  },
+  "references/port_worker.rs": {
+    "original_bytes": 15628,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/harness/src/bin/port_worker.rs",
+    "original_sha256": "2654a160a100c25e1b3bfaae5732a940f2f578abbf2c4faa865516a902a26726"
+  },
+  "results-review.md": {
+    "original_bytes": 1962,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/results-review.md",
+    "original_sha256": "7726c0d405134c56cd195d3b7eadef3d5cdf9f2666d05b36d1f52d61414b185f"
+  },
+  "stage.py": {
+    "original_bytes": 4069,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/stage.py",
+    "original_sha256": "7e6c5e3cf51c1ac7d4a195c28130e59ae1698e1c5008d059e21c3f1493d09750"
+  },
+  "summary.json": {
+    "original_bytes": 32338,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/summary.json",
+    "original_sha256": "3e5e3c09ca0587c4ee47f680a50182c11572e350b948d86de6a9d9b16dc568f9"
+  },
+  "synthesis.md": {
+    "original_bytes": 3887,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/synthesis.md",
+    "original_sha256": "d94fcf3ca34be376a6775f470bfc2703b92aed3229fd57e5ee5d8f567c8eae73"
+  },
+  "test-Cargo.lock": {
+    "original_bytes": 68699,
+    "original_path": "/home/pronsh/Coding/playground/search/tantivy-or-maxscore-oct06/Cargo.lock",
+    "original_sha256": "8fd56550ca9d5463b1df932b60ed59bf8b99a43f7c0c22fe75297505759497c5"
+  },
+  "tests/after.json.gz": {
+    "original_bytes": 210490,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/tests/after.json",
+    "original_sha256": "31821c398cde3c1649b4e7949a4de18cddce29b3061aaeca2fae2eafab97d2ca"
+  },
+  "tests/before.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/tests/before.json",
+    "original_sha256": "b16d0d74f7bee03875592ec059befef63fa963af53fea682e80fbc1a830bae65"
+  },
+  "tests/command.json": {
+    "original_bytes": 563,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/tests/command.json",
+    "original_sha256": "61d0d1126c126736d886a286cd5ec8567fb0a8d224b997ff337941b23f788af8"
+  },
+  "tests/compiler.txt": {
+    "original_bytes": 196,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/tests/compiler.txt",
+    "original_sha256": "b569b0c98ea3133c7252b4b8ea6b39b7b353813df0dd5f5c412c355691424112"
+  },
+  "tests/guard-audit.json": {
+    "original_bytes": 1846,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/tests/guard-audit.json",
+    "original_sha256": "5c883f892f4e4b4811e9d9462cc7d0dc28d2fa34c779cbd49b70f615b1dd1d1e"
+  },
+  "tests/receipt.json": {
+    "original_bytes": 1166,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/tests/receipt.json",
+    "original_sha256": "f1c109aac00ab535399844d48adee5e779e1c4b47cbe957eb77ac1785e6d6018"
+  },
+  "tests/stderr.log": {
+    "original_bytes": 2581,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/tests/stderr.log",
+    "original_sha256": "f5e82fde1da94fa12c1b55a9f2e97ca6336deb69ef59299ce920dfd0867b75f2"
+  },
+  "tests/stdout.log.gz": {
+    "original_bytes": 114659,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/tests/stdout.log",
+    "original_sha256": "1d174d460eb37cc5aa2870fb653b4d9b842d7fad1f16fe4e3dd980fb492cba7d"
+  },
+  "unit-tests/after.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/unit-tests/after.json",
+    "original_sha256": "b16d0d74f7bee03875592ec059befef63fa963af53fea682e80fbc1a830bae65"
+  },
+  "unit-tests/before.json.gz": {
+    "original_bytes": 209045,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/unit-tests/before.json",
+    "original_sha256": "b16d0d74f7bee03875592ec059befef63fa963af53fea682e80fbc1a830bae65"
+  },
+  "unit-tests/command.json": {
+    "original_bytes": 277,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/unit-tests/command.json",
+    "original_sha256": "0027cba324c6be0637c5ab66b4e28bb7f61b982cc74eef7215d95410d40ce17f"
+  },
+  "unit-tests/compiler.txt": {
+    "original_bytes": 196,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/unit-tests/compiler.txt",
+    "original_sha256": "b569b0c98ea3133c7252b4b8ea6b39b7b353813df0dd5f5c412c355691424112"
+  },
+  "unit-tests/receipt.json": {
+    "original_bytes": 845,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/unit-tests/receipt.json",
+    "original_sha256": "bbf224e3ce6137fd94c374daea9ce43efd9dfa58bbc5101df7bbd6cae5b65863"
+  },
+  "unit-tests/stderr.log": {
+    "original_bytes": 7387,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/unit-tests/stderr.log",
+    "original_sha256": "74a7f03229a9c6544d7bb89a0e08bfdf09371358dffe2712650462fe79e620fc"
+  },
+  "unit-tests/stdout.log": {
+    "original_bytes": 1165,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/unit-tests/stdout.log",
+    "original_sha256": "a0cdf006ca3ac2ba8c5ede1ab4b4f734bea1d423601dbaf8e07c2c06523c9dc8"
+  },
+  "verify/after.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/verify/after.json",
+    "original_sha256": "e558d6bc66480709a6fee2aa42435f816552160f6330e6b5b9561f039a43f407"
+  },
+  "verify/before.json.gz": {
+    "original_bytes": 214806,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/verify/before.json",
+    "original_sha256": "e558d6bc66480709a6fee2aa42435f816552160f6330e6b5b9561f039a43f407"
+  },
+  "verify/candidate.protocol.jsonl.gz": {
+    "original_bytes": 616390,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/verify/candidate.protocol.jsonl",
+    "original_sha256": "f029aa81bba7b038da6d9b9c976c879bf11731aa568ba17689c4e770805b3f9e"
+  },
+  "verify/candidate.stderr": {
+    "original_bytes": 0,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/verify/candidate.stderr",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "verify/dumps.json.gz": {
+    "original_bytes": 3607083,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/verify/dumps.json",
+    "original_sha256": "87f4a01b34c244ebabc1352001d77c0570d3010b19cc8376a323a41331d742c4"
+  },
+  "verify/failures.json": {
+    "original_bytes": 3,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/verify/failures.json",
+    "original_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  },
+  "verify/receipt.json": {
+    "original_bytes": 113,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/verify/receipt.json",
+    "original_sha256": "fa69650fda5360d73ec9ae95340aa781fd6c2484a8338923e4388a36149210be"
+  },
+  "write_report.py": {
+    "original_bytes": 18314,
+    "original_path": "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/write_report.py",
+    "original_sha256": "341f8a5d79aa3fc629bb56588591bbc89096c5ce7c9c4005953dbc78130ad339"
+  }
+}

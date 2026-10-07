@@ -1,0 +1,21 @@
+{
+  "pass": true,
+  "test_returncode": 0,
+  "passed": 1427,
+  "ignored": 7,
+  "all_compiled_source_hashes_unchanged": true,
+  "only_new_artifacts": {
+    "tests/compat_tests_data/index_v11/.managed.json": "6c576c5073de1284384f5168e5574039bf0775e2a3f611f5d2321993dd194085",
+    "tests/compat_tests_data/index_v11/.tantivy-meta.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/compat_tests_data/index_v11/.tantivy-writer.lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/compat_tests_data/index_v11/0000109e000000000000000000000000.fast": "9904fcf90e7ab7cae8b5415cff4d96e4fbb70baa02990c4893f71773563e7391",
+    "tests/compat_tests_data/index_v11/0000109e000000000000000000000000.fieldnorm": "abe399a18c78dd4a004e70b284286d3b9e37ea5218adf27834d9db88530a06fa",
+    "tests/compat_tests_data/index_v11/0000109e000000000000000000000000.idx": "9847e5b523b3347b3eda1d13bc875545b14d5ba3bb960b5ba1d2b03551da7441",
+    "tests/compat_tests_data/index_v11/0000109e000000000000000000000000.pos": "9894887f72715b523d37720f71ee88871255bb8c45dc561d3af69c6d6e09fe92",
+    "tests/compat_tests_data/index_v11/0000109e000000000000000000000000.store": "4ce042931fb4cb9d66468af7906264aa81d0dae935ca458cec68a901b8705900",
+    "tests/compat_tests_data/index_v11/0000109e000000000000000000000000.term": "9598726927f30e523f60d5f3ad888099a0e5cc1c715791e227bd82c7b458ef62",
+    "tests/compat_tests_data/index_v11/meta.json": "846430f266f312cd0e64475da19383eea23ce7b8ce9486b56789b23447dc6796"
+  },
+  "cause": "Existing src/compat_tests.rs::create_format writes the current-version compatibility index if missing. These are generated test outputs, not code edits. Original failed guard receipt preserved.",
+  "original_receipt_sha256": "f1c109aac00ab535399844d48adee5e779e1c4b47cbe957eb77ac1785e6d6018"
+}

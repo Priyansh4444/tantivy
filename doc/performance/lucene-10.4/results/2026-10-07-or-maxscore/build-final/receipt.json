@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--release",
+    "--bin",
+    "tantivy_worker",
+    "--bin",
+    "configured_worker"
+  ],
+  "returncode": 0,
+  "wall_seconds": 111.49600666699916,
+  "source_unchanged": true,
+  "compiler": "1.99.0",
+  "rustflags": "-C target-cpu=native",
+  "jobs": 2,
+  "profile": {
+    "opt_level": 3,
+    "lto": "fat",
+    "codegen_units": 1,
+    "overflow_checks": false,
+    "panic": "abort",
+    "debug": false
+  },
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "48f34f31fa229da5d288a5e9f55cdf618f81e250ba7168800735d037b4f9bee6",
+  "audited_index_unchanged": true
+}

@@ -1,0 +1,14 @@
+
+running 9 tests
+test query::boolean_query::or_maxscore::tests::deferred_optional_clause_becomes_essential_after_shallow_full_blocks ... ok
+test query::boolean_query::or_maxscore::tests::similar_density_terms_keep_local_certificates_until_both_are_optional ... ok
+test query::boolean_query::or_maxscore::tests::threshold_growth_promotes_local_optionals_to_global_certificates ... ok
+test query::boolean_query::or_maxscore::tests::unsafe_domains_use_exhaustive_canonical_sum_before_any_seek ... ok
+test query::boolean_query::or_maxscore::tests::exact_midpoint_leaves_preserve_incoming_order_and_strict_ties ... ok
+test query::boolean_query::or_maxscore::tests::globally_optional_dense_terms_cover_sparse_essential_gaps_and_tails ... ok
+test query::boolean_query::or_maxscore::tests::exact_traces_at_full_block_and_tail_boundaries ... ok
+test query::boolean_query::or_maxscore::tests::duplicates_disparate_boosts_exhaustion_and_sparse_regions ... ok
+test query::boolean_query::or_maxscore::tests::exact_growing_threshold_traces_for_mixed_dense_and_sparse_terms ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 1389 filtered out; finished in 0.69s
+

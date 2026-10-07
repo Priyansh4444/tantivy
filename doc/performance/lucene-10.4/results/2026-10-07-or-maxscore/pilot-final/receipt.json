@@ -1,0 +1,367 @@
+{
+  "seconds": 13.588750158000039,
+  "unchanged": true,
+  "summary": [
+    {
+      "set": "all",
+      "queries": 373,
+      "AB": {
+        "candidate_mean_ns": 357584.0254691689,
+        "baseline_mean_ns": 555346.0509383378,
+        "ratio_mean": 0.6438940636473038,
+        "median_ratio": 0.9638911037703611
+      },
+      "BA": {
+        "candidate_mean_ns": 355458.6179624665,
+        "baseline_mean_ns": 551759.8176943699,
+        "ratio_mean": 0.644227083167846,
+        "median_ratio": 0.9840870591858735
+      }
+    },
+    {
+      "set": "or3plus",
+      "queries": 103,
+      "AB": {
+        "candidate_mean_ns": 742019.9563106796,
+        "baseline_mean_ns": 1450284.8155339805,
+        "ratio_mean": 0.5116374027797258,
+        "median_ratio": 0.5164604164511918
+      },
+      "BA": {
+        "candidate_mean_ns": 736139.7524271845,
+        "baseline_mean_ns": 1443720.859223301,
+        "ratio_mean": 0.5098906396789308,
+        "median_ratio": 0.5240723277476053
+      }
+    },
+    {
+      "set": "or2",
+      "queries": 202,
+      "AB": {
+        "candidate_mean_ns": 202567.66336633664,
+        "baseline_mean_ns": 206368.75742574257,
+        "ratio_mean": 0.981581058553528,
+        "median_ratio": 0.9881819883195899
+      },
+      "BA": {
+        "candidate_mean_ns": 202241.64108910892,
+        "baseline_mean_ns": 203690.53465346535,
+        "ratio_mean": 0.9928867899197112,
+        "median_ratio": 0.994095566842621
+      }
+    }
+  ],
+  "worst_regressions": [
+    {
+      "id": 895,
+      "kind": "OR",
+      "terms": [
+        "movie",
+        "theatres"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0779419550892742,
+      "BA": 1.0654804208774638
+    },
+    {
+      "id": 510,
+      "kind": "AND",
+      "terms": [
+        "elliott",
+        "smith"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.1034215289149358,
+      "BA": 1.0444357621931366
+    },
+    {
+      "id": 823,
+      "kind": "OR",
+      "terms": [
+        "farmers",
+        "almanac"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.131887248487461,
+      "BA": 1.0436507936507937
+    },
+    {
+      "id": 969,
+      "kind": "PHRASE",
+      "terms": [
+        "kasota",
+        "stone"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0397482324538714,
+      "BA": 1.1240504215710827
+    },
+    {
+      "id": 703,
+      "kind": "OR",
+      "terms": [
+        "shih",
+        "tzu"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0867143527204504,
+      "BA": 1.0350119904076738
+    },
+    {
+      "id": 816,
+      "kind": "AND",
+      "terms": [
+        "centerville",
+        "high",
+        "school"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.034076299341896,
+      "BA": 1.0435379852960145
+    },
+    {
+      "id": 669,
+      "kind": "OR",
+      "terms": [
+        "john",
+        "klein"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.032730189395246,
+      "BA": 1.115909236352998
+    },
+    {
+      "id": 153,
+      "kind": "TERM",
+      "terms": [
+        "obstruction"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.214768249202477,
+      "BA": 1.0315535866946453
+    },
+    {
+      "id": 713,
+      "kind": "OR",
+      "terms": [
+        "automatic",
+        "writing"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0312645010287949,
+      "BA": 1.0294153995441104
+    },
+    {
+      "id": 501,
+      "kind": "OR",
+      "terms": [
+        "jonathan",
+        "daniel"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0292267078476998,
+      "BA": 1.04575656746154
+    },
+    {
+      "id": 525,
+      "kind": "OR",
+      "terms": [
+        "kenosha",
+        "wisconsin"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.027353926311872,
+      "BA": 1.0914794779496049
+    },
+    {
+      "id": 503,
+      "kind": "OR",
+      "terms": [
+        "clothing",
+        "optional"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0431982946187117,
+      "BA": 1.0269350578993701
+    },
+    {
+      "id": 589,
+      "kind": "OR",
+      "terms": [
+        "sarah",
+        "fisher"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0398134330412947,
+      "BA": 1.02677503417635
+    },
+    {
+      "id": 10,
+      "kind": "AND",
+      "terms": [
+        "new",
+        "york"
+      ],
+      "tags": [
+        "wiki20",
+        "intersection",
+        "andHighMed"
+      ],
+      "AB": 1.026376326900158,
+      "BA": 1.0860362362889104
+    },
+    {
+      "id": 645,
+      "kind": "OR",
+      "terms": [
+        "camp",
+        "claiborne"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0244609807288685,
+      "BA": 1.0253211716341213
+    },
+    {
+      "id": 367,
+      "kind": "OR",
+      "terms": [
+        "glass",
+        "works"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0508261575222038,
+      "BA": 1.023894385997917
+    },
+    {
+      "id": 875,
+      "kind": "OR",
+      "terms": [
+        "canon",
+        "powershot"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.036797028952554,
+      "BA": 1.0225518159345883
+    },
+    {
+      "id": 2,
+      "kind": "TERM",
+      "terms": [
+        "and"
+      ],
+      "tags": [
+        "wiki20",
+        "term",
+        "high"
+      ],
+      "AB": 1.0217124817383418,
+      "BA": 1.028925317531331
+    },
+    {
+      "id": 899,
+      "kind": "OR",
+      "terms": [
+        "health",
+        "literacy"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0213912851803981,
+      "BA": 1.0361980103080426
+    },
+    {
+      "id": 469,
+      "kind": "OR",
+      "terms": [
+        "flow",
+        "meter"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0233255269320842,
+      "BA": 1.0207675058607686
+    }
+  ],
+  "loads": [
+    {
+      "at": 1791381834.7175064,
+      "loadavg": [
+        10.5537109375,
+        8.3291015625,
+        6.095703125
+      ],
+      "processes": [
+        "    PID COMMAND         %CPU",
+        " 226646 ps               100",
+        " 226626 python          94.1",
+        " 204669 helium          63.0",
+        " 204655 helium          34.2",
+        " 204626 helium          31.0",
+        "   2784 helium          27.9",
+        " 207404 t3code          20.3",
+        " 207394 t3code          13.3",
+        " 177880 helium          11.2",
+        " 208985 claude          10.0",
+        "   2661 helium           9.8",
+        " 195784 vesktop          9.5"
+      ]
+    },
+    {
+      "at": 1791381845.8239603,
+      "loadavg": [
+        9.31201171875,
+        8.13623046875,
+        6.056640625
+      ],
+      "processes": [
+        "    PID COMMAND         %CPU",
+        " 204669 helium          62.7",
+        " 204655 helium          34.2",
+        " 204626 helium          31.1",
+        "   2784 helium          27.9",
+        " 207404 t3code          20.0",
+        " 226626 python          14.8",
+        " 207394 t3code          13.2",
+        " 177880 helium          11.2",
+        " 208985 claude           9.9",
+        "   2661 helium           9.8",
+        " 195784 vesktop          9.5",
+        " 195907 vesktop          8.4"
+      ]
+    }
+  ]
+}

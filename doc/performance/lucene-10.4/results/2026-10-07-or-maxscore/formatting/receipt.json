@@ -1,0 +1,30 @@
+{
+  "command": [
+    "rustfmt",
+    "--edition",
+    "2021",
+    "--check",
+    "--config",
+    "skip_children=true",
+    "../../../tantivy-or-maxscore-oct06/src/query/boolean_query/or_maxscore.rs",
+    "../../../tantivy-or-maxscore-oct06/src/query/boolean_query/boolean_weight.rs",
+    "../../../tantivy-or-maxscore-oct06/src/query/boolean_query/mod.rs",
+    "../../../tantivy-or-maxscore-oct06/tests/query_pruning_correctness.rs"
+  ],
+  "returncode": 0,
+  "wall_seconds": 0.43211797699768795,
+  "source_unchanged": true,
+  "compiler": "1.99.0",
+  "rustflags": "-C target-cpu=native",
+  "jobs": 2,
+  "profile": {
+    "opt_level": 0,
+    "lto": false,
+    "overflow_checks": true,
+    "debug_assertions": true,
+    "profile": "test/check; Cargo defaults"
+  },
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "22ef6c1c5c027b7d42a28acf5a5168daecdde796d1337317bd160d4ce0b7b69b",
+  "audited_index_unchanged": true
+}

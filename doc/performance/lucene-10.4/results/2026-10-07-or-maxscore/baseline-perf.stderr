@@ -1,0 +1,2 @@
+[ perf record: Woken up 2 times to write data ]
+[ perf record: Captured and wrote 0.501 MB /home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/baseline-perf.data (10875 samples) ]

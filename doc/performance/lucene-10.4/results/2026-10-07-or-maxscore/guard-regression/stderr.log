@@ -1,0 +1,11 @@
+warning: unused import: `doc`
+   --> src/postings/segment_postings.rs:498:17
+    |
+498 |     use crate::{doc, DocId, Index};
+    |                 ^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `tantivy` (lib test) generated 1 warning (run `cargo fix --lib -p tantivy --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running unittests src/lib.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/test-target/debug/deps/tantivy-95c542b621ca5120)
