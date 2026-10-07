@@ -1,0 +1,32 @@
+   Compiling tantivy v0.27.0 (/home/pronsh/Coding/playground/search/tantivy-or-refinement-oct07)
+warning: unused import: `doc`
+   --> src/postings/segment_postings.rs:498:17
+    |
+498 |     use crate::{doc, DocId, Index};
+    |                 ^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `tantivy` (lib test) generated 1 warning (run `cargo fix --lib -p tantivy --tests` to apply 1 suggestion)
+warning: method `phrase_count` is never used
+   --> src/query/phrase_query/phrase_scorer.rs:294:12
+    |
+153 | impl<TPostings: Postings> PhraseScorer<TPostings> {
+    | ------------------------------------------------- method in this implementation
+...
+294 |     pub fn phrase_count(&self) -> u32 {
+    |            ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `tantivy` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.36s
+     Running unittests src/lib.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target/debug/deps/tantivy-95c542b621ca5120)
+     Running tests/bm25_parameter_configuration.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target/debug/deps/bm25_parameter_configuration-7aafb3e64c29322d)
+     Running tests/bm25_parameters.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target/debug/deps/bm25_parameters-a23f4bf3e6b7ba84)
+     Running tests/dense_blocks_e2e.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target/debug/deps/dense_blocks_e2e-649a9ea2b0ba1c4c)
+     Running tests/native_basic_norms.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target/debug/deps/native_basic_norms-57bbec51f4bb16f6)
+     Running tests/native_bm25.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target/debug/deps/native_bm25-33bb8a1804433712)
+     Running tests/native_boolean_score_sums.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target/debug/deps/native_boolean_score_sums-199f7ce31b2ac8f2)
+     Running tests/native_overlap_norms.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target/debug/deps/native_overlap_norms-9ecdcec49646eb99)
+     Running tests/query_pruning_correctness.rs (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target/debug/deps/query_pruning_correctness-19817d91e7ffb3a3)

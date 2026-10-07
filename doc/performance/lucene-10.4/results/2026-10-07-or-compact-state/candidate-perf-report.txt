@@ -1,0 +1,24 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 5K of event 'cpu_core/cycles/u'
+# Event count (approx.): 23036518400
+#
+# Overhead  Symbol                                                                                                                                                               IPC   [IPC Coverage]
+# ........  ...................................................................................................................................................................  ....................
+#
+    86.35%  [.] <tantivy::query::boolean_query::boolean_weight::BooleanWeight<tantivy::query::score_combiner::SumCombiner> as tantivy::query::weight::Weight>::for_each_pruning  -      -            
+     5.91%  [.] <tantivy::query::term_query::term_scorer::TermScorer>::block_max_score                                                                                           -      -            
+     2.32%  [.] <tantivy::postings::block_segment_postings::BlockSegmentPostings>::load_block                                                                                    -      -            
+     1.22%  [.] 0x0000000000176d80                                                                                                                                               -      -            
+     1.21%  [.] bitpacking::bitpacker4x::sse3::decompress_to::<bitpacking::bitpacker4x::sse3::StrictDeltaIntegrate>                                                              -      -            
+     0.83%  [.] <tantivy::postings::compression::BlockDecoder>::uncompress_term_freqs                                                                                            -      -            
+     0.63%  [.] <tantivy::postings::skip::SkipReader>::read_block_info                                                                                                           -      -            
+     0.52%  [.] bitpacking::bitpacker4x::sse3::decompress_to::<bitpacking::bitpacker4x::sse3::Store>                                                                             -      -            
+
+
+#
+# (Tip: To show IPC for sampling periods use perf record -e '{cycles,instructions}:S' and then browse context)
+#

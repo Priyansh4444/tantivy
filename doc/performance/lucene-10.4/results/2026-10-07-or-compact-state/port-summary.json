@@ -1,0 +1,285 @@
+{
+  "pass": true,
+  "cells": 29304,
+  "samples": 468864,
+  "ratio": "candidate Tantivy / fixed lucene-rs; below1 candidate faster",
+  "summaries": [
+    {
+      "set": "wiki20",
+      "kind": "ALL",
+      "queries": 20,
+      "AB": {
+        "candidate_mean_query_median_ns": 267050.35,
+        "port_mean_query_median_ns": 226576.475,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.1786322918122898,
+        "geomean_candidate_over_port": 0.9131975519063543,
+        "port_control_geomean": 0.987531989905744
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 267163.2,
+        "port_mean_query_median_ns": 226218.05,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.1809985984761164,
+        "geomean_candidate_over_port": 0.9105262493798462,
+        "port_control_geomean": 0.9985385528234016
+      }
+    },
+    {
+      "set": "wiki20",
+      "kind": "TERM",
+      "queries": 8,
+      "AB": {
+        "candidate_mean_query_median_ns": 95889.25,
+        "port_mean_query_median_ns": 85413.75,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.1226441878503168,
+        "geomean_candidate_over_port": 0.7876927165701598,
+        "port_control_geomean": 1.0072506792842981
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 95124.375,
+        "port_mean_query_median_ns": 85254.875,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.1157646410249267,
+        "geomean_candidate_over_port": 0.7767539012169665,
+        "port_control_geomean": 0.9849812922840285
+      }
+    },
+    {
+      "set": "wiki20",
+      "kind": "AND",
+      "queries": 6,
+      "AB": {
+        "candidate_mean_query_median_ns": 285874.6666666667,
+        "port_mean_query_median_ns": 264251.25,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.0818290042778103,
+        "geomean_candidate_over_port": 0.8129215173572235,
+        "port_control_geomean": 0.9980639928594218
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 287340.8333333333,
+        "port_mean_query_median_ns": 259082.91666666666,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.1090690078305048,
+        "geomean_candidate_over_port": 0.8416816286251987,
+        "port_control_geomean": 1.0181396776026885
+      }
+    },
+    {
+      "set": "wiki20",
+      "kind": "OR",
+      "queries": 4,
+      "AB": {
+        "candidate_mean_query_median_ns": 455982.0,
+        "port_mean_query_median_ns": 349055.5,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.3063309416410858,
+        "geomean_candidate_over_port": 1.2819927967233964,
+        "port_control_geomean": 0.9280151606649375
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 455632.0,
+        "port_mean_query_median_ns": 354793.125,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.2842187965169845,
+        "geomean_candidate_over_port": 1.2345110581615815,
+        "port_control_geomean": 0.9932457820314334
+      }
+    },
+    {
+      "set": "wiki20",
+      "kind": "OR_2",
+      "queries": 4,
+      "AB": {
+        "candidate_mean_query_median_ns": 455982.0,
+        "port_mean_query_median_ns": 349055.5,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.3063309416410858,
+        "geomean_candidate_over_port": 1.2819927967233964,
+        "port_control_geomean": 0.9280151606649375
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 455632.0,
+        "port_mean_query_median_ns": 354793.125,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.2842187965169845,
+        "geomean_candidate_over_port": 1.2345110581615815,
+        "port_control_geomean": 0.9932457820314334
+      }
+    },
+    {
+      "set": "wiki20",
+      "kind": "PHRASE",
+      "queries": 2,
+      "AB": {
+        "candidate_mean_query_median_ns": 517358.5,
+        "port_mean_query_median_ns": 433245.0,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.194147653175455,
+        "geomean_candidate_over_port": 1.1865964352124847,
+        "port_control_geomean": 1.000866488030985
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 517848.0,
+        "port_mean_query_median_ns": 434326.0,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.192302556144463,
+        "geomean_candidate_over_port": 1.1840155866389086,
+        "port_control_geomean": 1.005543582288127
+      }
+    },
+    {
+      "set": "port-style",
+      "kind": "ALL",
+      "queries": 1201,
+      "AB": {
+        "candidate_mean_query_median_ns": 218738.5978351374,
+        "port_mean_query_median_ns": 169126.63447127395,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.2933421073443638,
+        "geomean_candidate_over_port": 0.9757418893975859,
+        "port_control_geomean": 0.9959705413155995
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 219400.08825978352,
+        "port_mean_query_median_ns": 168077.67693588676,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.3053493614352707,
+        "geomean_candidate_over_port": 0.978191800989432,
+        "port_control_geomean": 0.9978184390554483
+      }
+    },
+    {
+      "set": "port-style",
+      "kind": "TERM",
+      "queries": 300,
+      "AB": {
+        "candidate_mean_query_median_ns": 14969.088333333333,
+        "port_mean_query_median_ns": 21835.033333333333,
+        "ratio_of_mean_query_medians_candidate_over_port": 0.6855537202446832,
+        "geomean_candidate_over_port": 0.699345424708401,
+        "port_control_geomean": 0.9972483656630815
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 14916.626666666667,
+        "port_mean_query_median_ns": 21912.871666666666,
+        "ratio_of_mean_query_medians_candidate_over_port": 0.6807244113676566,
+        "geomean_candidate_over_port": 0.688647743195888,
+        "port_control_geomean": 0.994034298985767
+      }
+    },
+    {
+      "set": "port-style",
+      "kind": "AND",
+      "queries": 300,
+      "AB": {
+        "candidate_mean_query_median_ns": 169421.11666666667,
+        "port_mean_query_median_ns": 128409.715,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.3193792748988398,
+        "geomean_candidate_over_port": 1.0462925606304379,
+        "port_control_geomean": 1.000326021235063
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 170190.34333333332,
+        "port_mean_query_median_ns": 127865.30666666667,
+        "ratio_of_mean_query_medians_candidate_over_port": 1.3310126708334122,
+        "geomean_candidate_over_port": 1.0499773807914545,
+        "port_control_geomean": 0.996711934624526
+      }
+    },
+    {
+      "set": "port-style",
+      "kind": "OR",
+      "queries": 301,
+      "AB": {
+        "candidate_mean_query_median_ns": 365084.28405315615,
+        "port_mean_query_median_ns": 151853.91528239203,
+        "ratio_of_mean_query_medians_candidate_over_port": 2.404180908830929,
+        "geomean_candidate_over_port": 1.6858728426175562,
+        "port_control_geomean": 0.982721534397287
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 365757.66943521594,
+        "port_mean_query_median_ns": 150335.4950166113,
+        "ratio_of_mean_query_medians_candidate_over_port": 2.432942861529818,
+        "geomean_candidate_over_port": 1.7040823138930095,
+        "port_control_geomean": 0.9991374823100443
+      }
+    },
+    {
+      "set": "port-style",
+      "kind": "OR_3PLUS",
+      "queries": 103,
+      "AB": {
+        "candidate_mean_query_median_ns": 691980.3786407767,
+        "port_mean_query_median_ns": 304382.9708737864,
+        "ratio_of_mean_query_medians_candidate_over_port": 2.2733872944807714,
+        "geomean_candidate_over_port": 1.59190373566048,
+        "port_control_geomean": 0.9913852000979404
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 694035.1553398059,
+        "port_mean_query_median_ns": 301094.0631067961,
+        "ratio_of_mean_query_medians_candidate_over_port": 2.305044304688386,
+        "geomean_candidate_over_port": 1.621962950211159,
+        "port_control_geomean": 1.0003512216140242
+      }
+    },
+    {
+      "set": "port-style",
+      "kind": "OR_2",
+      "queries": 198,
+      "AB": {
+        "candidate_mean_query_median_ns": 195032.27525252526,
+        "port_mean_query_median_ns": 72507.99242424243,
+        "ratio_of_mean_query_medians_candidate_over_port": 2.6898038234377855,
+        "geomean_candidate_over_port": 1.7369287884359352,
+        "port_control_geomean": 0.9782446566989839
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 194987.05808080808,
+        "port_mean_query_median_ns": 71910.58333333333,
+        "ratio_of_mean_query_medians_candidate_over_port": 2.711521017385824,
+        "geomean_candidate_over_port": 1.7484318730521506,
+        "port_control_geomean": 0.9985066750782925
+      }
+    },
+    {
+      "set": "port-style",
+      "kind": "PHRASE",
+      "queries": 300,
+      "AB": {
+        "candidate_mean_query_median_ns": 324992.0833333333,
+        "port_mean_query_median_ns": 374465.45,
+        "ratio_of_mean_query_medians_candidate_over_port": 0.867882693405582,
+        "geomean_candidate_over_port": 0.7334634501734426,
+        "port_control_geomean": 1.0037602356021003
+      },
+      "BA": {
+        "candidate_mean_query_median_ns": 326247.855,
+        "port_mean_query_median_ns": 372256.175,
+        "ratio_of_mean_query_medians_candidate_over_port": 0.8764068319350243,
+        "geomean_candidate_over_port": 0.7416941902312397,
+        "port_control_geomean": 1.0014007402597058
+      }
+    }
+  ],
+  "rss": [
+    {
+      "pair": 0,
+      "A": {
+        "VmSize": "620620 kB",
+        "VmHWM": "314220 kB",
+        "VmRSS": "314220 kB"
+      },
+      "B": {
+        "VmSize": "683272 kB",
+        "VmHWM": "322528 kB",
+        "VmRSS": "322528 kB"
+      }
+    },
+    {
+      "pair": 1,
+      "A": {
+        "VmSize": "683272 kB",
+        "VmHWM": "322560 kB",
+        "VmRSS": "322560 kB"
+      },
+      "B": {
+        "VmSize": "683272 kB",
+        "VmHWM": "322572 kB",
+        "VmRSS": "322572 kB"
+      }
+    }
+  ],
+  "samples_sha256": "bd505bc798ad1d9a11eef2cd01a2ee016093c7094eb3d6f777ae78a9dc526cf9",
+  "per_query_sha256": "30df267440dc3f8a3476cc4ea8bc8210c630697c83269a6c64cec329e7d464a6"
+}

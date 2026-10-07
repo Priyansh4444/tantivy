@@ -1,0 +1,43 @@
+{
+  "command": [
+    "perf",
+    "record",
+    "-e",
+    "cycles:u",
+    "-F",
+    "499",
+    "-o",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/candidate-perf.data",
+    "--",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-improvement-oct06/target/release/tantivy_worker",
+    "/home/pronsh/Coding/playground/search/bench/wiki-1m-native-aligned-v11-oct05.idx",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-balanced-oct06/queries.jsonl"
+  ],
+  "returncode": 0,
+  "seconds": 11.758022730999073,
+  "binary_sha256": "6df0b41330dfb2a0b65cff4734b2481101aa192c56e684cefd1e113eb9e181ec",
+  "correctness_checksums_match": true,
+  "cases": [
+    {
+      "id": 920,
+      "terms": "a search engine is an information retrieval software system designed to help find information stored on one or more computer systems"
+    },
+    {
+      "id": 919,
+      "terms": "to be or not to be"
+    },
+    {
+      "id": 917,
+      "terms": "laborers international union of north america"
+    },
+    {
+      "id": 861,
+      "terms": "the book of life"
+    },
+    {
+      "id": 831,
+      "terms": "new york times best sellers list"
+    }
+  ],
+  "first_preparation_and_warmup_included_in_trace": true
+}

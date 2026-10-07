@@ -1,0 +1,92 @@
+[
+  {
+    "line": 1300,
+    "percent": 1.85,
+    "instruction": "1.85 :   29a2e9: vucomiss %xmm4,%xmm1"
+  },
+  {
+    "line": 1301,
+    "percent": 1.8,
+    "instruction": "1.80 :   29a2ed: ja     29a304 <<tantivy::query::boolean_query::boolean_weight::BooleanWeight<tantivy::query::score_combiner::SumCombiner> as tantivy::query::weight::Weight>::for_each_pruning+0x1944>"
+  },
+  {
+    "line": 1430,
+    "percent": 1.56,
+    "instruction": "1.56 :   29a568: cmp    $0x7fffffff,%r15d"
+  },
+  {
+    "line": 1435,
+    "percent": 1.31,
+    "instruction": "1.31 :   29a583: mov    0x488(%r13),%r12d"
+  },
+  {
+    "line": 1596,
+    "percent": 2.56,
+    "instruction": "2.56 :   29a8b0: inc    %rdx"
+  },
+  {
+    "line": 1605,
+    "percent": 1.03,
+    "instruction": "1.03 :   29a8d9: movl   $0x0,(%rbx,%rdx,4)"
+  },
+  {
+    "line": 1621,
+    "percent": 1.94,
+    "instruction": "1.94 :   29a91e: inc    %rdi"
+  },
+  {
+    "line": 1631,
+    "percent": 1.82,
+    "instruction": "1.82 :   29a945: jb     29a138 <<tantivy::query::boolean_query::boolean_weight::BooleanWeight<tantivy::query::score_combiner::SumCombiner> as tantivy::query::weight::Weight>::for_each_pruning+0x1778>"
+  },
+  {
+    "line": 1632,
+    "percent": 1.3,
+    "instruction": "1.30 :   29a94b: mov    0xd0(%rsp),%rax"
+  },
+  {
+    "line": 1796,
+    "percent": 1.1,
+    "instruction": "1.10 :   29ac6f: test   %r8,%r8"
+  },
+  {
+    "line": 1806,
+    "percent": 2.23,
+    "instruction": "2.23 :   29ac9c: movzbl (%r8),%eax"
+  },
+  {
+    "line": 1815,
+    "percent": 1.95,
+    "instruction": "1.95 :   29acce: vsubss %xmm0,%xmm1,%xmm0"
+  },
+  {
+    "line": 1826,
+    "percent": 1.86,
+    "instruction": "1.86 :   29ad03: vaddsd %xmm0,%xmm3,%xmm3"
+  },
+  {
+    "line": 1827,
+    "percent": 1.1,
+    "instruction": "1.10 :   29ad07: jmp    29ac20 <<tantivy::query::boolean_query::boolean_weight::BooleanWeight<tantivy::query::score_combiner::SumCombiner> as tantivy::query::weight::Weight>::for_each_pruning+0x2260>"
+  },
+  {
+    "line": 1908,
+    "percent": 2.46,
+    "instruction": "2.46 :   29ae77: vucomiss %xmm1,%xmm4"
+  },
+  {
+    "line": 1909,
+    "percent": 2.03,
+    "instruction": "2.03 :   29ae7b: jae    29b304 <<tantivy::query::boolean_query::boolean_weight::BooleanWeight<tantivy::query::score_combiner::SumCombiner> as tantivy::query::weight::Weight>::for_each_pruning+0x2944>"
+  },
+  {
+    "line": 1910,
+    "percent": 1.08,
+    "instruction": "1.08 :   29ae81: dec    %r15"
+  },
+  {
+    "line": 2139,
+    "percent": 1.06,
+    "instruction": "1.06 :   29b304: lea    0x0(,%rbp,8),%r14"
+  }
+]

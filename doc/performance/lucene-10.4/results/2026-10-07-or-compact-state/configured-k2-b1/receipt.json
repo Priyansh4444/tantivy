@@ -1,0 +1,20 @@
+{
+  "unchanged": true,
+  "pass": true,
+  "queries": 1227,
+  "failures": 0,
+  "seconds": 6.111884920999728,
+  "ready": {
+    "b_bits": "3f800000",
+    "collector": "top10-no-totals",
+    "doc_count": 917578,
+    "engine": "tantivy",
+    "k1_bits": "40000000",
+    "max_doc": 1000000,
+    "num_docs": 1000000,
+    "op": "ready",
+    "queries": 1227,
+    "query_cache": "disabled",
+    "sum_total_term_freq": 294827020
+  }
+}

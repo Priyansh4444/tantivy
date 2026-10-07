@@ -1,0 +1,12 @@
+{
+  "pass": true,
+  "baseline_fork_head": "6edfb101e7df20fb3258a283ac1070f1be709c51",
+  "baseline_core_commit": "412bdc245640b28f98d6e17ba91c96d2c1112b24",
+  "baseline_binary_sha256": "6df0b41330dfb2a0b65cff4734b2481101aa192c56e684cefd1e113eb9e181ec",
+  "baseline_trace_sha256": "2991260c72c549e0a001092b225a2931b2cad5bdac6b146726c2e9b2de4b5a70",
+  "checked_non_doc_files": 600,
+  "non_doc_differences": [],
+  "default_worker_source_unchanged": true,
+  "common_lock_unchanged": true,
+  "compiler": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1\n"
+}

@@ -1,0 +1,164 @@
+warning: this expression creates a reference which is immediately dereferenced by the compiler
+   --> sstable/src/streamer.rs:328:36
+    |
+328 |                 .will_always_match(&self.states.first().unwrap()),
+    |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: change this to: `self.states.first().unwrap()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_borrow
+    = note: `#[warn(clippy::needless_borrow)]` on by default
+
+warning: `tantivy-sstable` (lib) generated 1 warning (run `cargo clippy --fix --lib -p tantivy-sstable -- ` to apply 1 suggestion)
+    Checking tantivy v0.27.0 (/home/pronsh/Coding/playground/search/tantivy-or-refinement-oct07)
+warning: unused import: `doc`
+   --> src/postings/segment_postings.rs:498:17
+    |
+498 |     use crate::{doc, DocId, Index};
+    |                 ^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `phrase_count` is never used
+   --> src/query/phrase_query/phrase_scorer.rs:294:12
+    |
+153 | impl<TPostings: Postings> PhraseScorer<TPostings> {
+    | ------------------------------------------------- method in this implementation
+...
+294 |     pub fn phrase_count(&self) -> u32 {
+    |            ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: manually reimplementing `div_ceil`
+  --> src/postings/bitset_fill.rs:76:24
+   |
+76 |     let bytes_needed = ((bit_off + nbits + 7) / 8) as usize;
+   |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider using `.div_ceil()`: `(bit_off + nbits).div_ceil(8)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_div_ceil
+   = note: `#[warn(clippy::manual_div_ceil)]` on by default
+
+warning: unnecessary closure used to substitute value for `Option::None`
+   --> src/postings/segment_postings.rs:295:33
+    |
+295 | ...                   alternate_mask.get_or_insert_with(|| [TinySet::EMPTY; 64]);
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_lazy_evaluations
+    = note: `#[warn(clippy::unnecessary_lazy_evaluations)]` on by default
+help: use `get_or_insert` instead
+    |
+295 -                                 alternate_mask.get_or_insert_with(|| [TinySet::EMPTY; 64]);
+295 +                                 alternate_mask.get_or_insert([TinySet::EMPTY; 64]);
+    |
+
+warning: this block may be rewritten with the `?` operator
+   --> src/postings/segment_postings.rs:430:9
+    |
+430 | /         if self.position_reader.is_none() {
+431 | |             return None;
+432 | |         }
+    | |_________^ help: replace it with: `self.position_reader.as_ref()?;`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#question_mark
+    = note: `#[warn(clippy::question_mark)]` on by default
+
+warning: this function has too many arguments (8/7)
+   --> src/postings/serializer.rs:179:5
+    |
+179 | /     fn create_with_average(
+180 | |         index_record_option: IndexRecordOption,
+181 | |         total_num_tokens: u64,
+182 | |         term_dictionary_write: &'a mut CountingWriter<W>,
+...   |
+187 | |         selection: BlockMaxSelection,
+188 | |     ) -> io::Result<FieldSerializer<'a, W>> {
+    | |___________________________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+    = note: `#[warn(clippy::too_many_arguments)]` on by default
+
+warning: manual `RangeInclusive::contains` implementation
+  --> src/postings/skip.rs:50:9
+   |
+50 |         num_longs >= 1 && num_longs <= MAX_DENSE_LONGS,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use: `(1..=MAX_DENSE_LONGS).contains(&num_longs)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_range_contains
+   = note: `#[warn(clippy::manual_range_contains)]` on by default
+
+warning: this `if` statement can be collapsed
+  --> src/query/boolean_query/block_wand_union.rs:56:13
+   |
+56 | /             if score + optional.max_score() > threshold && optional.doc() <= doc {
+57 | |                 if optional.seek(doc) == doc {
+58 | |                     score += optional.score();
+59 | |                 }
+60 | |             }
+   | |_____________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+   = note: `#[warn(clippy::collapsible_if)]` on by default
+help: collapse nested if block
+   |
+56 ~             if score + optional.max_score() > threshold && optional.doc() <= doc
+57 ~                 && optional.seek(doc) == doc {
+58 |                     score += optional.score();
+59 ~                 }
+   |
+
+warning: this function has too many arguments (8/7)
+   --> src/query/phrase_query/phrase_scorer.rs:223:5
+    |
+223 | /     pub(crate) fn new_danger_with_repeat_groups(
+224 | |         mut term_postings_with_offset: Vec<(usize, TPostings)>,
+225 | |         similarity_weight_opt: Option<Bm25Weight>,
+226 | |         fieldnorm_reader: FieldNormReader,
+...   |
+231 | |         repeat_groups: Vec<Vec<usize>>,
+232 | |     ) -> (SeekDangerResult, PhraseScorer<TPostings>) {
+    | |____________________________________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+
+warning: this lint expectation is unfulfilled
+  --> src/query/phrase_prefix_query/phrase_prefix_scorer.rs:11:10
+   |
+11 | #[expect(clippy::large_enum_variant)]
+   |          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unfulfilled_lint_expectations)]` on by default
+
+warning: `tantivy` (lib) generated 9 warnings (run `cargo clippy --fix --lib -p tantivy -- ` to apply 5 suggestions)
+warning: unnecessary use of `clone` to create a slice from a reference
+   --> src/index/field_statistics.rs:338:55
+    |
+338 |         let native = Bm25Weight::for_terms(&searcher, &[term.clone()])?;
+    |                                                       ^^^^^^^^^^^^^^^ help: try: `std::slice::from_ref(&term)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#cloned_ref_to_slice_refs
+    = note: `#[warn(clippy::cloned_ref_to_slice_refs)]` on by default
+
+warning: unnecessary use of `clone` to create a slice from a reference
+   --> src/query/bm25.rs:930:55
+    |
+930 |         let weight = Bm25Weight::for_terms(&searcher, &[sparse_term.clone()])?;
+    |                                                       ^^^^^^^^^^^^^^^^^^^^^^ help: try: `std::slice::from_ref(&sparse_term)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#cloned_ref_to_slice_refs
+
+warning: float has excessive precision
+   --> src/query/phrase_query/mod.rs:233:42
+    |
+233 |         assert_nearly_equals!(scores[0], 0.06577900);
+    |                                          ^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#excessive_precision
+    = note: `#[warn(clippy::excessive_precision)]` on by default
+help: consider changing the type or truncating it to
+    |
+233 -         assert_nearly_equals!(scores[0], 0.06577900);
+233 +         assert_nearly_equals!(scores[0], 0.065_779);
+    |
+
+warning: `tantivy` (lib test) generated 12 warnings (8 duplicates) (run `cargo clippy --fix --lib -p tantivy --tests -- ` to apply 4 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.43s

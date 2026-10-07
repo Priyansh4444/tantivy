@@ -1,0 +1,9 @@
+[
+  "rustfmt",
+  "--edition",
+  "2021",
+  "--check",
+  "--config",
+  "skip_children=true",
+  "../../../tantivy-or-refinement-oct07/src/query/boolean_query/or_maxscore.rs"
+]

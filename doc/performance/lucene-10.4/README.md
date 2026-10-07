@@ -1,5 +1,11 @@
 # Wikipedia 1M comparison with Lucene 10.4
 
+The [October 7 compact clause metadata refinement](results/2026-10-07-or-compact-state/README.md)
+reduces mean top-10 latency by a further 5.2–5.3% across the same 103 longer OR
+queries. Exact scores and index files remain unchanged; one per-query regression
+is retained. The packet includes a fresh port comparison, memory tradeoffs, an
+independent archive audit and a [search architecture diagram](results/2026-10-07-or-compact-state/architecture.md).
+
 The [October 7 OR improvement](results/2026-10-07-or-maxscore/README.md)
 roughly halves mean top-10 latency across 103 longer OR queries, with exact
 score bits and index contents unchanged. It includes direct baseline/control

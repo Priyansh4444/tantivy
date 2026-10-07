@@ -1,0 +1,29 @@
+{
+  "command": [
+    "cargo",
+    "clippy",
+    "--locked",
+    "--manifest-path",
+    "../../../tantivy-or-refinement-oct07/Cargo.toml",
+    "--target-dir",
+    "/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/test-target",
+    "--lib",
+    "--tests"
+  ],
+  "returncode": 0,
+  "wall_seconds": 6.819611911996617,
+  "source_unchanged": true,
+  "compiler": "1.99.0",
+  "rustflags": "-C target-cpu=native",
+  "jobs": 2,
+  "profile": {
+    "opt_level": 0,
+    "lto": false,
+    "overflow_checks": true,
+    "debug_assertions": true,
+    "profile": "test/check; Cargo defaults"
+  },
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "63f29ea894fc67775b47b1932f79ecb531dc09999c1c17a7565a1a2bfd97b790",
+  "audited_index_unchanged": true
+}

@@ -1,0 +1,371 @@
+{
+  "seconds": 10.867757053001696,
+  "unchanged": true,
+  "summary": [
+    {
+      "set": "all",
+      "queries": 373,
+      "AB": {
+        "candidate_mean_ns": 342286.8404825737,
+        "baseline_mean_ns": 354555.2587131367,
+        "ratio_mean": 0.965397725942378,
+        "median_ratio": 0.9903571603387231
+      },
+      "BA": {
+        "candidate_mean_ns": 343109.00804289547,
+        "baseline_mean_ns": 354390.0335120644,
+        "ratio_mean": 0.9681677688354493,
+        "median_ratio": 0.9864804911326177
+      }
+    },
+    {
+      "set": "or3plus",
+      "queries": 103,
+      "AB": {
+        "candidate_mean_ns": 693161.0922330098,
+        "baseline_mean_ns": 732926.3058252428,
+        "ratio_mean": 0.9457445949528867,
+        "median_ratio": 0.9761427033194914
+      },
+      "BA": {
+        "candidate_mean_ns": 695118.9174757282,
+        "baseline_mean_ns": 732033.5291262136,
+        "ratio_mean": 0.9495725124851203,
+        "median_ratio": 0.9816933433527927
+      }
+    },
+    {
+      "set": "or2",
+      "queries": 202,
+      "AB": {
+        "candidate_mean_ns": 199761.36633663366,
+        "baseline_mean_ns": 201126.47772277228,
+        "ratio_mean": 0.9932126719385985,
+        "median_ratio": 0.9939742175476056
+      },
+      "BA": {
+        "candidate_mean_ns": 200517.5198019802,
+        "baseline_mean_ns": 201557.1014851485,
+        "ratio_mean": 0.9948422473060573,
+        "median_ratio": 0.9930743163228536
+      }
+    }
+  ],
+  "worst_regressions": [
+    {
+      "id": 1037,
+      "kind": "PHRASE",
+      "terms": [
+        "elise",
+        "neal"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.2025964527335893,
+      "BA": 1.1771626726113071
+    },
+    {
+      "id": 593,
+      "kind": "OR",
+      "terms": [
+        "little",
+        "brown",
+        "jug"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.037303995953465,
+      "BA": 1.1464138862054445
+    },
+    {
+      "id": 499,
+      "kind": "OR",
+      "terms": [
+        "world",
+        "bank",
+        "president"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0617355551758358,
+      "BA": 1.0297038689871272
+    },
+    {
+      "id": 391,
+      "kind": "OR",
+      "terms": [
+        "people",
+        "having",
+        "sex"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.025485090298194,
+      "BA": 1.0586123038707222
+    },
+    {
+      "id": 15,
+      "kind": "OR",
+      "terms": [
+        "the",
+        "american"
+      ],
+      "tags": [
+        "wiki20",
+        "union",
+        "orHighMed",
+        "luceneutil:OrHighMed"
+      ],
+      "AB": 1.0248718887649464,
+      "BA": 1.022096869381425
+    },
+    {
+      "id": 952,
+      "kind": "PHRASE",
+      "terms": [
+        "interest",
+        "only"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0235051718780412,
+      "BA": 1.0217062386553282
+    },
+    {
+      "id": 441,
+      "kind": "OR",
+      "terms": [
+        "connecticut",
+        "post"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0207197277333024,
+      "BA": 1.0330446823566546
+    },
+    {
+      "id": 741,
+      "kind": "OR",
+      "terms": [
+        "premier",
+        "wine"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0360925155298233,
+      "BA": 1.017439915906159
+    },
+    {
+      "id": 887,
+      "kind": "OR",
+      "terms": [
+        "animal",
+        "rights"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.013690074847322,
+      "BA": 1.0241141331185486
+    },
+    {
+      "id": 445,
+      "kind": "OR",
+      "terms": [
+        "chicago",
+        "bulls"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0153813262385234,
+      "BA": 1.0132991011117674
+    },
+    {
+      "id": 631,
+      "kind": "OR",
+      "terms": [
+        "worcester",
+        "state",
+        "college"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0232730554749703,
+      "BA": 1.0115366910585881
+    },
+    {
+      "id": 693,
+      "kind": "OR",
+      "terms": [
+        "justin",
+        "timberlake"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0110320418690464,
+      "BA": 1.0593146037433767
+    },
+    {
+      "id": 851,
+      "kind": "OR",
+      "terms": [
+        "danube",
+        "river"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.010613128798069,
+      "BA": 1.1073179363811583
+    },
+    {
+      "id": 915,
+      "kind": "OR",
+      "terms": [
+        "google",
+        "satellite"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.010497168847042,
+      "BA": 1.0253141445601976
+    },
+    {
+      "id": 327,
+      "kind": "OR",
+      "terms": [
+        "digital",
+        "scanning"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0584644425010175,
+      "BA": 1.0096525428095426
+    },
+    {
+      "id": 483,
+      "kind": "OR",
+      "terms": [
+        "international",
+        "baseball"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.00950976346868,
+      "BA": 1.0165606743697688
+    },
+    {
+      "id": 323,
+      "kind": "OR",
+      "terms": [
+        "bowel",
+        "obstruction"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0074143905421933,
+      "BA": 1.092732009273201
+    },
+    {
+      "id": 367,
+      "kind": "OR",
+      "terms": [
+        "glass",
+        "works"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0072409430707303,
+      "BA": 1.0093469748642163
+    },
+    {
+      "id": 523,
+      "kind": "OR",
+      "terms": [
+        "anderson",
+        "hospital"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.0061355726869785,
+      "BA": 1.030685786629668
+    },
+    {
+      "id": 845,
+      "kind": "OR",
+      "terms": [
+        "perfume",
+        "bottles"
+      ],
+      "tags": [
+        "port-style"
+      ],
+      "AB": 1.006977804270837,
+      "BA": 1.0059022365448271
+    }
+  ],
+  "loads": [
+    {
+      "at": 1791387605.3042557,
+      "loadavg": [
+        4.3876953125,
+        3.82763671875,
+        3.03369140625
+      ],
+      "processes": [
+        "    PID COMMAND         %CPU",
+        " 451154 python          93.3",
+        " 446951 helium          28.7",
+        "   2784 helium          27.2",
+        " 445692 helium          23.4",
+        " 177880 helium           9.8",
+        "   2661 helium           9.6",
+        " 195784 vesktop          9.0",
+        " 195907 vesktop          8.9",
+        "   1472 Hyprland         7.3",
+        " 207394 t3code           6.1",
+        "  94572 helium           5.5",
+        " 207404 t3code           4.4"
+      ]
+    },
+    {
+      "at": 1791387613.7360961,
+      "loadavg": [
+        4.18017578125,
+        3.80029296875,
+        3.033203125
+      ],
+      "processes": [
+        "    PID COMMAND         %CPU",
+        "   2784 helium          27.2",
+        " 445692 helium          25.8",
+        " 446951 helium          23.6",
+        " 451154 python          17.9",
+        " 177880 helium           9.8",
+        "   2661 helium           9.6",
+        " 195784 vesktop          9.0",
+        " 195907 vesktop          8.9",
+        "   1472 Hyprland         7.3",
+        " 207394 t3code           6.1",
+        "  94572 helium           5.5",
+        " 207404 t3code           4.4"
+      ]
+    }
+  ]
+}

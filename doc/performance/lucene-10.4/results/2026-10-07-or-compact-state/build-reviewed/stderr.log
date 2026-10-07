@@ -1,0 +1,15 @@
+   Compiling tantivy v0.27.0 (/home/pronsh/Coding/playground/search/tantivy-or-refinement-oct07)
+warning: method `phrase_count` is never used
+   --> /home/pronsh/Coding/playground/search/tantivy-or-refinement-oct07/src/query/phrase_query/phrase_scorer.rs:294:12
+    |
+153 | impl<TPostings: Postings> PhraseScorer<TPostings> {
+    | ------------------------------------------------- method in this implementation
+...
+294 |     pub fn phrase_count(&self) -> u32 {
+    |            ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+   Compiling balanced-search v0.0.0 (/home/pronsh/Coding/playground/search/bench/lucene-rs-or-refinement-oct07/harness)
+warning: `tantivy` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 1m 38s

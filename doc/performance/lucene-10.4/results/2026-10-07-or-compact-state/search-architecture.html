@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tantivy search architecture</title>
+<style>
+body{margin:0;color:var(--foreground);font-family:var(--font-sans);background:transparent}#search-architecture{width:100%}.tabs{display:flex;gap:18px;align-items:center;margin:0 0 12px;flex-wrap:wrap}.tabs button{font:inherit;color:var(--muted-foreground);border:0;border-bottom:2px solid transparent;background:transparent;padding:8px 0}.tabs button[aria-selected="true"]{color:var(--foreground);border-bottom-color:var(--foreground)}.caption{font-size:13px;line-height:1.5;margin:10px 0 0;color:var(--muted-foreground)}.flow{display:block;width:100%;overflow:visible}.flow text{fill:var(--foreground);font-size:13px}.flow .name{font-weight:500}.flow .sub{font-size:12px;fill:var(--muted-foreground)}.flow .node{fill:var(--background);stroke:var(--border);stroke-width:1}.flow .learned{fill:color-mix(in srgb,var(--chart-1) 10%,var(--background));stroke:var(--border)}.flow .edge{stroke:var(--muted-foreground);stroke-width:1.15;fill:none}.flow .feedback{stroke:var(--chart-1);stroke-width:1.4;fill:none}.legend{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted-foreground);margin:6px 0 12px}.legend span{display:inline-block;width:11px;height:11px;border:1px solid var(--chart-1);background:color-mix(in srgb,var(--chart-1) 10%,var(--background))}#diagram-detail{font-size:13px;line-height:1.5;min-height:40px;margin:12px 0 0}.node-button{display:flex;flex-direction:column;justify-content:center;gap:6px;box-sizing:border-box;width:100%;height:68px;padding:10px 12px;border:0;background:transparent;color:var(--foreground);font:inherit;font-size:13px;text-align:left}.node-button .sub{color:var(--muted-foreground);font-size:12px}.node-button .name{font-weight:500} @media(max-width:460px){.tabs{gap:16px}.caption{font-size:12px}} @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style></head><body>
+<div id="search-architecture">
+<nav class="tabs" role="tablist" aria-label="Architecture view"><button type="button" id="overview-tab" role="tab" aria-controls="architecture-panel" aria-selected="true">Ranked search flow</button><button type="button" id="or-tab" role="tab" aria-controls="architecture-panel" aria-selected="false">Inside an OR query</button></nav>
+<div class="legend"><span aria-hidden="true"></span>Execution ideas learned from lucene-rs</div>
+<div id="architecture-panel" role="tabpanel" aria-labelledby="overview-tab"><svg class="flow" role="group" aria-labelledby="diagram-title diagram-description"></svg></div>
+<p id="diagram-detail" aria-live="polite">The reader maps an existing index. Search follows posting lists; it does not scan every stored document.</p>
+</div>
+<script>
+(()=>{
+ const root=document.getElementById('search-architecture'),svg=root.querySelector('svg'),detail=root.querySelector('#diagram-detail'),panel=root.querySelector('#architecture-panel');let view='overview';
+ const NS='http://www.w3.org/2000/svg';
+ const create=(tag,attrs,text)=>{const el=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs||{}))el.setAttribute(k,v);if(text!==undefined)el.textContent=text;return el};
+ const overview=[
+  {id:'documents',col:0,row:0,name:'Documents → tokenizer',sub:'Schema and analyzer',detail:'The analyzer turns document text into terms and positions. The schema chooses stored fields, indexing options and fast fields.'},
+  {id:'segments',col:0,row:1,name:'Immutable segment files',sub:'Postings · positions · norms',detail:'The index stores term-to-document posting lists, frequencies, positions, encoded field lengths, stored documents and fast fields. This optimization adds no new disk format.'},
+  {id:'reader',col:0,row:2,name:'IndexReader',sub:'Mapped pages and segment readers',detail:'IndexReader opens existing segments and produces a consistent Searcher snapshot. The operating system brings mapped pages into memory as they are accessed.'},
+  {id:'cursors',col:0,row:3,name:'Term posting cursors',sub:'Document IDs, frequency and norm',detail:'Each term cursor walks its posting list. BM25 reads term frequency and encoded document length. Position streams are needed by phrase execution.'},
+  {id:'query',col:1,row:0,name:'Query text or direct AST',sub:'Terms · Boolean · phrases',detail:'QueryParser can construct the AST from text, or a caller can build it directly. The benchmark uses prebuilt ASTs.'},
+  {id:'snapshot',col:1,row:1,name:'Bind query + snapshot',sub:'Statistics and BM25 parameters',detail:'The snapshot fixes the visible segments and collection statistics. Per-field BM25 parameters determine how frequencies and norms become scores.'},
+  {id:'weight',col:1,row:2,name:'Build query weights',sub:'Dispatch independently per segment',detail:'Weights bind query logic and statistics. Each segment gets suitable scorers and a collector, and segment tasks may execute independently.'},
+  {id:'execution',col:1,row:3,name:'Choose query execution',sub:'OR MaxScore · other existing paths',learned:true,detail:'Safe 3–32-term OR sums use our MaxScore path. Two-term OR and other query shapes keep their separate specialized or general routes. COUNT disables scoring and returns an exact count through its own collector.'},
+  {id:'topk',col:1,row:4,name:'Per-segment Top-K',sub:'Deletion filter and score threshold',detail:'The collector rejects deleted physical documents and keeps the best K live hits. Its Kth score feeds a competitive threshold back to the pruning scorer.'},
+  {id:'merge',col:1,row:5,name:'Merge ranked hits',sub:'Score, then document-address ties',detail:'The collector merges per-segment results. Equal scores use stable document-address ordering. An exact count operation instead merges segment counts.'},
+  {id:'fetch',col:1,row:6,name:'Optional document retrieval',sub:'Fetch stored fields after ranking',detail:'Ranking returns document addresses and scores. Stored document contents are fetched separately when the caller asks for them.'}
+ ];
+ const orNodes=[
+  {id:'admission',col:0,row:0,name:'OR admission',sub:'3–32 terms · safe f64 sum',detail:'Only the eligible specialized term-union route enters this engine. Unsafe numeric domains use exhaustive canonical summation before any cursor mutation.'},
+  {id:'states',col:0,row:1,name:'Compact clause state',sub:'Ordinal · doc · cost · bounds',learned:true,detail:'Hot metadata is kept together for candidate and region tests. Original scoring cursors remain in incoming order. Actual seek and advance update the mirrored document; shallow block selection does not replace it.'},
+  {id:'bounds',col:0,row:2,name:'Certify a document region',sub:'Local bounds + selected global bounds',learned:true,detail:'Local score bounds apply only through their block ends. A globally optional dense prefix can span farther when the remaining essential drivers are sparse. Conservative bounds, not estimated averages, prove a skip safe.'},
+  {id:'candidates',col:0,row:3,name:'Essential clauses drive',sub:'Enumerate possible winners',learned:true,detail:'A document matching only the optional prefix cannot exceed the threshold. Candidate IDs therefore come from the essential suffix; optional-only IDs can be skipped.'},
+  {id:'optional',col:0,row:4,name:'Probe optional clauses',sub:'Seek and score only if still useful',learned:true,detail:'Before seeking another optional clause, an inclusive bound tests whether its remaining contribution can still make the candidate competitive. Real seeks reconcile stale decoded positions.'},
+  {id:'exact',col:0,row:5,name:'Publish the exact score',sub:'Original f32 leaves → f64 → f32',detail:'Scoring leaves are replayed in original clause order, summed in f64, then rounded once to f32. The pruning order never becomes the published addition order.'},
+  {id:'heap',col:0,row:6,name:'Top-K collector',sub:'Keep live winners; raise threshold',detail:'Callbacks arrive in ascending physical document order. The collector filters deletions, updates its heap and returns the current threshold. Strict score comparison preserves tie behavior.'}
+ ];
+ function draw(){
+  const width=Math.max(300,root.clientWidth),narrow=width<600,nodes=view==='overview'?overview:orNodes;svg.replaceChildren();
+  svg.append(create('title',{id:'diagram-title'},view==='overview'?'Tantivy text search: index, query, scoring and retrieval':'Tantivy MaxScore OR execution'));
+  svg.append(create('desc',{id:'diagram-description'},'Document indexing creates immutable segments. Mapped readers support query execution. OR pruning uses conservative bounds, compact metadata, and original-order exact score accumulation. Top-K thresholds feed back to pruning.'));
+  const boxHeight=68,gap=view==='overview'&&!narrow?100:96,boxWidth=view==='overview'&&!narrow?(width-64)/2:width-54;
+  const positions={};
+  for(const[n,node]of nodes.entries()){
+   let x,y;
+   if(view==='overview'&&!narrow){x=node.col===0?0:width-boxWidth;y=node.row*gap;}
+   else{x=view==='or'?0:27;y=n*gap;}
+   positions[node.id]={x,y,w:boxWidth,h:boxHeight};
+  }
+  const height=Math.max(...Object.values(positions).map(p=>p.y+p.h))+10;svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.style.height=height+'px';
+  const defs=create('defs');for(const id of ['normal-arrow','feedback-arrow']){const m=create('marker',{id,viewBox:'0 0 10 10',refX:'9',refY:'5',markerWidth:'7',markerHeight:'7',orient:'auto-start-reverse'});m.append(create('path',{d:'M 0 1 L 9 5 L 0 9 z',fill:id==='normal-arrow'?'var(--muted-foreground)':'var(--chart-1)'}));defs.append(m);}svg.append(defs);
+  function connect(a,b,feedback=false){const p=positions[a],q=positions[b];let d;
+   if(feedback){const x=width-15;d=`M ${p.x+p.w} ${p.y+p.h/2} H ${x} V ${q.y+q.h/2} H ${q.x+q.w}`;}
+   else if(p.x===q.x && q.y===p.y+gap){d=`M ${p.x+p.w/2} ${p.y+p.h} V ${q.y}`;}
+   else if(narrow){const x=12;d=`M ${p.x} ${p.y+p.h/2} H ${x} V ${q.y+q.h/2} H ${q.x}`;}
+   else if(!narrow){const mid=(p.x+p.w+q.x)/2;d=`M ${p.x+p.w} ${p.y+p.h/2} H ${mid} V ${q.y+q.h/2} H ${q.x}`;}
+   else{const x=12;d=`M ${p.x} ${p.y+p.h/2} H ${x} V ${q.y+q.h/2} H ${q.x}`;}
+   svg.append(create('path',{d,class:feedback?'feedback':'edge','marker-end':`url(#${feedback?'feedback-arrow':'normal-arrow'})`}));
+  }
+  if(view==='overview'){
+   for(const pair of [['documents','segments'],['segments','reader'],['reader','cursors'],['query','snapshot'],['snapshot','weight'],['weight','execution'],['execution','topk'],['topk','merge'],['merge','fetch'],['cursors','execution'],['reader','snapshot']])connect(...pair);
+  }else{for(let i=0;i<nodes.length-1;i++)connect(nodes[i].id,nodes[i+1].id);connect('heap','candidates',true);svg.append(create('text',{x:width-26,y:positions.optional.y+34,transform:`rotate(-90 ${width-26} ${positions.optional.y+34})`,class:'sub','text-anchor':'middle'},'higher threshold → more pruning'));}
+  for(const node of nodes){const p=positions[node.id],g=create('g',{class:'node-control'});g.append(create('rect',{x:p.x,y:p.y,width:p.w,height:p.h,rx:3,class:node.learned?'node learned':'node'}));const foreign=create('foreignObject',{x:p.x,y:p.y,width:p.w,height:p.h});const button=document.createElement('button');button.type='button';button.className='node-button';button.setAttribute('aria-label',node.name+'. '+node.sub);for(const [cls,txt] of [['name',node.name],['sub',node.sub]]){const span=document.createElement('span');span.className=cls;span.textContent=txt;button.append(span);}button.addEventListener('click',()=>{detail.textContent=node.detail;});foreign.append(button);g.append(foreign);svg.append(g);}
+ }
+ for(const button of root.querySelectorAll('[role="tab"]'))button.addEventListener('click',()=>{view=button.id==='or-tab'?'or':'overview';for(const other of root.querySelectorAll('[role="tab"]'))other.setAttribute('aria-selected',String(other===button));panel.setAttribute('aria-labelledby',button.id);detail.textContent=view==='or'?'Pruning decides which candidates need work. The final score still follows the original clause order.':'The reader maps an existing index. Search follows posting lists; it does not scan every stored document.';draw();});
+ new ResizeObserver(draw).observe(root);draw();
+ console.log('Architecture nodes:',overview.length,orNodes.length,'views; local-only interaction');
+})();
+</script></body></html>
