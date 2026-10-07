@@ -3,6 +3,7 @@ mod block_wand_union;
 mod boolean_query;
 mod boolean_weight;
 mod occur_weights;
+mod or_maxscore;
 
 pub(crate) use self::block_wand_intersection::{
     block_wand_intersection, sparse_dense_intersection,
@@ -12,6 +13,7 @@ pub(crate) use self::block_wand_union::{
 };
 pub use self::boolean_query::BooleanQuery;
 pub use self::boolean_weight::BooleanWeight;
+pub(crate) use self::or_maxscore::or_maxscore;
 
 #[cfg(test)]
 mod tests {

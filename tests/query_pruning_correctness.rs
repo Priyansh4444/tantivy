@@ -7,8 +7,8 @@ use std::collections::BTreeSet;
 use tantivy::collector::{Count, TopDocs};
 use tantivy::merge_policy::NoMergePolicy;
 use tantivy::query::{
-    BooleanQuery, BoostQuery, EnableScoring, Occur, PhrasePrefixQuery, PhraseQuery, Query,
-    TermQuery,
+    Bm25Parameters, BooleanQuery, BoostQuery, EnableScoring, Occur, PhrasePrefixQuery, PhraseQuery,
+    Query, TermQuery,
 };
 use tantivy::schema::{
     Field, IndexRecordOption, Schema, TextFieldIndexing, TextOptions, Value, INDEXED, STORED,
@@ -98,6 +98,9 @@ fn cases(field: Field) -> Vec<Case> {
         vec!["common", "rare"],
         vec!["alpha", "beta"],
         vec!["alpha", "absent"],
+        vec!["common", "alpha", "rare"],
+        vec!["alpha", "beta", "gamma"],
+        vec!["alpha", "alpha", "absent", "rare"],
     ] {
         for occur in [Occur::Should, Occur::Must] {
             cases.push(Case {
@@ -179,6 +182,21 @@ fn cases(field: Field) -> Vec<Case> {
                 });
             }
         }
+    }
+    for boosts in [
+        [0.0, 0.0, 0.0],
+        [1.0, 0.0, 2.5],
+        [2.5, 0.5, 0.25],
+        [-1.0, -0.5, -0.25],
+        [1.0, -2.0, 0.5],
+        [1.0e16, 1.0, 1.0e-16],
+    ] {
+        let terms = ["common", "alpha", "rare"];
+        cases.push(Case {
+            name: format!("three-term OR clause boosts {boosts:?}"),
+            query: boolean_query(field, &terms, Occur::Should, Some(&boosts)),
+            matches: Matches::Any(terms.to_vec()),
+        });
     }
     cases
 }
@@ -339,9 +357,10 @@ fn validate_case(
                 "top-{k} doc: {context} {} (score={score}, expected={expected_score})",
                 case.name
             );
-            assert!(
-                (score - expected_score).abs() <= 1e-6 * expected_score.abs().max(1.0),
-                "top-{k} score: {context} {}: {score} != {expected_score}",
+            assert_eq!(
+                score.to_bits(),
+                expected_score.to_bits(),
+                "top-{k} raw score bits: {context} {}: {score} != {expected_score}",
                 case.name
             );
         }
@@ -398,3 +417,46 @@ configuration_test!(one_segment_without_fieldnorms, 1, false, false);
 configuration_test!(one_segment_deleted_without_fieldnorms, 1, false, true);
 configuration_test!(three_segments_without_fieldnorms, 3, false, false);
 configuration_test!(three_segments_deleted_without_fieldnorms, 3, false, true);
+
+#[test]
+fn configured_three_term_or_keeps_exact_bits_with_deletes() -> tantivy::Result<()> {
+    let fixture = fixture(3, true)?;
+    let mut writer = fixture
+        .index
+        .writer_with_num_threads::<TantivyDocument>(1, 15_000_000)?;
+    writer.set_merge_policy(Box::new(NoMergePolicy));
+    let mut deleted = BTreeSet::new();
+    for segment in 0..3 {
+        for local in [0, 127, 128, 255, 319] {
+            let id = (segment * DOCS_PER_SEGMENT + local) as u64;
+            writer.delete_term(Term::from_field_u64(fixture.id, id));
+            deleted.insert(id);
+        }
+    }
+    writer.commit()?;
+    let reader = fixture.index.reader()?;
+    for (k1, b) in [(0.9, 0.4), (2.0, 1.0)] {
+        let searcher = reader
+            .searcher()
+            .with_bm25_parameters(Bm25Parameters::new(k1, b)?);
+        for terms in [
+            vec!["common", "alpha", "rare"],
+            vec!["alpha", "beta", "gamma", "absent"],
+            vec!["alpha", "alpha", "rare"],
+        ] {
+            let case = Case {
+                name: format!("configured OR {terms:?}"),
+                query: boolean_query(fixture.text, &terms, Occur::Should, None),
+                matches: Matches::Any(terms),
+            };
+            validate_case(
+                &fixture,
+                &searcher,
+                &deleted,
+                &case,
+                &format!("k1={k1} b={b}"),
+            )?;
+        }
+    }
+    Ok(())
+}
