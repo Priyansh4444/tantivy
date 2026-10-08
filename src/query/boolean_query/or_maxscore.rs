@@ -55,9 +55,14 @@ impl ClauseState {
 type RegionChoice = (DocId, usize, usize, u64);
 
 #[cfg(test)]
+type GlobalPrefixState = (DocId, u32, usize, u64, usize);
+
+#[cfg(test)]
 thread_local! {
     // Test-only region evidence; no observer or counter exists in release.
     static GLOBAL_CHOICES: std::cell::RefCell<Option<Vec<RegionChoice>>> =
+        const { std::cell::RefCell::new(None) };
+    static GLOBAL_PREFIX_STATES: std::cell::RefCell<Option<Vec<GlobalPrefixState>>> =
         const { std::cell::RefCell::new(None) };
     static BATCH_LENGTHS: std::cell::RefCell<Option<Vec<usize>>> =
         const { std::cell::RefCell::new(None) };
@@ -123,25 +128,67 @@ pub(crate) fn or_maxscore(
         .min()
         .unwrap_or(TERMINATED);
 
+    // Global maxima and preference order are immutable, and callback thresholds
+    // only rise. Retain the exact sequential sum of the certified rank prefix;
+    // the density policy below still chooses its effective count per region.
+    let mut certified_global = 0;
+    let mut certified_global_sum = 0.0f64;
+    #[cfg(test)]
+    let mut global_appends = 0;
+
     while lo < max_doc {
         debug_assert!(clauses
             .iter()
             .all(|clause| clause.doc == scorers[clause.ordinal].doc()));
-        let mut globally_optional = 0;
-        let mut global_sum = 0.0f64;
-        for clause in &clauses {
-            let next_sum = global_sum + f64::from(clause.global_max);
+        while certified_global < num_terms {
+            let next_sum = certified_global_sum + f64::from(clauses[certified_global].global_max);
             if upper_bound.score(next_sum) > threshold {
                 break;
             }
-            global_sum = next_sum;
-            globally_optional += 1;
-        }
-        if globally_optional == num_terms {
-            return;
+            certified_global_sum = next_sum;
+            certified_global += 1;
+            #[cfg(test)]
+            {
+                global_appends += 1;
+            }
         }
         #[cfg(test)]
-        let certified = globally_optional;
+        {
+            // Independent old from-zero computation also uses the generic
+            // bound helper, rather than relying on the cached sum or count.
+            let naive_bound = crate::query::score_combiner::ScoreSumUpperBound::new(num_terms);
+            let mut naive_count = 0;
+            let mut naive_sum = 0.0f64;
+            for clause in &clauses {
+                let next_sum = naive_sum + f64::from(clause.global_max);
+                if naive_bound.score(next_sum) > threshold {
+                    break;
+                }
+                naive_sum = next_sum;
+                naive_count += 1;
+            }
+            assert_eq!(certified_global, naive_count);
+            assert_eq!(certified_global_sum.to_bits(), naive_sum.to_bits());
+            assert_eq!(global_appends, certified_global);
+            assert!(global_appends <= num_terms);
+            GLOBAL_PREFIX_STATES.with(|states| {
+                if let Some(states) = states.borrow_mut().as_mut() {
+                    states.push((
+                        lo,
+                        threshold.to_bits(),
+                        certified_global,
+                        certified_global_sum.to_bits(),
+                        global_appends,
+                    ));
+                }
+            });
+        }
+        if certified_global == num_terms {
+            return;
+        }
+        let mut globally_optional = certified_global;
+        #[cfg(test)]
+        let certified = certified_global;
         #[cfg(test)]
         let mut observed_remaining_cost = 0;
         if globally_optional > 0 {
@@ -401,6 +448,171 @@ mod tests {
         });
         assert_eq!(actual, expected, "threshold={threshold:?} limit={limit}");
         actual
+    }
+
+    fn check_scheduled_thresholds(
+        scorers: Vec<TermScorer>,
+        max_doc: DocId,
+        initial: Score,
+        schedule: &[(DocId, Score)],
+    ) -> (Vec<(DocId, u32)>, Vec<GlobalPrefixState>, Vec<RegionChoice>) {
+        assert!(schedule.windows(2).all(|pair| pair[0].1 <= pair[1].1));
+        let run = |optimized: bool| {
+            let mut accepted = Vec::new();
+            let mut current = initial;
+            let mut callback = |doc, score: Score| {
+                accepted.push((doc, score.to_bits()));
+                for &(from, planned) in schedule {
+                    if from <= doc {
+                        current = current.max(planned);
+                    }
+                }
+                current
+            };
+            if optimized {
+                or_maxscore(scorers.clone(), max_doc, initial, &mut callback);
+            } else {
+                let mut union =
+                    BufferedUnionScorer::build(scorers.clone(), SumCombiner::default, max_doc);
+                for_each_pruning_scorer(&mut union, initial, &mut callback);
+            }
+            assert!(accepted.windows(2).all(|pair| pair[0].0 < pair[1].0));
+            accepted
+        };
+        let expected = run(false);
+        GLOBAL_PREFIX_STATES.with(|states| *states.borrow_mut() = Some(Vec::new()));
+        GLOBAL_CHOICES.with(|choices| *choices.borrow_mut() = Some(Vec::new()));
+        let actual = run(true);
+        let states = GLOBAL_PREFIX_STATES.with(|states| states.borrow_mut().take().unwrap());
+        let choices = GLOBAL_CHOICES.with(|choices| choices.borrow_mut().take().unwrap());
+        assert_eq!(actual, expected);
+        assert!(states.windows(2).all(|pair| pair[0].2 <= pair[1].2));
+        assert!(states.iter().all(|state| state.4 <= scorers.len()));
+        (actual, states, choices)
+    }
+
+    #[test]
+    fn cached_global_prefix_preserves_equality_neighbors_and_large_threshold_jumps() {
+        let norms = vec![1; 2048];
+        let postings: Vec<_> = (0..2048).map(|doc| (doc, 1)).collect();
+        for native in [false, true] {
+            for num_terms in [4, 32] {
+                let boosts = [0.001, 0.002, 0.003, 1.0];
+                let mut scorers: Vec<_> = boosts
+                    .iter()
+                    .map(|&boost| {
+                        let weight = if native {
+                            Bm25Weight::for_native_block_bounds(1.0).boost_by(boost)
+                        } else {
+                            Bm25Weight::new_without_explain(1.0, 1.0).boost_by(boost)
+                        };
+                        assert!(weight.has_safe_score_bounds());
+                        TermScorer::create_for_test(&postings, &norms, weight)
+                    })
+                    .collect();
+                for _ in 4..num_terms {
+                    let weight = if native {
+                        Bm25Weight::for_native_block_bounds(1.0).boost_by(0.125)
+                    } else {
+                        Bm25Weight::new_without_explain(1.0, 1.0).boost_by(0.125)
+                    };
+                    scorers.push(TermScorer::create_for_test(&postings, &norms, weight));
+                }
+                let generic = crate::query::score_combiner::ScoreSumUpperBound::new(num_terms);
+                let mut sum = 0.0f64;
+                let bounds: Vec<_> = scorers[..3]
+                    .iter()
+                    .map(|scorer| {
+                        sum += f64::from(scorer.max_score());
+                        generic.score(sum)
+                    })
+                    .collect();
+                let schedule = [
+                    (0, bounds[0].next_down()),
+                    (128, bounds[0]),
+                    (256, bounds[0].next_up()),
+                    (384, bounds[1].next_down()),
+                    (512, bounds[1]),
+                    (640, bounds[1].next_up()),
+                    (768, bounds[2].next_down()),
+                    (896, bounds[2]),
+                    (1024, bounds[2].next_up()),
+                    (1408, 0.25),
+                    (1800, Score::INFINITY),
+                ];
+                for initial in [-Score::INFINITY, -1.0, -0.0, 0.0] {
+                    for reversed in [false, true] {
+                        let ordered = if reversed {
+                            scorers.iter().rev().cloned().collect()
+                        } else {
+                            scorers.clone()
+                        };
+                        let (trace, states, _) =
+                            check_scheduled_thresholds(ordered, 2048, initial, &schedule);
+                        assert_eq!(trace.first().unwrap().0, 0);
+                        assert_eq!(trace.last().unwrap().0, 1800);
+                        for count in [0, 1, 2, 3, num_terms] {
+                            assert!(states.iter().any(|state| state.2 == count), "{states:?}");
+                        }
+                        for &bound in &bounds {
+                            assert!(states.iter().any(|state| state.1 == bound.to_bits()));
+                        }
+                        let last = states.last().unwrap();
+                        assert_eq!(last.1, Score::INFINITY.to_bits());
+                        assert_eq!(last.4, num_terms);
+                        assert!(states.len() > num_terms.min(10));
+                    }
+                }
+                for initial in [Score::INFINITY, Score::NAN] {
+                    assert!(check(scorers.clone(), 2048, initial, 0).is_empty());
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn cached_certificate_survives_density_rejection_widening_and_rejection_again() {
+        let norms = vec![1; 4096];
+        let weak: Vec<_> = (0..300).map(|i| (1 + 10 * i, 1)).collect();
+        let high_cost: Vec<_> = (0..200).map(|doc| (doc, 1)).collect();
+        let driver: Vec<_> = std::iter::once((0, 1))
+            .chain((0..128).map(|i| (2000 + 15 * i, 1)))
+            .collect();
+        let tiny = [(0, 1), (3999, 1)];
+        let scorers = vec![
+            fixture(&weak, &norms, 0.01),
+            fixture(&high_cost, &norms, 0.02),
+            fixture(&driver, &norms, 1.0),
+            fixture(&tiny, &norms, 0.001),
+        ];
+        let (trace, states, choices) =
+            check_scheduled_thresholds(scorers, 4096, 0.04, &[(3800, 0.07)]);
+        assert_eq!(trace.first().unwrap().0, 0);
+        assert_eq!(trace.last().unwrap().0, 3905);
+        let rejected = choices
+            .iter()
+            .position(|&(_, certified, effective, cost)| {
+                certified == 1 && effective == 0 && cost == 200
+            })
+            .unwrap();
+        let widened = choices
+            .iter()
+            .position(|&(_, certified, effective, cost)| {
+                certified == 1 && effective == 1 && cost == 129
+            })
+            .unwrap();
+        let rejected_again = choices
+            .iter()
+            .position(|&(_, certified, effective, cost)| {
+                certified == 3 && effective == 0 && cost == 129
+            })
+            .unwrap();
+        assert!(
+            rejected < widened && widened < rejected_again,
+            "{choices:?}"
+        );
+        assert!(states.iter().any(|state| state.2 == 3));
+        assert_eq!(states.last().unwrap().4, 3);
     }
 
     #[test]
