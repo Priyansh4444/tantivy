@@ -10,6 +10,26 @@ use crate::query::bm25::{Bm25Weight, NativeInputEnvelope, NativeSelectionContext
 use crate::query::{Explanation, Scorer};
 use crate::{DocId, Score};
 
+/// Query-owned fixed scratch. Scores belong to the emitted docs even after
+/// the term cursor has moved to its authoritative first unread document.
+pub(crate) struct ScoredTermBatch {
+    pub(crate) docs: [DocId; crate::postings::compression::COMPRESSION_BLOCK_SIZE],
+    pub(crate) scores: [Score; crate::postings::compression::COMPRESSION_BLOCK_SIZE],
+    freqs: [u32; crate::postings::compression::COMPRESSION_BLOCK_SIZE],
+    norms: [Score; crate::postings::compression::COMPRESSION_BLOCK_SIZE],
+}
+
+impl ScoredTermBatch {
+    pub(crate) fn new() -> Self {
+        Self {
+            docs: [0; crate::postings::compression::COMPRESSION_BLOCK_SIZE],
+            scores: [0.0; crate::postings::compression::COMPRESSION_BLOCK_SIZE],
+            freqs: [0; crate::postings::compression::COMPRESSION_BLOCK_SIZE],
+            norms: [0.0; crate::postings::compression::COMPRESSION_BLOCK_SIZE],
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct TermScorer {
     postings: SegmentPostings,
@@ -28,6 +48,25 @@ enum TermBlockBounds {
 }
 
 impl TermScorer {
+    pub(crate) fn fill_scored_batch(
+        &mut self,
+        floor: DocId,
+        up_to: DocId,
+        batch: &mut ScoredTermBatch,
+    ) -> usize {
+        let len =
+            self.postings
+                .read_postings_batch(floor, up_to, &mut batch.docs, &mut batch.freqs);
+        self.similarity_weight.score_batch(
+            &self.fieldnorm_reader,
+            &batch.docs[..len],
+            &batch.freqs[..len],
+            &mut batch.norms[..len],
+            &mut batch.scores[..len],
+        );
+        len
+    }
+
     pub(crate) fn contains_doc_for_count(&mut self, target: DocId) -> bool {
         self.postings.contains_doc_for_count(target)
     }

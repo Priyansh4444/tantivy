@@ -23,6 +23,51 @@ pub struct SegmentPostings {
 }
 
 impl SegmentPostings {
+    /// Consume at most one decoded block suffix below `up_to`. This method owns
+    /// `cur`, including reconciliation after a shallow block selection. The
+    /// cursor is left on the first unread doc, just like repeated `advance`.
+    pub(crate) fn read_postings_batch(
+        &mut self,
+        floor: DocId,
+        up_to: DocId,
+        docs: &mut [DocId; COMPRESSION_BLOCK_SIZE],
+        freqs: &mut [u32; COMPRESSION_BLOCK_SIZE],
+    ) -> usize {
+        debug_assert!(floor <= up_to);
+        if !self.block_cursor.block_is_loaded() || self.doc() < floor {
+            // Ordinary seek may return an old decoded doc without loading a
+            // shallow-selected block. Reconcile through the block owner here.
+            self.cur = self.block_cursor.seek(floor.max(self.doc()));
+        }
+        if self.doc() >= up_to || self.doc() == TERMINATED {
+            return 0;
+        }
+        let start = self.cur;
+        let block_len = self.block_cursor.block_len();
+        let end =
+            start + self.block_cursor.docs()[start..block_len].partition_point(|&doc| doc < up_to);
+        let len = end - start;
+        docs[..len].copy_from_slice(&self.block_cursor.docs()[start..end]);
+        if matches!(
+            self.block_cursor.freq_reading_option(),
+            crate::postings::FreqReadingOption::ReadFreq
+        ) {
+            freqs[..len].copy_from_slice(&self.block_cursor.freqs()[start..end]);
+        } else {
+            // The scalar frequency decoder is prefilled with ones, but its
+            // public slice can be empty when frequencies were not decoded.
+            freqs[..len].fill(1);
+        }
+        if end == COMPRESSION_BLOCK_SIZE {
+            self.cur = 0;
+            self.block_cursor.advance();
+        } else {
+            // A partial block's first padding slot contains TERMINATED.
+            self.cur = end;
+        }
+        len
+    }
+
     fn current_position_read_offset(&mut self) -> u64 {
         let block_offset = self.block_cursor.position_offset();
         let (start, prefix) = match self.position_prefix {
@@ -496,6 +541,159 @@ mod tests {
     use crate::postings::postings::Postings;
     use crate::schema::{IndexRecordOption, Schema, Term, TEXT};
     use crate::{doc, DocId, Index};
+
+    #[test]
+    fn batch_cursor_matches_literal_postings_across_blocks_and_tails() {
+        use crate::postings::compression::COMPRESSION_BLOCK_SIZE;
+        for length in [1, 127, 128, 129, 255, 256, 257] {
+            for gap in [1, 3, 97] {
+                let literal: Vec<_> = (0..length).map(|i| (i * gap, 1 + i % 11)).collect();
+                for basic in [false, true] {
+                    let mut postings = if basic {
+                        SegmentPostings::create_from_docs(
+                            &literal.iter().map(|&(doc, _)| doc).collect::<Vec<_>>(),
+                        )
+                    } else {
+                        SegmentPostings::create_from_docs_and_tfs(&literal, None)
+                    };
+                    let mut docs = [0; COMPRESSION_BLOCK_SIZE];
+                    let mut freqs = [0; COMPRESSION_BLOCK_SIZE];
+                    let mut calls = 0;
+                    while postings.doc() != TERMINATED {
+                        let floor = postings.doc() + (calls % 3);
+                        let up_to = floor + [1, 128, 129, 513][calls as usize % 4];
+                        // Exercise the unloaded shallow state separately from
+                        // ordinary seek's next-doc shortcut.
+                        if calls % 2 == 0 {
+                            postings.block_cursor.seek_block(floor);
+                        }
+                        let before = literal.partition_point(|&(doc, _)| doc < floor);
+                        let len = postings.read_postings_batch(floor, up_to, &mut docs, &mut freqs);
+                        let available = literal[before..]
+                            .iter()
+                            .take_while(|&&(doc, _)| doc < up_to)
+                            .count();
+                        assert!(len <= available && len <= COMPRESSION_BLOCK_SIZE);
+                        assert_eq!(len == 0, available == 0);
+                        for i in 0..len {
+                            assert_eq!(docs[i], literal[before + i].0);
+                            assert_eq!(freqs[i], if basic { 1 } else { literal[before + i].1 });
+                        }
+                        let next = literal
+                            .get(before + len)
+                            .map_or(TERMINATED, |&(doc, _)| doc);
+                        assert_eq!(postings.doc(), next);
+                        if next != TERMINATED {
+                            assert_eq!(
+                                postings.term_freq(),
+                                if basic { 1 } else { literal[before + len].1 }
+                            );
+                            // Mix scalar moves with later batch calls.
+                            if calls % 3 == 1 {
+                                let after = literal
+                                    .get(before + len + 1)
+                                    .map_or(TERMINATED, |&(doc, _)| doc);
+                                assert_eq!(postings.advance(), after);
+                            }
+                        }
+                        calls += 1;
+                        assert!(calls <= length * 2 + 1);
+                    }
+                    assert_eq!(
+                        postings.read_postings_batch(TERMINATED, TERMINATED, &mut docs, &mut freqs),
+                        0
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn batch_then_scalar_reads_preserve_positions_and_skipfreq() -> crate::Result<()> {
+        use crate::postings::compression::COMPRESSION_BLOCK_SIZE;
+        let mut schema = Schema::builder();
+        let field = schema.add_text_field("text", TEXT);
+        let index = Index::create_in_ram(schema.build());
+        let mut writer = index.writer_for_tests()?;
+        let texts = ["x", "x z x", "z x z x z x", "z z x x"];
+        let expected = [&[0][..], &[0, 2], &[1, 3, 5], &[2, 3]];
+        for doc in 0..300 {
+            writer.add_document(doc!(field => texts[doc % 4]))?;
+        }
+        writer.commit()?;
+        let searcher = index.reader()?.searcher();
+        let inverted = searcher.segment_reader(0).inverted_index(field)?;
+        let term = Term::from_field_text(field, "x");
+        for option in [
+            IndexRecordOption::WithFreqsAndPositions,
+            IndexRecordOption::Basic,
+        ] {
+            let mut postings = inverted.read_postings(&term, option)?.unwrap();
+            let mut docs = [0; COMPRESSION_BLOCK_SIZE];
+            let mut freqs = [0; COMPRESSION_BLOCK_SIZE];
+            let check = |postings: &mut SegmentPostings| {
+                let doc = postings.doc();
+                if doc != TERMINATED {
+                    let mut positions = Vec::new();
+                    postings.positions(&mut positions);
+                    if option == IndexRecordOption::WithFreqsAndPositions {
+                        assert_eq!(positions, expected[doc as usize % 4]);
+                    }
+                    assert_eq!(
+                        postings.term_freq(),
+                        if option == IndexRecordOption::Basic {
+                            1
+                        } else {
+                            expected[doc as usize % 4].len() as u32
+                        }
+                    );
+                }
+            };
+            check(&mut postings);
+            assert_eq!(
+                postings.read_postings_batch(0, 127, &mut docs, &mut freqs),
+                127
+            );
+            assert_eq!(postings.doc(), 127);
+            check(&mut postings);
+            assert_eq!(postings.advance(), 128);
+            check(&mut postings);
+            // Move only the skip selection into the tail, leaving decoded doc
+            // 128 stale. Batch reconciliation must own the real load/cur move.
+            let mut deferred = postings.clone();
+            deferred.block_cursor.seek_block(260);
+            assert_eq!(deferred.doc(), 128);
+            assert!(!deferred.block_cursor.block_is_loaded());
+            assert_eq!(
+                deferred.read_postings_batch(260, 270, &mut docs, &mut freqs),
+                10
+            );
+            assert_eq!(deferred.doc(), 270);
+            check(&mut deferred);
+            assert_eq!(
+                postings.read_postings_batch(128, 256, &mut docs, &mut freqs),
+                128
+            );
+            assert_eq!(postings.doc(), 256);
+            check(&mut postings);
+            assert_eq!(postings.seek(270), 270);
+            check(&mut postings);
+            // A partial tail batch must retain the first unread positions.
+            postings.block_cursor.seek_block(280);
+            assert_eq!(
+                postings.read_postings_batch(280, 290, &mut docs, &mut freqs),
+                10
+            );
+            assert_eq!(postings.doc(), 290);
+            check(&mut postings);
+            assert_eq!(
+                postings.read_postings_batch(290, 300, &mut docs, &mut freqs),
+                10
+            );
+            assert_eq!(postings.doc(), TERMINATED);
+        }
+        Ok(())
+    }
 
     #[test]
     fn test_empty_segment_postings() {

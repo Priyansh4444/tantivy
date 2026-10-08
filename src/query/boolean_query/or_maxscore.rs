@@ -1,5 +1,5 @@
 use crate::query::score_combiner::{ScoreSumUpperBound, SumCombiner};
-use crate::query::term_query::TermScorer;
+use crate::query::term_query::{ScoredTermBatch, TermScorer};
 use crate::query::weight::for_each_pruning_scorer;
 use crate::query::{BufferedUnionScorer, Scorer};
 use crate::{DocId, DocSet, Score, TERMINATED};
@@ -29,6 +29,20 @@ impl ClauseState {
         self.assert_coherent(scorers);
     }
 
+    fn fill_scored_batch(
+        &mut self,
+        scorers: &mut [TermScorer],
+        floor: DocId,
+        up_to: DocId,
+        batch: &mut ScoredTermBatch,
+    ) -> usize {
+        self.assert_coherent(scorers);
+        let len = scorers[self.ordinal].fill_scored_batch(floor, up_to, batch);
+        self.doc = scorers[self.ordinal].doc();
+        self.assert_coherent(scorers);
+        len
+    }
+
     #[inline]
     fn advance(&mut self, scorers: &mut [TermScorer]) {
         self.assert_coherent(scorers);
@@ -44,6 +58,8 @@ type RegionChoice = (DocId, usize, usize, u64);
 thread_local! {
     // Test-only region evidence; no observer or counter exists in release.
     static GLOBAL_CHOICES: std::cell::RefCell<Option<Vec<RegionChoice>>> =
+        const { std::cell::RefCell::new(None) };
+    static BATCH_LENGTHS: std::cell::RefCell<Option<Vec<usize>>> =
         const { std::cell::RefCell::new(None) };
 }
 
@@ -97,6 +113,7 @@ pub(crate) fn or_maxscore(
     // next optional clause is included. No bound is formed by subtraction.
     let mut prefix = vec![0.0f64; num_terms + 1];
     let mut contributions = vec![0.0; num_terms];
+    let mut batch = ScoredTermBatch::new();
     let mut lo = clauses
         .iter()
         .map(|clause| clause.doc)
@@ -220,24 +237,57 @@ pub(crate) fn or_maxscore(
                 clause.seek(&mut scorers, lo);
             }
         }
+        // The buffered phase retains the current certified partition. Cursor
+        // docs always mean first unread; batch docs own the replay candidates.
+        let single_essential = num_terms - first_essential == 1;
+        let mut batch_len = 0;
+        let mut batch_index = 0;
         loop {
-            let doc = clauses[first_essential..]
-                .iter()
-                .map(|clause| clause.doc)
-                .min()
-                .unwrap_or(TERMINATED);
+            let doc = if single_essential {
+                if batch_index == batch_len {
+                    batch_len = clauses[first_essential].fill_scored_batch(
+                        &mut scorers,
+                        lo,
+                        hi,
+                        &mut batch,
+                    );
+                    batch_index = 0;
+                    #[cfg(test)]
+                    BATCH_LENGTHS.with(|lengths| {
+                        if let Some(lengths) = lengths.borrow_mut().as_mut() {
+                            lengths.push(batch_len);
+                        }
+                    });
+                    if batch_len == 0 {
+                        break;
+                    }
+                }
+                batch.docs[batch_index]
+            } else {
+                clauses[first_essential..]
+                    .iter()
+                    .map(|clause| clause.doc)
+                    .min()
+                    .unwrap_or(TERMINATED)
+            };
             if doc >= hi {
                 break;
             }
             contributions.fill(0.0);
             let mut known = 0.0f64;
-            for clause in &clauses[first_essential..] {
-                if clause.doc == doc {
-                    clause.assert_coherent(&scorers);
-                    let leaf = scorers[clause.ordinal].score();
-                    clause.assert_coherent(&scorers);
-                    contributions[clause.ordinal] = leaf;
-                    known += f64::from(leaf);
+            if single_essential {
+                let leaf = batch.scores[batch_index];
+                contributions[clauses[first_essential].ordinal] = leaf;
+                known = f64::from(leaf);
+            } else {
+                for clause in &clauses[first_essential..] {
+                    if clause.doc == doc {
+                        clause.assert_coherent(&scorers);
+                        let leaf = scorers[clause.ordinal].score();
+                        clause.assert_coherent(&scorers);
+                        contributions[clause.ordinal] = leaf;
+                        known += f64::from(leaf);
+                    }
                 }
             }
             let mut competitive = true;
@@ -269,9 +319,13 @@ pub(crate) fn or_maxscore(
                     threshold = next_threshold;
                 }
             }
-            for clause in &mut clauses[first_essential..] {
-                if clause.doc == doc {
-                    clause.advance(&mut scorers);
+            if single_essential {
+                batch_index += 1;
+            } else {
+                for clause in &mut clauses[first_essential..] {
+                    if clause.doc == doc {
+                        clause.advance(&mut scorers);
+                    }
                 }
             }
         }
@@ -344,6 +398,77 @@ mod tests {
         });
         assert_eq!(actual, expected, "threshold={threshold:?} limit={limit}");
         actual
+    }
+
+    #[test]
+    fn single_driver_batches_replay_every_dynamic_threshold_exactly() {
+        let norms = vec![1; 4096];
+        let weak: Vec<_> = (0..4096).map(|doc| (doc, 1)).collect();
+        let driver: Vec<_> = (0..257)
+            .map(|i| {
+                (
+                    i * 4,
+                    match i {
+                        33 => 10,
+                        240 => 30,
+                        _ => 1,
+                    },
+                )
+            })
+            .collect();
+        let scorers = vec![
+            fixture(&weak, &norms, 0.001),
+            fixture(&driver, &norms, 1.0),
+            fixture(&weak, &norms, 0.002),
+        ];
+        BATCH_LENGTHS.with(|lengths| *lengths.borrow_mut() = Some(Vec::new()));
+        let accepted = check(scorers.clone(), 4096, 0.1, 1);
+        let lengths = BATCH_LENGTHS.with(|lengths| lengths.borrow_mut().take().unwrap());
+        assert!(
+            lengths.contains(&128),
+            "must exercise a full buffered block"
+        );
+        assert_eq!(
+            accepted.iter().map(|&(doc, _)| doc).collect::<Vec<_>>(),
+            [0, 132, 960]
+        );
+        check(scorers.clone(), 4096, 0.1, 0);
+        check(scorers.clone(), 4096, 0.1, 10);
+        // Model collector-owned deletions: rejected early winners must leave
+        // the callback threshold unchanged for the next buffered candidate.
+        let with_deletions = |buffered: bool| {
+            let mut accepted = Vec::new();
+            let mut current = 0.1;
+            let mut callback = |doc, score: Score| {
+                accepted.push((doc, score.to_bits()));
+                if doc != 0 && doc != 132 {
+                    current = score;
+                }
+                current
+            };
+            if buffered {
+                or_maxscore(scorers.clone(), 4096, 0.1, &mut callback);
+            } else {
+                let mut union =
+                    BufferedUnionScorer::build(scorers.clone(), SumCombiner::default, 4096);
+                for_each_pruning_scorer(&mut union, 0.1, &mut callback);
+            }
+            accepted
+        };
+        let deletion_trace = with_deletions(true);
+        assert_eq!(deletion_trace, with_deletions(false));
+        assert_eq!(
+            deletion_trace
+                .iter()
+                .map(|&(doc, _)| doc)
+                .collect::<Vec<_>>(),
+            [0, 4, 132, 960]
+        );
+        eprintln!(
+            "OR_BATCH_LAYOUT batch={} max_array_payload={}",
+            std::mem::size_of::<ScoredTermBatch>(),
+            36 * 32 + 8 + std::mem::size_of::<ScoredTermBatch>()
+        );
     }
 
     #[test]

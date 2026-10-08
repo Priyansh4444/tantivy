@@ -570,6 +570,38 @@ impl Bm25Weight {
         self.score_with_frequency(fieldnorm_id, term_freq as Score)
     }
 
+    /// Gather the cached normalization components first, then evaluate the
+    /// literal scalar scoring expression in an independent arithmetic loop.
+    pub(crate) fn score_batch(
+        &self,
+        fieldnorms: &FieldNormReader,
+        docs: &[crate::DocId],
+        freqs: &[u32],
+        norms: &mut [Score],
+        scores: &mut [Score],
+    ) {
+        debug_assert_eq!(docs.len(), freqs.len());
+        debug_assert_eq!(docs.len(), norms.len());
+        debug_assert_eq!(docs.len(), scores.len());
+        for (norm, &doc) in norms.iter_mut().zip(docs) {
+            *norm = self.cache[fieldnorms.fieldnorm_id(doc) as usize];
+        }
+        match self.scoring {
+            Bm25Scoring::LegacyClassic => {
+                for ((score, &freq), &norm) in scores.iter_mut().zip(freqs).zip(norms.iter()) {
+                    let frequency = freq as Score;
+                    *score = self.weight * (frequency / (frequency + norm));
+                }
+            }
+            Bm25Scoring::NativeLucene => {
+                for ((score, &freq), &norm) in scores.iter_mut().zip(freqs).zip(norms.iter()) {
+                    let frequency = freq as Score;
+                    *score = self.weight - self.weight / (1.0 + frequency * norm);
+                }
+            }
+        }
+    }
+
     /// Score a fractional phrase frequency without rounding its distance weights.
     #[inline]
     pub(crate) fn score_with_frequency(&self, fieldnorm_id: u8, frequency: Score) -> Score {
@@ -814,6 +846,51 @@ impl Bm25Weight {
 mod tests {
     use super::{idf, Bm25Weight};
     use crate::{assert_nearly_equals, Score};
+
+    #[test]
+    fn batch_leaves_match_literal_scalar_bits_for_all_norm_ids() {
+        use crate::fieldnorm::FieldNormReader;
+        use crate::query::{Bm25Parameters, Explanation};
+        let norms: Vec<_> = (0..=u8::MAX)
+            .map(FieldNormReader::id_to_fieldnorm)
+            .collect();
+        let reader = FieldNormReader::for_test(&norms);
+        let docs: Vec<_> = (0..256).collect();
+        for doc in 0..256 {
+            assert_eq!(reader.fieldnorm_id(doc), doc as u8);
+        }
+        for parameters in [
+            Bm25Parameters::DEFAULT,
+            Bm25Parameters::new(0.9, 0.4).unwrap(),
+            Bm25Parameters::new(2.0, 1.0).unwrap(),
+        ] {
+            for native in [false, true] {
+                for boost in [0.0, 1.0, 3.25, -2.0] {
+                    let explanation = Explanation::new("idf", 1.234567);
+                    let weight = if native {
+                        Bm25Weight::new_native_with_parameters(explanation, 100.0, parameters)
+                    } else {
+                        Bm25Weight::new_with_parameters(explanation, 100.0, parameters)
+                    }
+                    .boost_by(boost);
+                    for freq in [1, 7, 128, 16_777_217, u32::MAX] {
+                        let freqs = vec![freq; docs.len()];
+                        let mut gathered = vec![0.0; docs.len()];
+                        let mut scores = vec![0.0; docs.len()];
+                        weight.score_batch(&reader, &docs, &freqs, &mut gathered, &mut scores);
+                        for (&doc, &actual) in docs.iter().zip(&scores) {
+                            let expected = weight.score(reader.fieldnorm_id(doc), freq);
+                            assert_eq!(
+                                actual.to_bits(),
+                                expected.to_bits(),
+                                "native={native} doc={doc} freq={freq} boost={boost}"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     #[test]
     fn native_policy_keeps_old_pairs_untrusted_and_global_bound_conservative() {

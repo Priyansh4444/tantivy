@@ -3,6 +3,7 @@ mod term_scorer;
 mod term_weight;
 
 pub use self::term_query::TermQuery;
+pub(crate) use self::term_scorer::ScoredTermBatch;
 pub use self::term_scorer::TermScorer;
 #[cfg(test)]
 mod tests {
