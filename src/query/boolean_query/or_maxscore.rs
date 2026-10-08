@@ -1,4 +1,4 @@
-use crate::query::score_combiner::{ScoreSumUpperBound, SumCombiner};
+use crate::query::score_combiner::{SmallScoreSumUpperBound, SumCombiner};
 use crate::query::term_query::{ScoredTermBatch, TermScorer};
 use crate::query::weight::for_each_pruning_scorer;
 use crate::query::{BufferedUnionScorer, Scorer};
@@ -88,7 +88,10 @@ pub(crate) fn or_maxscore(
     }
 
     let num_terms = scorers.len();
-    let upper_bound = ScoreSumUpperBound::new(num_terms);
+    // Numeric admission above certifies finite nonnegative f32 leaves. Every
+    // prefix/probe sum contains at most the admitted number of original terms.
+    let upper_bound =
+        SmallScoreSumUpperBound::new(num_terms).expect("admitted 3..=32-term score sum");
     let mut clauses: Vec<ClauseState> = scorers
         .iter()
         .enumerate()

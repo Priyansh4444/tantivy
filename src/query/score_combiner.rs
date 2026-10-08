@@ -124,6 +124,35 @@ impl ScoreSumUpperBound {
     }
 }
 
+/// The same rounded bound for an admitted 3..=32-term nonnegative score sum.
+/// Keep the generic helper for signed, exceptional, and unrestricted callers.
+pub(crate) struct SmallScoreSumUpperBound {
+    factor: f64,
+}
+
+impl SmallScoreSumUpperBound {
+    pub(crate) fn new(num_terms: usize) -> Option<Self> {
+        if !(3..=32).contains(&num_terms) {
+            return None;
+        }
+        let factor = ScoreSumUpperBound::new(num_terms).factor;
+        debug_assert!(factor.is_finite() && factor > 1.0 && factor < 2.0);
+        Some(Self { factor })
+    }
+
+    /// `sum` must be finite, nonnegative, and at most 32 * f32::MAX. The admitted
+    /// term caller establishes this domain before any cursor movement.
+    #[inline]
+    pub(crate) fn score(&self, sum: f64) -> Score {
+        debug_assert!(sum.is_finite() && sum >= 0.0 && sum <= 32.0 * f64::from(Score::MAX));
+        let inflated = sum * self.factor;
+        // Positive finite products use exactly the next_up bit successor.
+        // For either signed zero, this instead produces the corresponding
+        // signed least subnormal f64; its f32 cast preserves the zero bits.
+        f64::from_bits(inflated.to_bits() + 1) as Score
+    }
+}
+
 /// Take max score of different scorers
 /// and optionally sum it with other matches multiplied by `tie_breaker`
 #[derive(Default, Clone, Copy)]
@@ -164,7 +193,132 @@ impl ScoreCombiner for DisjunctionMaxCombiner {
 
 #[cfg(test)]
 mod tests {
-    use super::ScoreSumUpperBound;
+    use super::{ScoreSumUpperBound, SmallScoreSumUpperBound};
+
+    fn check_small_bound(generic: &ScoreSumUpperBound, small: &SmallScoreSumUpperBound, sum: f64) {
+        assert_eq!(
+            small.score(sum).to_bits(),
+            generic.score(sum).to_bits(),
+            "sum={sum:?} sum_bits={:#018x}",
+            sum.to_bits()
+        );
+    }
+
+    #[test]
+    fn small_score_sum_bound_matches_generic_at_cast_boundaries() {
+        for unsupported in [0, 1, 2, 33, usize::MAX] {
+            assert!(SmallScoreSumUpperBound::new(unsupported).is_none());
+        }
+        let leaf_bits = [
+            0,
+            1,
+            2,
+            0x007f_fffe,
+            0x007f_ffff,
+            0x0080_0000,
+            0x0080_0001,
+            0x3f7f_ffff,
+            0x3f80_0000,
+            0x3f80_0001,
+            0x7f7f_fffe,
+            0x7f7f_ffff,
+        ];
+        for count in 3..=32 {
+            let generic = ScoreSumUpperBound::new(count);
+            let small = SmallScoreSumUpperBound::new(count).unwrap();
+            assert_eq!(small.factor.to_bits(), generic.factor.to_bits());
+            // Distinguish both signs: numeric equality alone would miss drift.
+            check_small_bound(&generic, &small, 0.0);
+            check_small_bound(&generic, &small, -0.0);
+            assert_eq!(small.score(0.0).to_bits(), 0.0f32.to_bits());
+            assert_eq!(small.score(-0.0).to_bits(), (-0.0f32).to_bits());
+            check_small_bound(
+                &generic,
+                &small,
+                f64::from(u32::try_from(count).unwrap()) * f64::from(f32::MAX),
+            );
+            for bits in leaf_bits {
+                let leaf = f32::from_bits(bits);
+                check_small_bound(&generic, &small, f64::from(leaf));
+                // The final finite-to-infinite f32 cast boundary has the same
+                // half-ULP tie as the adjacent finite representable values.
+                let midpoint = if leaf == f32::MAX {
+                    f64::from(leaf) + 2.0f64.powi(103)
+                } else {
+                    (f64::from(leaf) + f64::from(leaf.next_up())) * 0.5
+                };
+                // Reverse the unchanged factor to put products around each
+                // f32 midpoint, then probe neighboring representable inputs.
+                // The first midpoint also checks f32 cast underflow to zero.
+                let input = midpoint / generic.factor;
+                let mut below = input;
+                let mut above = input;
+                for _ in 0..4 {
+                    below = below.next_down();
+                    above = above.next_up();
+                }
+                for sum in [below, input.next_down(), input, input.next_up(), above] {
+                    check_small_bound(&generic, &small, sum);
+                }
+                // Also prove both sides of the cast boundary were exercised,
+                // including zero/subnormal and maximum/infinity transitions.
+                assert_eq!(small.score(below).to_bits(), leaf.to_bits());
+                assert_eq!(small.score(above).to_bits(), leaf.next_up().to_bits());
+            }
+            // Exceptional/signed values keep the generic conservative route.
+            for sum in [-1.0, f64::NEG_INFINITY, f64::INFINITY, f64::NAN] {
+                assert_eq!(generic.score(sum), f32::INFINITY);
+            }
+        }
+        assert_eq!(
+            ScoreSumUpperBound::new(2).score(3.0).to_bits(),
+            3.0f32.to_bits()
+        );
+    }
+
+    #[test]
+    fn small_score_sum_bound_matches_generic_for_disjoint_leaf_sums() {
+        for count in 3..=32 {
+            let generic = ScoreSumUpperBound::new(count);
+            let small = SmallScoreSumUpperBound::new(count).unwrap();
+            for seed in 0..256u64 {
+                let mut state = seed + 1;
+                let leaves: Vec<_> = (0..count)
+                    .map(|_| {
+                        state = state.wrapping_mul(6364136223846793005).wrapping_add(1);
+                        let bits = u32::try_from(state >> 32).unwrap() % 0x7f80_0000;
+                        f32::from_bits(bits)
+                    })
+                    .collect();
+                let mut prefix = 0.0f64;
+                // Every split mirrors disjoint known leaves plus a remaining
+                // inclusive prefix, retaining the original count's allowance.
+                for split in 0..=count {
+                    let mut known = 0.0f64;
+                    for &leaf in leaves[split..].iter().rev() {
+                        known += f64::from(leaf);
+                    }
+                    check_small_bound(&generic, &small, prefix);
+                    check_small_bound(&generic, &small, known + prefix);
+                    if split < count {
+                        prefix += f64::from(leaves[split]);
+                    }
+                }
+            }
+        }
+        // Adversarial incoming orders straddle a normal f32 tie even though
+        // every leaf is itself exactly representable in f32.
+        let leaves = [1.0f32, 2.0f32.powi(-24), 2.0f32.powi(-53), 2.0f32.powi(-53)];
+        let generic = ScoreSumUpperBound::new(leaves.len());
+        let small = SmallScoreSumUpperBound::new(leaves.len()).unwrap();
+        for order in [[0, 1, 2, 3], [2, 3, 1, 0], [1, 0, 3, 2]] {
+            let mut sum = 0.0f64;
+            for index in order {
+                sum += f64::from(leaves[index]);
+            }
+            check_small_bound(&generic, &small, sum);
+        }
+    }
 
     #[test]
     fn score_sum_bound_covers_double_order_error_at_float_midpoint() {
